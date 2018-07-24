@@ -45,7 +45,7 @@ ksreg=0
 notKick=[]
 
 localtime = time.asctime(time.localtime(time.time()))
-log=open("../../../../../repo/yuuki-status","a+")
+log=open("yuuki-status","a+")
 log.write("<br>"+localtime+": Start")
 for gi in syb._getGroupIdsInvited():
   syb._acceptGroupInvitation(gi)
