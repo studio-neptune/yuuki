@@ -26,7 +26,7 @@ It was used the edited version of [carpedm20/LINE](https://github.com/carpedm20/
 You need the "LINE  Unofficial  API Python Core" only. (Ex:[olsb](https://github.com/star-inc/olsb_cores),  [akad](https://pypi.org/project/akad), [curve](https://pypi.org/project/curve) ...)
 
 ## Old Version
-Maybe you want the history version of SYB. Click [it](https://github.com/star-inc/star_yuuki_bot/releases/tag/old_versions).
+Maybe you want the history version of SYB. Click [it](https://github.com/star-inc/star_yuuki_bot/releases/tag/old-versions).
 
 ## Usage
     python main.py
