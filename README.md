@@ -1,6 +1,6 @@
 Star Yuuki(pYthon) BOT - Yuuki
 ==================
-![Version](https://img.shields.io/badge/v6.3.2-OpenSource-%233FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-%20%09%23FF8800.svg) ![Python](https://img.shields.io/badge/python-2.x-%230066FF.svg)
+![Version](https://img.shields.io/badge/v6.3.2-OpenSource-33FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-%20%09%23FF8800.svg) ![Python](https://img.shields.io/badge/python-2.x-%230066FF.svg)
 
 A LINE Unofficial API  Python BOT by SA Kingdom and Star Inc.
 ![ICON](logo.png)
