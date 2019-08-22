@@ -28,8 +28,6 @@ class Yuuki_Connection:
         "User-Agent": ""
     }
 
-
-
 class YuukiConnect:
     def __init__(self, Yuuki_Connection):
 
@@ -38,6 +36,9 @@ class YuukiConnect:
         self.poll_path = Yuuki_Connection.connectInfo["LongPoll_path"]
 
         self.con_header = Yuuki_Connection.connectHeader
+
+        self.helper = []
+        self.helper_ids = []
 
     def connect(self):
         transport = THttpClient.THttpClient(self.host + self.com_path)
@@ -56,3 +57,23 @@ class YuukiConnect:
         transport_in.open()
 
         return client, listen
+
+    def helperConnect(self, LINE_ACCESS_KEY):
+        helper_ConnectHeader = self.con_header
+        helper_ConnectHeader["X-Line-Access"] = LINE_ACCESS_KEY
+
+        transport = THttpClient.THttpClient(self.host + self.com_path)
+        transport.setCustomHeaders(helper_ConnectHeader)
+        protocol = TCompactProtocol.TCompactProtocol(transport)
+        client = Client(protocol)
+        transport.open()
+
+        try:
+            profile = client.getProfile()
+
+            self.helper.append(client)
+            self.helper_ids.append(profile.mid)
+
+            return True
+        except:
+            print("Error:\n%s\nNot Acceptable\n" % (LINE_ACCESS_KEY,))

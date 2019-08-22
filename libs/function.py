@@ -9,21 +9,24 @@ from libs.core.TalkService import *
 from .connection import YuukiConnect
 
 class Yuuki:
-    def __init__(self, Seq, Yuuki_Connection, Accounts, Admin=[]):
+    def __init__(self, Seq, Yuuki_Connection, helper_LINE_ACCESS_KEYs, Admin=[]):
         self.Seq = Seq
         self.LINE_Media_server = "https://obs.line-apps.com"
 
-        Connect = YuukiConnect(Yuuki_Connection)
+        self.Connect = YuukiConnect(Yuuki_Connection)
 
-        (self.client, self.listen) = Connect.connect()
+        (self.client, self.listen) = self.Connect.connect()
         self.connectHeader = Yuuki_Connection.connectHeader
+
+        for access in helper_LINE_ACCESS_KEYs:
+            self.Connect.helperConnect(access)
 
         self.MyMID = self.client.getProfile().mid
 
     def exit(restart=False):
         if restart:
             Catched = open(".cache.sh", "w")
-            Catched.write(sys.executable + " ./bot.py")
+            Catched.write(sys.executable + " ./main.py")
             Catched.close()
             os.system("sh .cache.sh")
             os.system("rm .cache.sh")

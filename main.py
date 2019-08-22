@@ -31,9 +31,9 @@ Connection.connectHeader = {
 }
 
 Seq = 0
-Accounts = []
+helper_LINE_ACCESS_KEYs = []
 
-Console = Yuuki(Seq, Connection, Accounts, Admin)
+Console = Yuuki(Seq, Connection, helper_LINE_ACCESS_KEYs, Admin)
 Console.cleanMyGroupInvitations()
 
 ##############################################################
