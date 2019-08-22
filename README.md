@@ -17,8 +17,8 @@ The latest stable version is "v6.5.0".
 
 Some function of old version maybe will make your LINE account be banned.
 
-## Requires
-[!] Run with GNU/Linux only
+## Requirement
+### [!] Run with GNU/Linux only
 
 Recommand Environment:
 
