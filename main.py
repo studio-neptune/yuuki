@@ -12,7 +12,7 @@
 """
 
 Admin = [""]
-
+Language = "en"
 LINE_ACCESS_KEY = ""
 helper_LINE_ACCESS_KEYs = []
 
@@ -34,7 +34,7 @@ Connection.connectHeader = {
 }
 
 Seq = 0
-Console = Yuuki(Seq, Connection, helper_LINE_ACCESS_KEYs, Admin)
+Console = Yuuki(Seq, Connection, helper_LINE_ACCESS_KEYs, Language, Admin)
 Console.cleanMyGroupInvitations()
 
 ###########################Start!#############################
