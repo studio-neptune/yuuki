@@ -4,17 +4,20 @@
     ~~~~~~~~~~~
      This is a main program in SYB.
      It`s belong to Star Yuuki(pYthon) Bot Project of Star Neptune Bot
+
     Version: v6.5.0
+
     Copyright(c) 2019 Star Inc. All Rights Reserved.
+    The software licensed under Mozilla Public License Version 2.0
 """
 
 Admin = [""]
 
 LINE_ACCESS_KEY = ""
+helper_LINE_ACCESS_KEYs = []
 
 ########################Initializing##########################
-from libs.function import Yuuki
-from libs.connection import Yuuki_Connection
+from libs import *
 
 Connection = Yuuki_Connection()
 
@@ -31,12 +34,8 @@ Connection.connectHeader = {
 }
 
 Seq = 0
-helper_LINE_ACCESS_KEYs = []
-
 Console = Yuuki(Seq, Connection, helper_LINE_ACCESS_KEYs, Admin)
 Console.cleanMyGroupInvitations()
-
-##############################################################
 
 ###########################Start!#############################
 print("Star Yuuki BOT - Start Successful!")

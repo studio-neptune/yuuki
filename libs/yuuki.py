@@ -6,14 +6,19 @@ import os, time,\
        json, ntpath
 
 from libs.core.TalkService import *
-from .connection import YuukiConnect
+from .connection import Yuuki_Connect
+
+from .i18n import Yuuki_LangSetting
 
 class Yuuki:
-    def __init__(self, Seq, Yuuki_Connection, helper_LINE_ACCESS_KEYs, Admin=[]):
+    def __init__(self, Seq, Yuuki_Connection, helper_LINE_ACCESS_KEYs, Lang="en", Admin=[]):
         self.Seq = Seq
+        self.Admin = Admin
+        self.i18n = Yuuki_LangSetting(Lang)
+
         self.LINE_Media_server = "https://obs.line-apps.com"
 
-        self.Connect = YuukiConnect(Yuuki_Connection)
+        self.Connect = Yuuki_Connect(Yuuki_Connection)
 
         (self.client, self.listen) = self.Connect.connect()
         self.connectHeader = Yuuki_Connection.connectHeader
@@ -23,11 +28,13 @@ class Yuuki:
 
         self.MyMID = self.client.getProfile().mid
 
+        _ = self.i18n._
+        global _
+
     def exit(restart=False):
         if restart:
-            Catched = open(".cache.sh", "w")
-            Catched.write(sys.executable + " ./main.py")
-            Catched.close()
+            with open(".cache.sh", "w") as c:
+                c.write(sys.executable + " ./main.py")
             os.system("sh .cache.sh")
             os.system("rm .cache.sh")
             sys.exit(0)
@@ -170,7 +177,7 @@ class Yuuki:
                                 break
                         if not Finded:
                             Revision = self.client.getLastOpRevision()
-                    for Root in self.permission["Admin"]:
+                    for Root in self.Admin:
                         self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s" %
                                      (err1, err2, err3))
                 except:
@@ -187,9 +194,9 @@ class Yuuki:
             self.client.send_leaveRoom(self.Seq, ncMessage.message.to)
         elif ncMessage.message.contentType == ContentType.NONE:
             if 'Yuuki/mid' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), "LINE System UserID：\n" + ncMessage.message.from_)
+                self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
             elif 'Yuuki/Speed' == ncMessage.message.text:
                 Time1 = time.time()
-                self.sendText(self.sendToWho(ncMessage), "Testing...")
+                self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
-                self.sendText(self.sendToWho(ncMessage), "Speed:\n%ss" % (Time2 - Time1,))
+                self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))

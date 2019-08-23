@@ -28,7 +28,7 @@ class Yuuki_Connection:
         "User-Agent": ""
     }
 
-class YuukiConnect:
+class Yuuki_Connect:
     def __init__(self, Yuuki_Connection):
 
         self.host = Yuuki_Connection.connectInfo["Host"]

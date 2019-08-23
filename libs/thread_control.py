@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-class Thread_Control:
+import threading
+
+class Yuuki_Thread:
     def __init__(self):
-        pass
+        tasks = []
