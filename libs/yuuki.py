@@ -97,6 +97,18 @@ class Yuuki:
             contactInfo = False
         return contactInfo
 
+    def securityForWhere(self, Message):
+        if Message.type == OpType.NOTIFIED_UPDATE_GROUP:
+            return Message.param1
+        elif Message.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+            return Message.param1
+        elif Message.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+            return Message.param1
+        elif Message.type == OpType.KICKOUT_FROM_GROUP:
+            return Message.param1
+        elif Message.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+            return Message.param1
+
     def sendToWho(self, Message):
         if Message.message.toType == MIDType.USER:
             return Message.message.from_
@@ -210,7 +222,19 @@ class Yuuki:
                 KICKOUT_FROM_GROUP (18)
                 NOTIFIED_KICKOUT_FROM_GROUP (19)
         """
-        pass
+        SEGroup = self.data.getSEGroup(self.securityForWhere(ncMessage))
+
+        if SEGroup[ncMessage.type]:
+            if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
+                pass
+            elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+                pass
+            elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+                pass
+            elif ncMessage.type == OpType.KICKOUT_FROM_GROUP:
+                pass
+            elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+                pass
 
     # Main
 
