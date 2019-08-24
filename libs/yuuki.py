@@ -273,6 +273,9 @@ class Yuuki:
         GroupID = self.securityForWhere(ncMessage)
         SEGroup = self.data.getSEGroup(GroupID)
 
+        if SEGroup == None:
+            return
+
         if SEGroup[ncMessage.type]:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
                 pass
