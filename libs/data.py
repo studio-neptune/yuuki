@@ -20,7 +20,6 @@ class Yuuki_Data:
         }
 
         self.GroupType = {
-            "ID":"",
             "SEGroup":None,
             "Ext_Admin":[]
         }
@@ -118,17 +117,14 @@ class Yuuki_Data:
     def getData(self, Type):
         return self.Data[Type]
 
-    def getDataGroupID(self, DataGroup):
-        return DataGroup["ID"]
-
     def getGroup(self, GroupID):
         Groups = self.getData("Group")
         if len(Groups) > 0:
-            GroupIDs = [self.getDataGroupID(Group) for Group in Groups]
+            GroupIDs = [Group for Group in Groups]
             if GroupID not in GroupIDs:
-                Groups[GroupID] = self.DataType["Group"]
+                Groups[GroupID] = self.GroupType
         else:
-            Groups[GroupID] = self.DataType["Group"]
+            Groups[GroupID] = self.GroupType
         return Groups[GroupID]
 
     def getSEGroup(self, GroupID):
