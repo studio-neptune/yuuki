@@ -144,7 +144,8 @@ class Yuuki_Data:
 
     def getSEGroup(self, GroupID):
         SEMode = self.getGroup(GroupID)["SEGroup"]
+        SEMode_ = self.getGroup(GroupID)["SEGroup"]
         for Mode in SEMode:
             if type(Mode == str):
-                SEMode[int(Mode)] = SEMode[Mode]
-        return SEMode
+                SEMode_[int(Mode)] = SEMode[Mode]
+        return SEMode_
