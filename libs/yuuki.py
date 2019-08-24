@@ -28,8 +28,10 @@ class Yuuki:
 
         self.MyMID = self.client.getProfile().mid
 
-        _ = self.i18n._
         global _
+        _ = self.i18n._
+
+    # Basic Func
 
     def exit(restart=False):
         if restart:
@@ -66,12 +68,12 @@ class Yuuki:
             us = True
         group.members, group.invitee = None, None
         group.preventJoinByTicket = us
-        self.client.send_updateGroup(self.Seq, group)
+        self.client.updateGroup(self.Seq, group)
 
     def cleanMyGroupInvitations(self):
         for cleanInvitations in self.client.getGroupIdsInvited():
-            self.client.send_acceptGroupInvitation(self.Seq, cleanInvitations)
-            self.client.send_leaveGroup(self.Seq, cleanInvitations)
+            self.client.acceptGroupInvitation(self.Seq, cleanInvitations)
+            self.client.leaveGroup(self.Seq, cleanInvitations)
 
     def getContact(self, mid):
         if len(mid) == len(self.MyMID) and mid[0] == "u":
@@ -92,8 +94,8 @@ class Yuuki:
             return Message.message.to
 
     def sendText(self, toid, msg):
-        message = Message(to=toid, text=msg.encode('utf-8'))
-        self.client.send_sendMessage(self.Seq, message)
+        message = Message(to=toid, text=msg)
+        self.client.sendMessage(self.Seq, message)
 
     def sendUser(self, toid, mid):
         message = Message(contentType=ContentType.CONTACT,
@@ -103,7 +105,7 @@ class Yuuki:
                                 'displayName': 'LINE User',
                           },
                           to=toid)
-        self.client.send_sendMessage(self.Seq, message)
+        self.client.sendMessage(self.Seq, message)
 
     def sendMedia(self, toid, type, path):
         if os.path.exists(path):
@@ -137,7 +139,9 @@ class Yuuki:
             url = self.LINE_Media_server + '/talk/m/upload.nhn'
             r = requests.post(url, headers=self.connectHeader, data=data, files=files)
             if r.status_code != 201:
-                self.client.sendText(toid, "Error!")
+                self.sendText(toid, "Error!")
+
+    # Task
 
     def Poll(self):
         NoWork = 0
@@ -155,7 +159,7 @@ class Yuuki:
                         if ncMessage.type == OpType.RECEIVE_MESSAGE:
                             self.Commands(ncMessage)
                         elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                            self.Main(ncMessage)
+                            self.JoinGroup(ncMessage)
                         if ncMessage.reqSeq != -1:
                             Revision = max(Revision, ncMessage.revision)
                 else:
@@ -184,6 +188,21 @@ class Yuuki:
                     print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s" % (err1, err2, err3))
                     self.exit()
 
+    def JoinGroup(self, ncMessage):
+        GroupMember = []
+        if self.checkInInvitationList(ncMessage):
+            GroupID = ncMessage.param1
+            GroupInfo = self.client.getGroup(GroupID)
+            if GroupInfo.members:
+                GroupMember = [Catched.mid for Catched in GroupInfo.members]
+            self.client.acceptGroupInvitation(self.Seq, GroupID)
+            LeaveGroup = True
+            for Root in self.Admin:
+                if Root in GroupMember:
+                    LeaveGroup = False
+            if LeaveGroup:
+                self.client.leaveGroup(self.Seq, GroupID)
+
     def Main(self, ncMessage):
         pass
 
@@ -191,7 +210,7 @@ class Yuuki:
         if 'BOT_CHECK' in ncMessage.message.contentMetadata:
             pass
         elif ncMessage.message.toType == MIDType.ROOM:
-            self.client.send_leaveRoom(self.Seq, ncMessage.message.to)
+            self.client.leaveRoom(self.Seq, ncMessage.message.to)
         elif ncMessage.message.contentType == ContentType.NONE:
             if 'Yuuki/mid' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
