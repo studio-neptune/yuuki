@@ -309,6 +309,10 @@ class Yuuki:
             elif 'Yuuki/Exit' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("Exit."))
                 self.exit()
+            elif 'Yuuki/Com' == msgSep[0] and len(msgSep) != 1:
+                if ncMessage.message.from_ in self.Admin:
+                    ComMsg = self.readCommandLine(msgSep[1:len(msgSep)])
+                    self.sendText(self.sendToWho(ncMessage), str(eval(ComMsg)))
 
     def Security(self, ncMessage):
         """
