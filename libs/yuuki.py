@@ -14,12 +14,26 @@ from .data import Yuuki_Data
 
 from .i18n import Yuuki_LangSetting
 
+class Yuuki_Settings:
+    """ Yuuki Custom Settings """
+
+    config = {
+        "Seq": 0,
+        "Admin": [],
+        "Default_Language": "en",
+        "GroupMebers_Demand": 100,
+        "helper_LINE_ACCESS_KEYs": []
+    }
+
 class Yuuki:
-    def __init__(self, Seq, Yuuki_Connection, helper_LINE_ACCESS_KEYs, Lang="en", Admin=[]):
-        self.Seq = Seq
-        self.Admin = Admin
+    def __init__(self, Yuuki_Settings, Yuuki_Connection):
+        self.YuukiConfigs = Yuuki_Settings.config
+
+        self.Seq = self.YuukiConfigs["Seq"]
+        self.Admin = self.YuukiConfigs["Admin"]
+
         self.data = Yuuki_Data()
-        self.i18n = Yuuki_LangSetting(Lang)
+        self.i18n = Yuuki_LangSetting(self.YuukiConfigs["Default_Language"])
 
         self.LINE_Media_server = "https://obs.line-apps.com"
 
@@ -28,7 +42,7 @@ class Yuuki:
         (self.client, self.listen) = self.Connect.connect()
         self.connectHeader = Yuuki_Connection.connectHeader
 
-        for access in helper_LINE_ACCESS_KEYs:
+        for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
             self.Connect.helperConnect(access)
 
         self.MyMID = self.client.getProfile().mid
@@ -179,13 +193,14 @@ class Yuuki:
             GroupMember = [Catched.mid for Catched in GroupInfo.members]
             if GroupInfo.members:
                 self.client.acceptGroupInvitation(self.Seq, GroupID)
-                if len(GroupMember) >= 100:
+                if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                     self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO"))
                     self.sendText(GroupID, _("Admin of the Group：\n%s") %
                                   (self.sybGetGroupCreator(GroupInfo).displayName,))
                 else:
-                    self.sendText(GroupID, _("Sorry...\nThe number of members is not satisfied (100 needed)"))
+                    self.sendText(GroupID, _("Sorry...\nThe number of members is not satisfied (%s needed)") %
+                                  (self.YuukiConfigs["GroupMebers_Demand"],))
                     self.client.leaveGroup(self.Seq, GroupID)
 
     def Commands(self, ncMessage):

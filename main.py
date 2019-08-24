@@ -14,6 +14,7 @@
 Admin = [""]
 Language = "en"
 LINE_ACCESS_KEY = ""
+GroupMebers_Demand = 100
 helper_LINE_ACCESS_KEYs = []
 
 ########################Initializing##########################
@@ -33,8 +34,17 @@ Connection.connectHeader = {
     'User-Agent': ''
 }
 
-Seq = 0
-Console = Yuuki(Seq, Connection, helper_LINE_ACCESS_KEYs, Language, Admin)
+Settings = Yuuki_Settings()
+
+Settings.config = {
+    "Seq": 0,
+    "Admin": Admin,
+    "Default_Language": Language,
+    "GroupMebers_Demand": GroupMebers_Demand,
+    "helper_LINE_ACCESS_KEYs": helper_LINE_ACCESS_KEYs
+}
+
+Console = Yuuki(Settings, Connection)
 Console.cleanMyGroupInvitations()
 
 ###########################Start!#############################
