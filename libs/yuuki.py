@@ -35,7 +35,7 @@ class Yuuki:
 
     # Basic Func
 
-    def exit(restart=False):
+    def exit(self, restart=False):
         if restart:
             with open(".cache.sh", "w") as c:
                 c.write(sys.executable + " ./main.py")
