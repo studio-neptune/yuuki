@@ -16,7 +16,7 @@
 class English:
 
     i18nText = {
-        "X-Line-Application": "LINE System UserID：\n",
+        "LINE System UserID：\n": "LINE System UserID：\n",
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss"
     }
