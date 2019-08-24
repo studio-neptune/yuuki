@@ -155,7 +155,66 @@ class Yuuki:
 
     # Task
 
-    def Poll(self):
+    def JoinGroup(self, ncMessage):
+        """
+            ToDo Type:
+                NOTIFIED_INVITE_INTO_GROUP (13)
+        """
+        if self.checkInInvitationList(ncMessage):
+            GroupID = ncMessage.param1
+            Inviter = ncMessage.param2
+            GroupInfo = self.client.getGroup(GroupID)
+            GroupMember = [Catched.mid for Catched in GroupInfo.members]
+            if GroupInfo.members:
+                self.client.acceptGroupInvitation(self.Seq, GroupID)
+                if len(GroupMember) >= 100:
+                    self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
+                    self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO"))
+                    self.sendText(GroupID, _("Admin of the Group：\n%s") %
+                                  (self.sybGetGroupCreator(GroupInfo).displayName,))
+                else:
+                    self.sendText(GroupID, _("Sorry...\nThe number of members is not satisfied (100 needed)"))
+                    self.client.leaveGroup(self.Seq, GroupID)
+
+    def Commands(self, ncMessage):
+        """
+            ToDo Type:
+                RECEIVE_MESSAGE (26)
+        """
+        if 'BOT_CHECK' in ncMessage.message.contentMetadata:
+            pass
+        elif ncMessage.message.toType == MIDType.ROOM:
+            self.client.leaveRoom(self.Seq, ncMessage.message.to)
+        elif ncMessage.message.contentType == ContentType.NONE:
+            if 'Yuuki/mid' == ncMessage.message.text:
+                self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
+            elif 'Yuuki/Speed' == ncMessage.message.text:
+                Time1 = time.time()
+                self.sendText(self.sendToWho(ncMessage), _("Testing..."))
+                Time2 = time.time()
+                self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
+            elif 'Yuuki/Quit' == ncMessage.message.text:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    self.sendText(ncMessage.message.to, _("Bye Bye"))
+                    self.client.leaveGroup(self.Seq, ncMessage.message.to)
+            elif 'Yuuki/Exit' == ncMessage.message.text:
+                self.sendText(self.sendToWho(ncMessage), _("Exit."))
+                self.exit()
+
+    def Security(self, ncMessage):
+        """
+            ToDo Type:
+                NOTIFIED_UPDATE_GROUP (11)
+                NOTIFIED_INVITE_INTO_GROUP (13)
+                NOTIFIED_ACCEPT_GROUP_INVITATION (17)
+                KICKOUT_FROM_GROUP (18)
+                NOTIFIED_KICKOUT_FROM_GROUP (19)
+        """
+        pass
+
+    # Main
+
+    def Main(self):
         NoWork = 0
         catchedNews = []
         ncMessage = Operation()
@@ -168,10 +227,10 @@ class Yuuki:
                 if catchedNews:
                     NoWork = 0
                     for ncMessage in catchedNews:
-                        if ncMessage.type == OpType.RECEIVE_MESSAGE:
-                            self.Commands(ncMessage)
-                        elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+                        if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                             self.JoinGroup(ncMessage)
+                        elif ncMessage.type == OpType.RECEIVE_MESSAGE:
+                            self.Commands(ncMessage)
                         if ncMessage.reqSeq != -1:
                             Revision = max(Revision, ncMessage.revision)
                 else:
@@ -203,44 +262,3 @@ class Yuuki:
                 except:
                     print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo))
                     self.exit()
-
-    def JoinGroup(self, ncMessage):
-        if self.checkInInvitationList(ncMessage):
-            GroupID = ncMessage.param1
-            Inviter = ncMessage.param2
-            GroupInfo = self.client.getGroup(GroupID)
-            GroupMember = [Catched.mid for Catched in GroupInfo.members]
-            if GroupInfo.members:
-                self.client.acceptGroupInvitation(self.Seq, GroupID)
-                if len(GroupMember) >= 100:
-                    self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
-                    self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki><\nNice to meet you OwO"))
-                    self.sendText(GroupID, _("Admin of the Group：\n%s") %
-                                  (self.sybGetGroupCreator(GroupInfo).displayName,))
-                else:
-                    self.sendText(GroupID, _("Sorry...\nThe number of members is not satisfied (100 needed)"))
-                    self.client.leaveGroup(self.Seq, GroupID)
-
-    def Main(self, ncMessage):
-        pass
-
-    def Commands(self, ncMessage):
-        if 'BOT_CHECK' in ncMessage.message.contentMetadata:
-            pass
-        elif ncMessage.message.toType == MIDType.ROOM:
-            self.client.leaveRoom(self.Seq, ncMessage.message.to)
-        elif ncMessage.message.contentType == ContentType.NONE:
-            if 'Yuuki/mid' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
-            elif 'Yuuki/Speed' == ncMessage.message.text:
-                Time1 = time.time()
-                self.sendText(self.sendToWho(ncMessage), _("Testing..."))
-                Time2 = time.time()
-                self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
-            elif 'Yuuki/Quit' == ncMessage.message.text:
-                if ncMessage.message.toType == MIDType.GROUP:
-                    self.sendText(ncMessage.message.to, _("Bye Bye"))
-                    self.client.leaveGroup(self.Seq, ncMessage.message.to)
-            elif 'Yuuki/Exit' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), _("Exit."))
-                self.exit()

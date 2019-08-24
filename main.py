@@ -41,4 +41,4 @@ Console.cleanMyGroupInvitations()
 print("Star Yuuki BOT - Start Successful!")
 
 if __name__ == "__main__":
-    Console.Poll()
+    Console.Main()
