@@ -87,7 +87,7 @@ class Yuuki_Data:
 
     def file(self, Type, Mode, Format):
         if Format == "Data":
-            return open(self.LogPath + self.LogName.format(Type), Mode)
+            return open(self.DataPath + self.DataName.format(Type), Mode)
         elif Format == "Log":
             return open(self.LogPath + self.LogName.format(Type), Mode)
 
