@@ -16,12 +16,18 @@ class Yuuki_Data:
                 "SecurityService":False,
             },
             "Group": {},
+            "LimitInfo":{},
             "BlackList":[]
         }
 
         self.GroupType = {
             "SEGroup":None,
             "Ext_Admin":[]
+        }
+
+        self.Limittype = {
+            "Kick":{},
+            "Cancel":{}
         }
 
         self.SEGrouptype = {
