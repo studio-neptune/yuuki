@@ -44,6 +44,7 @@ class Yuuki_Data:
             if not os.path.isfile(name):
                 with open(name, "w") as f:
                     f.write("")
+                Type = 0
             else:
                 with open(name, "r") as f:
                     try:
@@ -58,8 +59,9 @@ class Yuuki_Data:
         for Type in self.DataType:
             name = self.DataPath + self.DataName.format(Type)
             with open(name, "r+") as f:
-                if f.read() != "":
-                    self.Data[Type] = json.loads(f.read())
+                text = f.read()
+                if text != "":
+                    self.Data[Type] = json.loads(text)
                 else:
                     self.Data[Type] = self.DataType[Type]
                     f.write(json.dumps(self.Data[Type]))
