@@ -15,6 +15,9 @@ class Yuuki_Data:
         self.initHeader = "<title>{} - SYB</title>" \
                           "<meta charset='utf-8' />"
 
+        if not os.path.isdir(self.LogPath):
+            os.mkdir(self.LogPath)
+
         for Type in self.LogType:
             name = self.LogPath + self.LogName.format(Type)
             if not os.path.isfile(name):
