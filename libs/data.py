@@ -17,7 +17,7 @@ class Yuuki_Data:
 
         for Type in self.LogType:
             name = self.LogPath + self.LogName.format(Type)
-            if os.path.isfile(name):
+            if not os.path.isfile(name):
                 with open(name, "w") as f:
                     f.write(self.initHeader.format(Type))
 
