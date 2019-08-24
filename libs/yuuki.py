@@ -408,10 +408,13 @@ class Yuuki:
         NoWork = 0
         catchedNews = []
         ncMessage = Operation()
-        LastResetLimitTime = 0
+        LastResetLimitTime = time.localtime().tm_hour
         Revision = self.client.getLastOpRevision()
         while True:
             try:
+                if time.localtime().tm_hour != LastResetLimitTime:
+                    LastResetLimitTime = time.localtime().tm_hour
+                    self.limitReset()
                 if NoWork == 300:
                     Revision = self.client.getLastOpRevision()
                 catchedNews = self.listen.fetchOperations(Revision, 50)
