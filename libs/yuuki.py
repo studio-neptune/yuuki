@@ -175,7 +175,7 @@ class Yuuki:
                 traceback.print_tb(err3)
                 tb_info = traceback.extract_tb(err3)
                 filename, line, func, text = tb_info[-1]
-                ErrorInfo = "occurred {} on line {} in statement {}".format(filename, line, text)
+                ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
                 try:
                     if catchedNews and ncMessage:
                         Finded = False
@@ -188,10 +188,10 @@ class Yuuki:
                         if not Finded:
                             Revision = self.client.getLastOpRevision()
                     for Root in self.Admin:
-                        self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n%s" %
+                        self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
                                      (err1, err2, err3, ErrorInfo))
                 except:
-                    print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s" % (err1, err2, err3))
+                    print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo))
                     self.exit()
 
     def JoinGroup(self, ncMessage):
