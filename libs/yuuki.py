@@ -341,8 +341,8 @@ class Yuuki:
                     else:
                         status = _("URL:%s\nJoin:%s\nInvite:%s\nMembers:%s") % (
                             group_status[OpType.NOTIFIED_UPDATE_GROUP],
-                            group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
                             group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
+                            group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
                             group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP],
                         )
                     self.sendText(self.sendToWho(ncMessage), status)
