@@ -7,7 +7,7 @@ import os, time,  \
        traceback
 
 
-from libs.core.TalkService import *
+from .core.TalkService import *
 from .connection import Yuuki_Connect
 
 from .data import Yuuki_Data
