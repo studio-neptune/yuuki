@@ -25,9 +25,9 @@ class Yuuki_Data:
             "Ext_Admin":[]
         }
 
-        self.Limittype = {
-            "Kick":{},
-            "Cancel":{}
+        self.LimitType = {
+            "KickLimit":{},
+            "CancelLimit":{}
         }
 
         self.SEGrouptype = {
@@ -122,6 +122,15 @@ class Yuuki_Data:
 
     def getData(self, Type):
         return self.Data[Type]
+
+    def getLimit(self, Type):
+        LimitInfo = self.getData("LimitInfo")
+        if len(LimitInfo) != 2:
+            LimitInfo = self.LimitType
+        if Type == "Kick":
+            return LimitInfo["KickLimit"]
+        elif Type == "Cancel":
+            return LimitInfo["CancelLimit"]
 
     def getGroup(self, GroupID):
         Groups = self.getData("Group")

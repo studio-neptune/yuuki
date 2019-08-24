@@ -53,8 +53,8 @@ class Yuuki:
 
         for client in [self.client] + self.Connect.helper:
             if len(self.data.getData("LimitInfo")) != 2:
-                self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], client, self.KickLimit)
-                self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], client, self.CancelLimit)
+                self.data.updateData(self.data.getLimit("Kick"), client, self.KickLimit)
+                self.data.updateData(self.data.getLimit("Cancel"), client, self.CancelLimit)
 
         self.MyMID = self.client.getProfile().mid
 
@@ -141,7 +141,7 @@ class Yuuki:
             self.client.leaveGroup(self.Seq, cleanInvitations)
 
     def getContact(self, userId):
-        if len(userId) == len(self.userId) and userId[0] == "u":
+        if len(userId) == len(self.MyMID) and userId[0] == "u":
             try:
                 contactInfo = self.getContact(userId)
             except:
@@ -171,37 +171,37 @@ class Yuuki:
     def limitReset(self):
         for client in [self.client] + self.Connect.helper:
             if len(self.data.getData("LimitInfo")) != 2:
-                self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], client, self.KickLimit)
-                self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], client, self.CancelLimit)
+                self.data.updateData(self.data.getLimit("Kick"), client, self.KickLimit)
+                self.data.updateData(self.data.getLimit("Cancel"), client, self.CancelLimit)
 
     def cancelSomeone(self, groupId, userId, exceptAccount=None):
         if len(self.Connect.helper) >= 1:
-            accounts = self.data.getData("LimitInfo")["CancelLimit"]
+            accounts = self.data.getLimit("Cancel")
             if exceptAccount:
                 accounts[exceptAccount] = -1
             helper = max(accounts, key=accounts.get)
         else:
             helper = self.client
 
-        if self.data.getData("LimitInfo")["CancelLimit"][helper] > 0:
+        if self.data.getLimit("Cancel")[helper] > 0:
             helper.cancelGroupInvitation(self.Seq, groupId, [userId])
-            self.data.getData("LimitInfo")["CancelLimit"][helper] -= 1
+            self.data.getLimit("Cancel")[helper] -= 1
             self.data.syncData()
         else:
             self.sendText(groupId, _("Cancel Limit."))
 
     def kickSomeone(self, groupId, userId, exceptAccount=None):
         if len(self.Connect.helper) >= 1:
-            accounts = self.data.getData("LimitInfo")["KickLimit"]
+            accounts = self.data.getLimit("Kick")
             if exceptAccount:
                 accounts[exceptAccount] = -1
             helper = max(accounts, key=accounts.get)
         else:
             helper = self.client
 
-        if self.data.getData("LimitInfo")["KickLimit"][helper] > 0:
+        if self.data.getLimit("Kick")[helper] > 0:
             helper.kickoutFromGroup(self.Seq, groupId, [userId])
-            self.data.getData("LimitInfo")["KickLimit"][helper] -= 1
+            self.data.getLimit("Kick")[helper] -= 1
             self.data.syncData()
         else:
             self.sendText(groupId, _("Kick Limit."))
