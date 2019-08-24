@@ -29,7 +29,6 @@ class Yuuki_Data:
             OpType.NOTIFIED_UPDATE_GROUP:False,
             OpType.NOTIFIED_INVITE_INTO_GROUP:False,
             OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:False,
-            OpType.KICKOUT_FROM_GROUP:False,
             OpType.NOTIFIED_KICKOUT_FROM_GROUP:False
         }
 
@@ -87,25 +86,29 @@ class Yuuki_Data:
                 with open(name, "w") as f:
                     f.write(self.initHeader.format(Type))
 
-    def file(self, Type, Mode):
-        return open(self.LogPath + self.LogName.format(Type), Mode)
+    def file(self, Type, Mode, Format):
+        if Format == "Data":
+            return open(self.LogPath + self.LogName.format(Type), Mode)
+        elif Format == "Log":
+            return open(self.LogPath + self.LogName.format(Type), Mode)
 
-    def updateData(self, Type, Input, Data):
-        with self.file(Type, "r") as f:
-            Data_ = json.loads(f.read())
-        if type(self.DataType[Type]) == list:
+    def syncData(self):
+        for Type in self.DataType:
+            with self.file(Type, "w", "Data") as f:
+                f.write(json.dumps(self.Data[Type]))
+
+    def updateData(self, Object, Input, Data):
+        if type(Object) == list:
             if Input:
-                Data_.append(Data)
+                Object.append(Data)
             else:
-                Data_.remove(Data)
-        elif type(self.DataType[Type]) == dict:
-            Data_[Type][Input] = Data
-        with self.file(Type, "w") as f:
-            f.write(json.dumps(Data_))
-        self.Data[Type] = Data_
+                Object.remove(Data)
+        elif type(Object) == dict:
+            Object[Input] = Data
+        self.syncData()
 
     def updateLog(self, Type, Data):
-        with self.file(Type, "a") as f:
+        with self.file(Type, "a", "Log") as f:
             f.write(self.LogType[Type] % Data)
 
     def getTime(self, format="%b %d %Y %H:%M:%S %Z"):

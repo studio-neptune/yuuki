@@ -103,6 +103,33 @@ class Yuuki:
         group.preventJoinByTicket = us
         self.client.updateGroup(self.Seq, group)
 
+    def enableSecurityStatus(self, groupId, status):
+        group_status = self.data.SEGrouptype
+        if 0 in status:
+            group_status[OpType.NOTIFIED_UPDATE_GROUP] = True
+        if 1 in status:
+            group_status[OpType.NOTIFIED_INVITE_INTO_GROUP] = True
+        if 2 in status:
+            group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION] = True
+        if 3 in status:
+            group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP] = True
+
+        self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
+
+    def disableSecurityStatus(self, groupId, status):
+        group_status = self.data.SEGrouptype
+        if 0 in status:
+            group_status[OpType.NOTIFIED_UPDATE_GROUP] = False
+        if 1 in status:
+            group_status[OpType.NOTIFIED_INVITE_INTO_GROUP] = False
+        if 2 in status:
+            group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION] = False
+        if 3 in status:
+            group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP] = False
+
+        self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
+
+
     def cleanMyGroupInvitations(self):
         for cleanInvitations in self.client.getGroupIdsInvited():
             self.client.acceptGroupInvitation(self.Seq, cleanInvitations)
@@ -247,13 +274,34 @@ class Yuuki:
         elif ncMessage.message.toType == MIDType.ROOM:
             self.client.leaveRoom(self.Seq, ncMessage.message.to)
         elif ncMessage.message.contentType == ContentType.NONE:
-            if 'Yuuki/mid' == ncMessage.message.text:
+            msgSep = ncMessage.message.text.split(" ")
+            if 'Yuuki/UserID' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
             elif 'Yuuki/Speed' == ncMessage.message.text:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))
+            elif 'Yuuki/Enable' == msgSep[0]:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    status = []
+                    for code in msgSep:
+                        try:
+                            status.append(int(code))
+                        except:
+                            pass
+                    self.enableSecurityStatus(ncMessage.message.to, status)
+                    self.sendText(ncMessage.message.to, _("Okay"))
+            elif 'Yuuki/Disable' == msgSep[0]:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    status = []
+                    for code in msgSep:
+                        try:
+                            status.append(int(code))
+                        except:
+                            pass
+                    self.disableSecurityStatus(ncMessage.message.to, status)
+                    self.sendText(ncMessage.message.to, _("Okay"))
             elif 'Yuuki/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     self.sendText(ncMessage.message.to, _("Bye Bye"))

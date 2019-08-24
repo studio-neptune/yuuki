@@ -24,5 +24,6 @@ class English:
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss",
         "Bye Bye": "Bye Bye",
+        "Okay": "Okay",
         "Exit.": "Exit."
     }
