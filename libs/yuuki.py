@@ -408,6 +408,7 @@ class Yuuki:
         NoWork = 0
         catchedNews = []
         ncMessage = Operation()
+        LastResetLimitTime = 0
         Revision = self.client.getLastOpRevision()
         while True:
             try:
