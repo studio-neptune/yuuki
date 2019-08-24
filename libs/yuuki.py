@@ -239,7 +239,7 @@ class Yuuki:
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
             elif 'Yuuki/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    self.client.sendMessage(ncMessage.message.to, _("Bye Bye"))
+                    self.client.sendText(ncMessage.message.to, _("Bye Bye"))
                     self.client.leaveGroup(ncMessage.message.to)
             elif 'Yuuki/Exit' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("Exit."))
