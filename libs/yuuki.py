@@ -10,12 +10,15 @@ import os, time,  \
 from libs.core.TalkService import *
 from .connection import Yuuki_Connect
 
+from .data import Yuuki_Data
+
 from .i18n import Yuuki_LangSetting
 
 class Yuuki:
     def __init__(self, Seq, Yuuki_Connection, helper_LINE_ACCESS_KEYs, Lang="en", Admin=[]):
         self.Seq = Seq
         self.Admin = Admin
+        self.data = Yuuki_Data()
         self.i18n = Yuuki_LangSetting(Lang)
 
         self.LINE_Media_server = "https://obs.line-apps.com"
@@ -44,6 +47,13 @@ class Yuuki:
             sys.exit(0)
         else:
             sys.exit(0)
+
+    def sybGetGroupCreator(self, group):
+        if group.creator == None:
+            contact = group.members[0]
+        else:
+            contact = group.creator
+        return contact
 
     def readCommandLine(self, msgs):
         replymsg = ""
@@ -195,19 +205,21 @@ class Yuuki:
                     self.exit()
 
     def JoinGroup(self, ncMessage):
-        GroupMember = []
         if self.checkInInvitationList(ncMessage):
             GroupID = ncMessage.param1
+            Inviter = ncMessage.param2
             GroupInfo = self.client.getGroup(GroupID)
+            GroupMember = [Catched.mid for Catched in GroupInfo.members]
             if GroupInfo.members:
-                GroupMember = [Catched.mid for Catched in GroupInfo.members]
-            self.client.acceptGroupInvitation(self.Seq, GroupID)
-            LeaveGroup = True
-            for Root in self.Admin:
-                if Root in GroupMember:
-                    LeaveGroup = False
-            if LeaveGroup:
-                self.client.leaveGroup(self.Seq, GroupID)
+                self.client.acceptGroupInvitation(self.Seq, GroupID)
+                if len(GroupMember) >= 100:
+                    self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
+                    self.sendText(self.sendToWho(ncMessage), _("Helllo^^\nMy name is Yuuki><\nNice to meet you OwO"))
+                    self.sendText(self.sendToWho(ncMessage), _("Admin of the Group：\n%s") %
+                                  (self.sybGetGroupCreator(GroupInfo).displayName,))
+                else:
+                    self.sendText(self.sendToWho(ncMessage), _("Sorry...\nThe number of members is not satisfied (100 needed)"))
+                    self.client.leaveGroup(self.Seq, GroupID)
 
     def Main(self, ncMessage):
         pass
@@ -225,3 +237,6 @@ class Yuuki:
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
+            elif 'Yuuki/Exit' == ncMessage.message.text:
+                self.sendText(self.sendToWho(ncMessage), _("Exit."))
+                self.exit()
