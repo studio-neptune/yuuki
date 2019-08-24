@@ -422,6 +422,10 @@ class Yuuki:
                             self.JoinGroup(ncMessage)
                         elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
                             self.Security(ncMessage)
+                        elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+                            self.Security(ncMessage)
+                        elif ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
+                            self.Security(ncMessage)
                         elif ncMessage.type == OpType.RECEIVE_MESSAGE:
                             self.Commands(ncMessage)
                         if ncMessage.reqSeq != -1:
