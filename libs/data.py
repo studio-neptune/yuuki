@@ -46,7 +46,12 @@ class Yuuki_Data:
                     f.write("")
             else:
                 with open(name, "r") as f:
-                    assert not json.loads(f.read()), "{}\nJson Test Error".format(name)
+                    try:
+                        json.loads(f.read())
+                        Type = 0
+                    except ValueError:
+                        Type = 1
+            assert Type == 0, "{}\nJson Test Error".format(name)
 
         # Data Initialize
 
