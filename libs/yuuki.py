@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import os, time,\
-       requests, \
-       json, ntpath
+import os, time,  \
+       requests,   \
+       json, ntpath,\
+       traceback
+
 
 from libs.core.TalkService import *
 from .connection import Yuuki_Connect
@@ -170,6 +172,10 @@ class Yuuki:
                 pass
             except:
                 err1, err2, err3 = sys.exc_info()
+                traceback.print_tb(err3)
+                tb_info = traceback.extract_tb(err3)
+                filename, line, func, text = tb_info[-1]
+                ErrorInfo = "occurred {} on line {} in statement {}".format(filename, line, text)
                 try:
                     if catchedNews and ncMessage:
                         Finded = False
@@ -182,8 +188,8 @@ class Yuuki:
                         if not Finded:
                             Revision = self.client.getLastOpRevision()
                     for Root in self.Admin:
-                        self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s" %
-                                     (err1, err2, err3))
+                        self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n%s" %
+                                     (err1, err2, err3, ErrorInfo))
                 except:
                     print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s" % (err1, err2, err3))
                     self.exit()
@@ -218,4 +224,4 @@ class Yuuki:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
-                self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))
+                self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
