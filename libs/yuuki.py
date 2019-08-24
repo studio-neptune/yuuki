@@ -214,11 +214,11 @@ class Yuuki:
                 self.client.acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= 100:
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
-                    self.sendText(self.sendToWho(ncMessage), _("Helllo^^\nMy name is Yuuki><\nNice to meet you OwO"))
-                    self.sendText(self.sendToWho(ncMessage), _("Admin of the Group：\n%s") %
+                    self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki><\nNice to meet you OwO"))
+                    self.sendText(GroupID, _("Admin of the Group：\n%s") %
                                   (self.sybGetGroupCreator(GroupInfo).displayName,))
                 else:
-                    self.sendText(self.sendToWho(ncMessage), _("Sorry...\nThe number of members is not satisfied (100 needed)"))
+                    self.sendText(GroupID, _("Sorry...\nThe number of members is not satisfied (100 needed)"))
                     self.client.leaveGroup(self.Seq, GroupID)
 
     def Main(self, ncMessage):
@@ -237,6 +237,10 @@ class Yuuki:
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
+            elif 'Yuuki/Quit' == ncMessage.message.text:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    self.client.sendMessage(ncMessage.message.to, _("Bye Bye"))
+                    self.client.leaveGroup(ncMessage.message.to)
             elif 'Yuuki/Exit' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("Exit."))
                 self.exit()

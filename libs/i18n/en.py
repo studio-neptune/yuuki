@@ -21,5 +21,6 @@ class English:
         "Sorry...\nThe number of members is not satisfied (100 needed)": "Sorry...\nThe number of members is not satisfied (100 needed)",
         "LINE System UserID：\n": "LINE System UserID：\n",
         "Testing...": "Testing...",
-        "Speed:\n%ss": "Speed:\n%ss"
+        "Speed:\n%ss": "Speed:\n%ss",
+        "Bye Bye": "Bye Bye"
     }
