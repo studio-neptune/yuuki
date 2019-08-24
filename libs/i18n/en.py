@@ -20,6 +20,7 @@ class English:
         "Admin of the Group：\n%s": "Admin of the Group：\n%s",
         "Sorry...\nThe number of members is not satisfied (%s needed)": "Sorry...\nThe number of members is not satisfied (%s needed)",
         "LINE System UserID：\n": "LINE System UserID：\n",
+        "Kick Limit.": "Kick Limit.",
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss",
         "Bye Bye": "Bye Bye",

@@ -4,7 +4,7 @@
 import os, time,  \
        requests,   \
        json, ntpath,\
-       traceback
+       random, traceback
 
 
 from .core.TalkService import *
@@ -20,6 +20,7 @@ class Yuuki_Settings:
     config = {
         "Seq": 0,
         "Admin": [],
+        "Hour_KickLimit": 10,
         "Default_Language": "en",
         "GroupMebers_Demand": 100,
         "helper_LINE_ACCESS_KEYs": []
@@ -31,6 +32,9 @@ class Yuuki:
 
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
+
+        self.KickedTimes = {}
+        self.KickLimit = self.YuukiConfigs["Hour_KickLimit"]
 
         self.data = Yuuki_Data()
         self.i18n = Yuuki_LangSetting(self.YuukiConfigs["Default_Language"])
@@ -44,6 +48,9 @@ class Yuuki:
 
         for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
             self.Connect.helperConnect(access)
+
+        for client in [self.client] + self.Connect.helper:
+            self.KickedTimes[client] = self.KickLimit
 
         self.MyMID = self.client.getProfile().mid
 
@@ -101,10 +108,10 @@ class Yuuki:
             self.client.acceptGroupInvitation(self.Seq, cleanInvitations)
             self.client.leaveGroup(self.Seq, cleanInvitations)
 
-    def getContact(self, mid):
-        if len(mid) == len(self.MyMID) and mid[0] == "u":
+    def getContact(self, userId):
+        if len(userId) == len(self.userId) and userId[0] == "u":
             try:
-                contactInfo = self.getContact(mid)
+                contactInfo = self.getContact(userId)
             except:
                 contactInfo = False
         else:
@@ -123,6 +130,31 @@ class Yuuki:
         elif Message.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
             return Message.param1
 
+    def getClientByMid(self, userId):
+        Accounts = [self.client] + self.Connect.helper
+        for count, AccountUserId in enumerate([self.MyMID] + self.Connect.helper_ids):
+            if AccountUserId == userId:
+                return Accounts[count]
+
+    def kickLimitReset(self):
+        for client in [self.client] + self.Connect.helper:
+            self.KickedTimes[client] = self.KickLimit
+
+    def kickSomeone(self, groupId, userId, exceptAccount=None):
+        if len(self.Connect.helper) >= 1:
+            accounts = [self.client] + self.Connect.helper
+            if exceptAccount:
+                accounts.remove(exceptAccount)
+            helper = max(accounts, key=accounts.get)
+        else:
+            helper = self.client
+
+        if self.KickedTimes[helper] > 0:
+            helper.kickoutFromGroup(self.Seq, groupId, [userId])
+            self.KickedTimes[helper] -= 1
+        else:
+            self.sendText(groupId, _("Kick Limit."))
+
     def sendToWho(self, Message):
         if Message.message.toType == MIDType.USER:
             return Message.message.from_
@@ -135,14 +167,16 @@ class Yuuki:
         message = Message(to=toid, text=msg)
         self.client.sendMessage(self.Seq, message)
 
-    def sendUser(self, toid, mid):
-        message = Message(contentType=ContentType.CONTACT,
-                          text='',
-                          contentMetadata={
-                                'mid': mid,
-                                'displayName': 'LINE User',
-                          },
-                          to=toid)
+    def sendUser(self, toid, userId):
+        message = Message(
+            contentType=ContentType.CONTACT,
+            text='',
+            contentMetadata={
+                'mid': userId,
+                'displayName': 'LINE User',
+            },
+            to=toid
+        )
         self.client.sendMessage(self.Seq, message)
 
     def sendMedia(self, toid, type, path):
@@ -234,10 +268,10 @@ class Yuuki:
                 NOTIFIED_UPDATE_GROUP (11)
                 NOTIFIED_INVITE_INTO_GROUP (13)
                 NOTIFIED_ACCEPT_GROUP_INVITATION (17)
-                KICKOUT_FROM_GROUP (18)
                 NOTIFIED_KICKOUT_FROM_GROUP (19)
         """
-        SEGroup = self.data.getSEGroup(self.securityForWhere(ncMessage))
+        GroupID = self.securityForWhere(ncMessage)
+        SEGroup = self.data.getSEGroup(GroupID)
 
         if SEGroup[ncMessage.type]:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
@@ -246,10 +280,16 @@ class Yuuki:
                 pass
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
                 pass
-            elif ncMessage.type == OpType.KICKOUT_FROM_GROUP:
-                pass
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-                pass
+                if ncMessage.param2 in self.Connect.helper_ids:
+                    self.data.updateLog("", ())
+                else:
+                    if ncMessage.param3 in [self.MyMID] + self.Connect.helper_ids:
+                        # Block
+                        pass
+                    else:
+                        self.sendText(GroupID, _("Bye Bye"))
+                        self.kickSomeone(GroupID, ncMessage.param2)
 
     # Main
 
@@ -268,6 +308,8 @@ class Yuuki:
                     for ncMessage in catchedNews:
                         if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                             self.JoinGroup(ncMessage)
+                        elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+                            self.Security(ncMessage)
                         elif ncMessage.type == OpType.RECEIVE_MESSAGE:
                             self.Commands(ncMessage)
                         if ncMessage.reqSeq != -1:

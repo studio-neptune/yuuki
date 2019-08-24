@@ -12,6 +12,7 @@
 """
 
 Admin = [""]
+KickLimit = 10
 Language = "en"
 LINE_ACCESS_KEY = ""
 GroupMebers_Demand = 100
@@ -39,6 +40,7 @@ Settings = Yuuki_Settings()
 Settings.config = {
     "Seq": 0,
     "Admin": Admin,
+    "Hour_KickLimit": KickLimit,
     "Default_Language": Language,
     "GroupMebers_Demand": GroupMebers_Demand,
     "helper_LINE_ACCESS_KEYs": helper_LINE_ACCESS_KEYs
