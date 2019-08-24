@@ -128,6 +128,8 @@ class Yuuki_Data:
             if GroupID not in GroupIDs:
                 Groups[GroupID] = self.DataType["Group"]
             return Groups[GroupID]
+        else:
+            Groups[GroupID] = self.DataType["Group"]
 
     def getSEGroup(self, GroupID):
         Group = self.getGroup(GroupID)

@@ -129,7 +129,6 @@ class Yuuki:
 
         self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
 
-
     def cleanMyGroupInvitations(self):
         for cleanInvitations in self.client.getGroupIdsInvited():
             self.client.acceptGroupInvitation(self.Seq, cleanInvitations)
