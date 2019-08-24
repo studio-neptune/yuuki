@@ -22,5 +22,6 @@ class English:
         "LINE System UserID：\n": "LINE System UserID：\n",
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss",
-        "Bye Bye": "Bye Bye"
+        "Bye Bye": "Bye Bye",
+        "Exit": "Exit"
     }

@@ -192,7 +192,7 @@ class Yuuki:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
-                self.sendText(self.sendToWho(ncMessage), _("Speed:\n{}s").format(Time2 - Time1,))
+                self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))
             elif 'Yuuki/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     self.sendText(ncMessage.message.to, _("Bye Bye"))
