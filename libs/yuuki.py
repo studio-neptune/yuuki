@@ -4,7 +4,7 @@
 import os, time,  \
        requests,   \
        json, ntpath,\
-       random, traceback
+       traceback
 
 
 from .core.TalkService import *
@@ -295,7 +295,7 @@ class Yuuki:
                     # Log
         for userId in self.Connect.helper_ids:
             if self.checkInInvitationList(ncMessage, userId):
-                self.getClientByMid(userId).acceptGroupInvitation(self.Seq, GroupID)
+                self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
                 # Log
         self.Security(ncMessage)
 
@@ -318,7 +318,7 @@ class Yuuki:
                 Time2 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))
             elif 'Yuuki/SecurityMode' == msgSep[0]:
-                if ncMessage.message.toType == MIDType.GROUP:
+                if ncMessage.message.from_ in self.Admin:
                     if len(msgSep) == 2:
                         try:
                             status = int(msgSep[1])
@@ -328,25 +328,47 @@ class Yuuki:
                     else:
                         self.sendText(self.sendToWho(ncMessage), bool(self.SecurityService))
             elif 'Yuuki/Enable' == msgSep[0]:
+                GroupInfo = self.client.getGroup(ncMessage.param1)
+                GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)] + self.data.getGroup(ncMessage.param1)["Ext_Admin"]
                 if ncMessage.message.toType == MIDType.GROUP:
-                    status = []
-                    for code in msgSep:
-                        try:
-                            status.append(int(code))
-                        except:
-                            pass
-                    self.enableSecurityStatus(ncMessage.message.to, status)
-                    self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                    if ncMessage.message.from_ in GroupPrivilege:
+                        status = []
+                        for code in msgSep:
+                            try:
+                                status.append(int(code))
+                            except:
+                                pass
+                        self.enableSecurityStatus(ncMessage.message.to, status)
+                        self.sendText(self.sendToWho(ncMessage), _("Okay"))
             elif 'Yuuki/Disable' == msgSep[0]:
+                GroupInfo = self.client.getGroup(ncMessage.param1)
+                GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)] + self.data.getGroup(ncMessage.param1)["Ext_Admin"]
                 if ncMessage.message.toType == MIDType.GROUP:
-                    status = []
-                    for code in msgSep:
-                        try:
-                            status.append(int(code))
-                        except:
-                            pass
-                    self.disableSecurityStatus(ncMessage.message.to, status)
-                    self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                    if ncMessage.message.from_ in GroupPrivilege:
+                        status = []
+                        for code in msgSep:
+                            try:
+                                status.append(int(code))
+                            except:
+                                pass
+                        self.disableSecurityStatus(ncMessage.message.to, status)
+                        self.sendText(self.sendToWho(ncMessage), _("Okay"))
+            elif 'Yuuki/ExtAdmin' == msgSep[0]:
+                GroupInfo = self.client.getGroup(ncMessage.param1)
+                GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)]
+                if ncMessage.message.toType == MIDType.GROUP:
+                    if ncMessage.message.from_ in GroupPrivilege:
+                        if msgSep[1] == "add":
+                            if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
+                                self.data.updateData(self.data.getGroup(ncMessage.param1), "Ext_Admin", msgSep[2])
+                                self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                            else:
+                                self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
+                        elif msgSep[1] == "delete":
+                                self.data.updateData(self.data.getGroup(ncMessage.param1), "Ext_Admin", msgSep[2])
+                                self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                        else:
+                            self.sendText(self.sendToWho(ncMessage), self.data.getGroup(ncMessage.param1)["Ext_Admin"])
             elif 'Yuuki/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     group_status = self.data.getSEGroup(ncMessage.message.to)
@@ -362,11 +384,15 @@ class Yuuki:
                     self.sendText(self.sendToWho(ncMessage), status)
             elif 'Yuuki/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    self.sendText(ncMessage.message.to, _("Bye Bye"))
-                    self.client.leaveGroup(self.Seq, ncMessage.message.to)
+                    GroupInfo = self.client.getGroup(ncMessage.param1)
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)] + self.data.getGroup(ncMessage.param1)["Ext_Admin"]
+                    if ncMessage.message.from_ in GroupPrivilege:
+                        self.sendText(ncMessage.message.to, _("Bye Bye"))
+                        self.client.leaveGroup(self.Seq, ncMessage.message.to)
             elif 'Yuuki/Exit' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), _("Exit."))
-                self.exit()
+                if ncMessage.message.from_ in self.Admin:
+                    self.sendText(self.sendToWho(ncMessage), _("Exit."))
+                    self.exit()
             elif 'Yuuki/Com' == msgSep[0] and len(msgSep) != 1:
                 if ncMessage.message.from_ in self.Admin:
                     ComMsg = self.readCommandLine(msgSep[1:len(msgSep)])

@@ -16,7 +16,7 @@ class Yuuki_LangSetting:
                 return self.support[lang].i18nText[text]
             return self.support[self.default].i18nText[text]
         except KeyError:
-            return text + "\n\n{Language Package is not Work, please inform the Admin of the Yuuki}"
+            return text + "\n\n{\n\tLanguage Package is not Work.\n\tPlease inform the Admin of the Yuuki.\n}"
 
     def _(self, text, lang=None):
         return self.gettext(text, lang)

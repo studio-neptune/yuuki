@@ -43,7 +43,7 @@ Settings.config["Admin"] = Admin
 Settings.config["SecurityService"] = True
 Settings.config["Hour_KickLimit"] = KickLimit
 Settings.config["Hour_CancelLimit"] = CancelLimit
-Settings.config["Default_Language"] = Language,
+Settings.config["Default_Language"] = Language
 Settings.config["GroupMebers_Demand"] = GroupMebers_Demand
 Settings.config["helper_LINE_ACCESS_KEYs"] = helper_LINE_ACCESS_KEYs
 

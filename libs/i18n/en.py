@@ -19,6 +19,7 @@ class English:
         "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO": "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO",
         "Admin of the Group：\n%s": "Admin of the Group：\n%s",
         "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s": "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s",
+        "Wrong UserID or the guy is not in Group": "Wrong UserID or the guy is not in Group",
         "Disable without Initialize": "Disable without Initialize",
         "Sorry...\nThe number of members is not satisfied (%s needed)": "Sorry...\nThe number of members is not satisfied (%s needed)",
         "LINE System UserID：\n": "LINE System UserID：\n",
