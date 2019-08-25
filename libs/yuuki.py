@@ -369,6 +369,8 @@ class Yuuki:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid]
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
+                        if GroupInfo not in self.data.getData("Group"):
+                            self.data.updateData(self.data.Data, GroupInfo.id, self.data.GroupType)
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
                                 if msgSep[2] not in self.data.getData("BlackList"):
