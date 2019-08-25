@@ -421,7 +421,7 @@ class Yuuki:
 
         if SEGroup[ncMessage.type] and self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-                if ncMessage.param3 == 3:
+                if ncMessage.param3 == '4':
                     GroupInfo = self.client.getGroup(GroupID)
                     if not GroupInfo.preventJoinByTicket:
                         self.changeGroupUrlStatus(GroupInfo, False)
@@ -429,9 +429,9 @@ class Yuuki:
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 if "\x1e" in ncMessage.param3:
                     for userId in ncMessage.param3.split("\x1e"):
-                        if userId not in self.MyMID + self.Connect.helper_ids:
+                        if userId not in [self.MyMID] + self.Connect.helper_ids:
                             self.cancelSomeone(GroupID, userId)
-                elif ncMessage.param3 not in self.MyMID + self.Connect.helper_ids:
+                elif ncMessage.param3 not in [self.MyMID] + self.Connect.helper_ids:
                     self.cancelSomeone(GroupID, ncMessage.param3)
                 # Log
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
