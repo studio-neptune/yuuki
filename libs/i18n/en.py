@@ -18,7 +18,7 @@ class English:
     i18nText = {
         "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO": "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO",
         "Admin of the Group：\n%s": "Admin of the Group：\n%s",
-        "URL:%s\nJoin:%s\nInvite:%s\nMembers:%s": "URL:%s\nJoin:%s\nInvite:%s\nMembers:%s",
+        "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s": "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s",
         "Disable without Initialize": "Disable without Initialize",
         "Sorry...\nThe number of members is not satisfied (%s needed)": "Sorry...\nThe number of members is not satisfied (%s needed)",
         "LINE System UserID：\n": "LINE System UserID：\n",

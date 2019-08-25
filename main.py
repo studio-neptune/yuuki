@@ -38,15 +38,15 @@ Connection.connectHeader = {
 
 Settings = Yuuki_Settings()
 
-Settings.config = {
-    "Seq": 0,
-    "Admin": Admin,
-    "Hour_KickLimit": KickLimit,
-    "Hour_CancelLimit": CancelLimit,
-    "Default_Language": Language,
-    "GroupMebers_Demand": GroupMebers_Demand,
-    "helper_LINE_ACCESS_KEYs": helper_LINE_ACCESS_KEYs
-}
+Settings.config["Seq"] = 0
+Settings.config["Admin"] = Admin
+Settings.config["SecurityService"] = True
+Settings.config["Hour_KickLimit"] = KickLimit
+Settings.config["Hour_CancelLimit"] = CancelLimit
+Settings.config["Default_Language"] = Language,
+Settings.config["GroupMebers_Demand"] = GroupMebers_Demand
+Settings.config["helper_LINE_ACCESS_KEYs"] = helper_LINE_ACCESS_KEYs
+
 
 Console = Yuuki(Settings, Connection)
 Console.cleanMyGroupInvitations()

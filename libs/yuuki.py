@@ -20,6 +20,7 @@ class Yuuki_Settings:
     config = {
         "Seq": 0,
         "Admin": [],
+        "SecurityService": False,
         "Hour_KickLimit": 10,
         "Hour_CancelLimit": 10,
         "Default_Language": "en",
@@ -50,11 +51,12 @@ class Yuuki:
         for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
             self.Connect.helperConnect(access)
 
+        self.SecurityService = self.YuukiConfigs["SecurityService"]
 
-        for client in [self.client] + self.Connect.helper:
+        for userId in [self.MyMID] + self.Connect.helper_ids:
             if len(self.data.getData("LimitInfo")) != 2:
-                self.data.updateData(self.data.getLimit("Kick"), client, self.KickLimit)
-                self.data.updateData(self.data.getLimit("Cancel"), client, self.CancelLimit)
+                self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
+                self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
 
         self.MyMID = self.client.getProfile().mid
 
@@ -169,38 +171,42 @@ class Yuuki:
                 return Accounts[count]
 
     def limitReset(self):
-        for client in [self.client] + self.Connect.helper:
+        for userId in [self.MyMID] + self.Connect.helper_ids:
             if len(self.data.getData("LimitInfo")) != 2:
-                self.data.updateData(self.data.getLimit("Kick"), client, self.KickLimit)
-                self.data.updateData(self.data.getLimit("Cancel"), client, self.CancelLimit)
+                self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
+                self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
 
-    def cancelSomeone(self, groupId, userId, exceptAccount=None):
+    def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
             accounts = self.data.getLimit("Cancel")
-            if exceptAccount:
-                accounts[exceptAccount] = -1
+            if exceptUserId:
+                accounts[exceptUserId] = -1
             helper = max(accounts, key=accounts.get)
         else:
-            helper = self.client
+            if exceptUserId == self.MyMID:
+                return
+            helper = self.MyMID
 
         if self.data.getLimit("Cancel")[helper] > 0:
-            helper.cancelGroupInvitation(self.Seq, groupId, [userId])
+            self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupId, [userId])
             self.data.getLimit("Cancel")[helper] -= 1
             self.data.syncData()
         else:
             self.sendText(groupId, _("Cancel Limit."))
 
-    def kickSomeone(self, groupId, userId, exceptAccount=None):
+    def kickSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
             accounts = self.data.getLimit("Kick")
-            if exceptAccount:
-                accounts[exceptAccount] = -1
+            if exceptUserId:
+                accounts[exceptUserId] = -1
             helper = max(accounts, key=accounts.get)
         else:
-            helper = self.client
+            if exceptUserId == self.MyMID:
+                return
+            helper = self.MyMID
 
         if self.data.getLimit("Kick")[helper] > 0:
-            helper.kickoutFromGroup(self.Seq, groupId, [userId])
+            self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupId, [userId])
             self.data.getLimit("Kick")[helper] -= 1
             self.data.syncData()
         else:
@@ -313,6 +319,16 @@ class Yuuki:
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))
+            elif 'Yuuki/SecurityMode' == msgSep[0]:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    if len(msgSep) == 2:
+                        try:
+                            status = int(msgSep[1])
+                            self.SecurityService = bool(status)
+                        except:
+                            pass
+                    else:
+                        self.sendText(self.sendToWho(ncMessage), bool(self.SecurityService))
             elif 'Yuuki/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     status = []
@@ -322,7 +338,7 @@ class Yuuki:
                         except:
                             pass
                     self.enableSecurityStatus(ncMessage.message.to, status)
-                    self.sendText(ncMessage.message.to, _("Okay"))
+                    self.sendText(self.sendToWho(ncMessage), _("Okay"))
             elif 'Yuuki/Disable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     status = []
@@ -332,17 +348,17 @@ class Yuuki:
                         except:
                             pass
                     self.disableSecurityStatus(ncMessage.message.to, status)
-                    self.sendText(ncMessage.message.to, _("Okay"))
+                    self.sendText(self.sendToWho(ncMessage), _("Okay"))
             elif 'Yuuki/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     group_status = self.data.getSEGroup(ncMessage.message.to)
                     if group_status == None:
                         status = _("Disable without Initialize")
                     else:
-                        status = _("URL:%s\nJoin:%s\nInvite:%s\nMembers:%s") % (
+                        status = _("URL:%s\nInvite:%s\nJoin:%s\nMembers:%s") % (
                             group_status[OpType.NOTIFIED_UPDATE_GROUP],
-                            group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
                             group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
+                            group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
                             group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP],
                         )
                     self.sendText(self.sendToWho(ncMessage), status)
@@ -372,14 +388,21 @@ class Yuuki:
         if SEGroup == None:
             return
 
-        if SEGroup[ncMessage.type]:
+        if SEGroup[ncMessage.type] and self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-                pass
+                if ncMessage.param3 == 3:
+                    GroupInfo = self.client.getGroup(GroupID)
+                    if not GroupInfo.preventJoinByTicket:
+                        self.changeGroupUrlStatus(GroupInfo, False)
+                        self.kickSomeone(GroupID, ncMessage.param2)
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                for userId in self.data.getData("BlackList"):
-                    if self.checkInInvitationList(ncMessage, userId):
-                        self.cancelSomeone(GroupID, userId)
-                        # Log
+                if "\x1e" in ncMessage.param3:
+                    for userId in ncMessage.param3.split("\x1e"):
+                        if userId not in self.MyMID + self.Connect.helper_ids:
+                            self.cancelSomeone(GroupID, userId)
+                elif ncMessage.param3 not in self.MyMID + self.Connect.helper_ids:
+                    self.cancelSomeone(GroupID, ncMessage.param3)
+                # Log
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
                 for userId in self.data.getData("BlackList"):
                     if userId == ncMessage.param2:
@@ -392,8 +415,8 @@ class Yuuki:
                 else:
                     if ncMessage.param3 in [self.MyMID] + self.Connect.helper_ids:
                         try:
+                            self.kickSomeone(GroupID, ncMessage.param2, ncMessage.param3)
                             # Log
-                            self.kickSomeone(GroupID, ncMessage.param2, self.getClientByMid(ncMessage.param3))
                         except:
                             # Log
                             pass
@@ -401,6 +424,17 @@ class Yuuki:
                     else:
                         self.sendText(GroupID, _("Bye Bye"))
                         self.kickSomeone(GroupID, ncMessage.param2)
+        elif self.SecurityService:
+            if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+                for userId in self.data.getData("BlackList"):
+                    if self.checkInInvitationList(ncMessage, userId):
+                        self.cancelSomeone(GroupID, userId)
+                        # Log
+            elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+                for userId in self.data.getData("BlackList"):
+                    if userId == ncMessage.param2:
+                        self.kickSomeone(GroupID, userId)
+                        # Log
 
     # Main
 
@@ -408,13 +442,14 @@ class Yuuki:
         NoWork = 0
         catchedNews = []
         ncMessage = Operation()
-        LastResetLimitTime = time.localtime().tm_hour
         Revision = self.client.getLastOpRevision()
+        if self.data.getData("Global")["LastResetLimitTime"] == None:
+            self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
         while True:
             try:
-                if time.localtime().tm_hour != LastResetLimitTime:
-                    LastResetLimitTime = time.localtime().tm_hour
+                if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
                     self.limitReset()
+                    self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
                 if NoWork == 300:
                     Revision = self.client.getLastOpRevision()
                 catchedNews = self.listen.fetchOperations(Revision, 50)

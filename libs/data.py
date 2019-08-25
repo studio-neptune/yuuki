@@ -13,7 +13,7 @@ class Yuuki_Data:
 
         self.DataType = {
             "Global":{
-                "SecurityService":False,
+                "LastResetLimitTime":None,
             },
             "Group": {},
             "LimitInfo":{},
