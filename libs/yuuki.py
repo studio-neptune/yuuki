@@ -375,7 +375,7 @@ class Yuuki:
                     group_status = self.data.getSEGroup(ncMessage.message.to)
                     if group_status == None:
                         status = _("Disable without Initialize\nAdmin of the Group：\n%s") % (
-                            self.sybGetGroupCreator(GroupInfo).name,
+                            self.sybGetGroupCreator(GroupInfo).displayName,
                         )
                     else:
                         status = _("URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s") % (
@@ -383,7 +383,7 @@ class Yuuki:
                             group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
                             group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
                             group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP],
-                            self.sybGetGroupCreator(GroupInfo).name,
+                            self.sybGetGroupCreator(GroupInfo).displayName,
                         )
                     self.sendText(self.sendToWho(ncMessage), status)
             elif 'Yuuki/Quit' == ncMessage.message.text:
