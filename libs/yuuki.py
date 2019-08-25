@@ -289,7 +289,7 @@ class Yuuki:
                 self.client.acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
                     self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO"))
-                    self.sendText(GroupID, _("Type:\n\tYuuki/Help\nto get more information\nAdmin of the Group：\n%s") %
+                    self.sendText(GroupID, _("Type:\n\tYuuki/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.sybGetGroupCreator(GroupInfo).displayName,))
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
