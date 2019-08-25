@@ -444,6 +444,8 @@ class Yuuki:
         catchedNews = []
         ncMessage = Operation()
         Revision = self.client.getLastOpRevision()
+        if "LastResetLimitTime" not in self.data.getData("Global"):
+            self.data.getData("Global")["LastResetLimitTime"] = None
         if self.data.getData("Global")["LastResetLimitTime"] == None:
             self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
         while True:
