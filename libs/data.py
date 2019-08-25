@@ -74,8 +74,8 @@ class Yuuki_Data:
 
         self.LogType = {
             "JoinGroup":"<li>%s: %s(%s) -> Inviter: %s</li>",
-            "KickEvent":"<li>%s: %s(%s) -> Kicker: %s | Kicked: %s | Status: %s</li>",
-            "CancelEvent":"<li>%s: %s(%s) -> Inviter: %s | Canceled: %s</li>",
+            "KickEvent":"<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
+            "CancelEvent":"<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
             "BlackList":"<li>%s: %s(%s)</li>"
         }
 

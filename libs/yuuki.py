@@ -203,7 +203,7 @@ class Yuuki:
             helper = max(accounts, key=accounts.get)
         else:
             if exceptUserId == self.MyMID:
-                return
+                return "None"
             helper = self.MyMID
 
         Limit = self.data.getLimit("Kick")[helper]
@@ -212,6 +212,7 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
             self.sendText(groupId, _("Kick Limit."))
+        return helper
 
     def sendToWho(self, Message):
         if Message.message.toType == MIDType.USER:
@@ -301,7 +302,7 @@ class Yuuki:
             if self.checkInInvitationList(ncMessage, userId):
                 self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
                 # Log
-                self.data.updateLog("JoinGroup", (self.data.getTime(), GroupID, userId, Inviter))
+                self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
 
     def Commands(self, ncMessage):
@@ -432,56 +433,62 @@ class Yuuki:
                 if ncMessage.param3 == '4':
                     if not GroupInfo.preventJoinByTicket:
                         self.changeGroupUrlStatus(GroupInfo, False)
-                        self.kickSomeone(GroupID, ncMessage.param2)
+                        Kicker = self.kickSomeone(GroupID, ncMessage.param2)
+                        # Log
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 if "\x1e" in ncMessage.param3:
+                    Canceler = "None"
                     for userId in ncMessage.param3.split("\x1e"):
                         if userId not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
-                            self.cancelSomeone(GroupID, userId)
+                            Canceler = self.cancelSomeone(GroupID, userId)
                     # Log
-                    self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3))
+                    self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, ncMessage.param3))
                 elif ncMessage.param3 not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
-                    self.cancelSomeone(GroupID, ncMessage.param3)
+                    Canceler = self.cancelSomeone(GroupID, ncMessage.param3)
                     # Log
-                    self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3))
+                    self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, ncMessage.param3))
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
                 for userId in self.data.getData("BlackList"):
                     if userId == ncMessage.param2:
-                        self.kickSomeone(GroupID, userId)
+                        Kicker = self.kickSomeone(GroupID, userId)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3, ncMessage.type))
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
                 if ncMessage.param2 in self.Connect.helper_ids:
                     # Log
-                    self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3, ncMessage.type*10+1))
+                    self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, Action, ncMessage.param3, ncMessage.type*10+1))
                 else:
                     if ncMessage.param3 in [self.MyMID] + self.Connect.helper_ids:
+                        Kicker = "None"
                         try:
-                            self.kickSomeone(GroupID, ncMessage.param2, ncMessage.param3)
+                            Kicker = self.kickSomeone(GroupID, ncMessage.param2, ncMessage.param3)
                             # Log
-                            self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3, ncMessage.type*10+2))
+                            self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type*10+2))
                         except:
                             # Log
-                            self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3, ncMessage.type*10+3))
+                            self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type*10+3))
                         self.data.updateData(self.data.getData("BlackList"), True, ncMessage.param2)
                         # Log
                         self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
                     else:
                         self.sendText(GroupID, _("Bye Bye"))
-                        self.kickSomeone(GroupID, ncMessage.param2)
+                        Kicker = self.kickSomeone(GroupID, ncMessage.param2)
+                        # Log
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type))
         elif self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 for userId in self.data.getData("BlackList"):
                     if self.checkInInvitationList(ncMessage, userId):
-                        self.cancelSomeone(GroupID, userId)
+                        Canceler = self.cancelSomeone(GroupID, userId)
                         # Log
-                        self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3))
+                        self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, ncMessage.param3))
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
                 for userId in self.data.getData("BlackList"):
                     if userId == ncMessage.param2:
-                        self.kickSomeone(GroupID, userId)
+                        Kicker = self.kickSomeone(GroupID, userId)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, ncMessage.param3, ncMessage.type))
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
 
     # Main
 
