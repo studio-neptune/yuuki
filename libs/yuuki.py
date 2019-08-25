@@ -143,7 +143,7 @@ class Yuuki:
     def getContact(self, userId):
         if len(userId) == len(self.MyMID) and userId[0] == "u":
             try:
-                contactInfo = self.getContact(userId)
+                contactInfo = self.client.getContact(userId)
             except:
                 contactInfo = False
         else:
@@ -421,7 +421,7 @@ class Yuuki:
         elif ncMessage.message.contentType == ContentType.CONTACT:
             Catched = ncMessage.message.contentMetadata["mid"]
             contactInfo = self.getContact(Catched)
-            if contactInfo == None or contactInfo == False:
+            if contactInfo == False:
                 msg = _("Not Found")
             elif contactInfo.mid in self.data.getData("BlackList"):
                 msg = "{}\n{}".format(_("The User(s) was in our blacklist database."), contactInfo.mid)
