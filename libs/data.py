@@ -73,7 +73,10 @@ class Yuuki_Data:
         # Log
 
         self.LogType = {
-            "JoinGroup":"<li>%s: %s(%s) -> Inviter: %s</li>"
+            "JoinGroup":"<li>%s: %s(%s) -> Inviter: %s</li>",
+            "KickEvent":"<li>%s: %s(%s) -> Kicker: %s | Kicked: %s | Status: %s</li>",
+            "CancelEvent":"<li>%s: %s(%s) -> Inviter: %s | Canceled: %s</li>",
+            "BlackList":"<li>%s: %s(%s)</li>"
         }
 
         self.LogPath = "logs/"
