@@ -170,9 +170,8 @@ class Yuuki:
 
     def limitReset(self):
         for userId in [self.MyMID] + self.Connect.helper_ids:
-            if len(self.data.getData("LimitInfo")) != 2:
-                self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
-                self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
+            self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
+            self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
 
     def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
@@ -478,8 +477,6 @@ class Yuuki:
         Revision = self.client.getLastOpRevision()
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
-        if self.data.getData("Global")["LastResetLimitTime"] == None:
-            self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
         while True:
             try:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
