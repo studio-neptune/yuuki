@@ -374,7 +374,9 @@ class Yuuki:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
                     group_status = self.data.getSEGroup(ncMessage.message.to)
                     if group_status == None:
-                        status = _("Disable without Initialize")
+                        status = _("Disable without Initialize\nAdmin of the Group：\n%s") % (
+                            self.sybGetGroupCreator(GroupInfo).name,
+                        )
                     else:
                         status = _("URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s") % (
                             group_status[OpType.NOTIFIED_UPDATE_GROUP],

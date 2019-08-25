@@ -20,7 +20,7 @@ class English:
         "Admin of the Group：\n%s": "Admin of the Group：\n%s",
         "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s": "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s",
         "Wrong UserID or the guy is not in Group": "Wrong UserID or the guy is not in Group",
-        "Disable without Initialize": "Disable without Initialize",
+        "Disable without Initialize\nAdmin of the Group：\n%s": "Disable without Initialize\nAdmin of the Group：\n%s",
         "Sorry...\nThe number of members is not satisfied (%s needed)": "Sorry...\nThe number of members is not satisfied (%s needed)",
         "LINE System UserID：\n": "LINE System UserID：\n",
         "Kick Limit.": "Kick Limit.",
