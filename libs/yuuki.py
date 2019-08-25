@@ -413,7 +413,10 @@ class Yuuki:
         (GroupID, Action) = self.securityForWhere(ncMessage)
         SEGroup = self.data.getSEGroup(GroupID)
 
-        if Action in self.Admin:
+        GroupInfo = self.client.getGroup(GroupID)
+        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+
+        if Action in GroupPrivilege:
             return
 
         if SEGroup == None:
@@ -422,7 +425,6 @@ class Yuuki:
         if SEGroup[ncMessage.type] and self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
                 if ncMessage.param3 == '4':
-                    GroupInfo = self.client.getGroup(GroupID)
                     if not GroupInfo.preventJoinByTicket:
                         self.changeGroupUrlStatus(GroupInfo, False)
                         self.kickSomeone(GroupID, ncMessage.param2)
