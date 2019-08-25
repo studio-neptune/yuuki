@@ -289,7 +289,7 @@ class Yuuki:
                 self.client.acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
                     self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO"))
-                    self.sendText(GroupID, _("Admin of the Group：\n%s") %
+                    self.sendText(GroupID, _("Type:\n\tYuuki/Help\nto get more information\nAdmin of the Group：\n%s") %
                                   (self.sybGetGroupCreator(GroupInfo).displayName,))
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
@@ -319,7 +319,9 @@ class Yuuki:
             self.client.leaveRoom(self.Seq, ncMessage.message.to)
         elif ncMessage.message.contentType == ContentType.NONE:
             msgSep = ncMessage.message.text.split(" ")
-            if 'Yuuki/UserID' == ncMessage.message.text:
+            if 'Yuuki/Help' == ncMessage.message.text:
+                self.sendText(self.sendToWho(ncMessage), "v6.5.0-alpha")
+            elif 'Yuuki/UserID' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
             elif 'Yuuki/Speed' == ncMessage.message.text:
                 Time1 = time.time()
@@ -366,7 +368,7 @@ class Yuuki:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid]
-                    if ncMessage.message.from_ in GroupPrivilege:
+                    if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
                                 self.data.updateData(self.data.getData("Group")[GroupInfo.id], "Ext_Admin", msgSep[2])
@@ -376,8 +378,8 @@ class Yuuki:
                         elif msgSep[1] == "delete":
                                 self.data.updateData(self.data.getData("Group")[GroupInfo.id], "Ext_Admin", msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
-                        else:
-                            self.sendText(self.sendToWho(ncMessage), self.data.getGroup(GroupInfo.id)["Ext_Admin"])
+                    else:
+                        self.sendText(self.sendToWho(ncMessage), self.data.getGroup(GroupInfo.id)["Ext_Admin"])
             elif 'Yuuki/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
@@ -477,7 +479,7 @@ class Yuuki:
                         self.data.updateData(self.data.getData("BlackList"), True, Action)
                         # Log
                         self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
-                        self.sendText(Action, _("You has been blocked by our database."))
+                        self.sendText(Action, _("You had been blocked by our database."))
                     else:
                         self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
                         Kicker = self.kickSomeone(GroupID, ncMessage.param2)

@@ -17,7 +17,7 @@ class English:
 
     i18nText = {
         "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO": "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO",
-        "Admin of the Group：\n%s": "Admin of the Group：\n%s",
+        "Type:\n\tYuuki/Help\nto get more information\nAdmin of the Group：\n%s": "Type:\n\tYuuki/Help\nto get more information\nAdmin of the Group：\n%s",
         "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s": "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s",
         "Wrong UserID or the guy is not in Group": "Wrong UserID or the guy is not in Group",
         "Disable without Initialize\nAdmin of the Group：\n%s": "Disable without Initialize\nAdmin of the Group：\n%s",
@@ -28,7 +28,7 @@ class English:
         "Do not invite anyone...thanks": "Do not invite anyone...thanks",
         "The User(s) was in our blacklist database.": "The User(s) was in our blacklist database.",
         "You are our blacklist. Bye~": "You are our blacklist. Bye~",
-        "You has been blocked by our database.": "You has been blocked by our database.",
+        "You had been blocked by our database.": "You had been blocked by our database.",
         "Kick Limit.": "Kick Limit.",
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss",
