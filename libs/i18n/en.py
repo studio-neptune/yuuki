@@ -37,5 +37,6 @@ class English:
         "Bye Bye": "Bye Bye",
         "Not Found": "Not Found",
         "Okay": "Okay",
-        "Exit.": "Exit."
+        "Exit.": "Exit.",
+        "Added": "Added"
     }
