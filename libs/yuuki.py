@@ -172,12 +172,12 @@ class Yuuki:
         for userId in [self.MyMID] + self.Connect.helper_ids:
             if reconnect:
                 if userId not in self.data.getLimit("Kick"):
-                    self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
+                    self.data.updateData(self.data.getData("LimitInfo")["Kick"], userId, self.KickLimit)
                 if userId not in self.data.getLimit("Cancel"):
-                    self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
+                    self.data.updateData(self.data.getData("LimitInfo")["Cancel"], userId, self.CancelLimit)
             else:
-                self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
-                self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
+                self.data.updateData(self.data.getData("LimitInfo")["Kick"], userId, self.KickLimit)
+                self.data.updateData(self.data.getData("LimitInfo")["Cancel"], self.CancelLimit)
 
     def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
@@ -193,7 +193,7 @@ class Yuuki:
         Limit = self.data.getLimit("Cancel")[helper]
         if Limit > 0:
             self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupId, [userId])
-            self.data.updateData(self.data.getLimit("Cancel"), helper, Limit - 1)
+            self.data.updateData(self.data.getData("LimitInfo")["Cancel"], helper, Limit - 1)
         else:
             self.sendText(groupId, _("Cancel Limit."))
 
@@ -211,7 +211,7 @@ class Yuuki:
         Limit = self.data.getLimit("Kick")[helper]
         if Limit > 0:
             self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupId, [userId])
-            self.data.updateData(self.data.getLimit("Kick"), helper, Limit - 1)
+            self.data.updateData(self.data.getData("LimitInfo")["Kick"], helper, Limit - 1)
         else:
             self.sendText(groupId, _("Kick Limit."))
 
@@ -365,12 +365,12 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                                self.data.updateData(self.data.getGroup(GroupInfo.id), "Ext_Admin", msgSep[2])
+                                self.data.updateData(self.data.getData("Group")[GroupInfo.id], "Ext_Admin", msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
-                                self.data.updateData(self.data.getGroup(GroupInfo.id), "Ext_Admin", msgSep[2])
+                                self.data.updateData(self.data.getData("Group")[GroupInfo.id], "Ext_Admin", msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), self.data.getGroup(GroupInfo.id)["Ext_Admin"])
