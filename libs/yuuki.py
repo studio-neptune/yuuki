@@ -371,7 +371,7 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                                if msgSep[2] in self.data.getData("BlackList"):
+                                if msgSep[2] in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
                                     self.sendText(self.sendToWho(ncMessage), _("Added"))
                                 elif msgSep[2] not in self.data.getData("BlackList"):
                                     self.data.updateData(self.data.getGroup(GroupInfo.id)["Ext_Admin"], True, msgSep[2])
