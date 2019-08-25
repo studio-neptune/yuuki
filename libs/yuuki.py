@@ -55,10 +55,8 @@ class Yuuki:
 
         self.MyMID = self.client.getProfile().mid
 
-        for userId in [self.MyMID] + self.Connect.helper_ids:
-            if len(self.data.getData("LimitInfo")) != 2:
-                self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
-                self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
+        if len(self.data.getData("LimitInfo")) != 2:
+            self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
 
         global _
         _ = self.i18n._
@@ -169,8 +167,6 @@ class Yuuki:
                 return Accounts[count]
 
     def limitReset(self, reconnect=False):
-        if len(self.data.getData("LimitInfo")) != 2:
-            self.data.updateData(self.data.getData("LimitInfo"), self.data.LimitType, self.KickLimit)
         for userId in [self.MyMID] + self.Connect.helper_ids:
             if reconnect:
                 if userId not in self.data.getLimit("Kick"):
@@ -179,7 +175,7 @@ class Yuuki:
                     self.data.updateData(self.data.getData("LimitInfo")["Cancel"], userId, self.CancelLimit)
             else:
                 self.data.updateData(self.data.getData("LimitInfo")["Kick"], userId, self.KickLimit)
-                self.data.updateData(self.data.getData("LimitInfo")["Cancel"], self.CancelLimit)
+                self.data.updateData(self.data.getData("LimitInfo")["Cancel"], userId, self.CancelLimit)
 
     def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
