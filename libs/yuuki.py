@@ -337,7 +337,7 @@ class Yuuki:
                         except:
                             pass
                     else:
-                        self.sendText(self.sendToWho(ncMessage), bool(self.SecurityService))
+                        self.sendText(self.sendToWho(ncMessage), str(bool(self.SecurityService)))
             elif 'Yuuki/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
@@ -379,8 +379,11 @@ class Yuuki:
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
+                            if msgSep[2] in self.data.getData("Group")[GroupInfo.id]["Ext_Admin"]:
                                 self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], False, msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                            else:
+                                self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                     else:
                         self.sendText(self.sendToWho(ncMessage), self.data.getGroup(GroupInfo.id)["Ext_Admin"])
             elif 'Yuuki/Status' == ncMessage.message.text:
