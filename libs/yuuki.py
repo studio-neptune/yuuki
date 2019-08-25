@@ -53,12 +53,12 @@ class Yuuki:
 
         self.SecurityService = self.YuukiConfigs["SecurityService"]
 
+        self.MyMID = self.client.getProfile().mid
+
         for userId in [self.MyMID] + self.Connect.helper_ids:
             if len(self.data.getData("LimitInfo")) != 2:
                 self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
                 self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
-
-        self.MyMID = self.client.getProfile().mid
 
         global _
         _ = self.i18n._
@@ -154,15 +154,13 @@ class Yuuki:
 
     def securityForWhere(self, Message):
         if Message.type == OpType.NOTIFIED_UPDATE_GROUP:
-            return Message.param1
+            return Message.param1, Message.param2
         elif Message.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-            return Message.param1
+            return Message.param1, Message.param2
         elif Message.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-            return Message.param1
-        elif Message.type == OpType.KICKOUT_FROM_GROUP:
-            return Message.param1
+            return Message.param1, Message.param2
         elif Message.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-            return Message.param1
+            return Message.param1, Message.param2
 
     def getClientByMid(self, userId):
         Accounts = [self.client] + self.Connect.helper
@@ -382,8 +380,11 @@ class Yuuki:
                 NOTIFIED_ACCEPT_GROUP_INVITATION (17)
                 NOTIFIED_KICKOUT_FROM_GROUP (19)
         """
-        GroupID = self.securityForWhere(ncMessage)
+        (GroupID, Action) = self.securityForWhere(ncMessage)
         SEGroup = self.data.getSEGroup(GroupID)
+
+        if Action in self.Admin:
+            return
 
         if SEGroup == None:
             return
