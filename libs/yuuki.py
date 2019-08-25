@@ -330,7 +330,7 @@ class Yuuki:
             elif 'Yuuki/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
                         for code in msgSep:
@@ -343,7 +343,7 @@ class Yuuki:
             elif 'Yuuki/Disable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
                         for code in msgSep:
@@ -356,7 +356,7 @@ class Yuuki:
             elif 'Yuuki/ExtAdmin' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid]
                     if ncMessage.message.from_ in GroupPrivilege:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
@@ -389,7 +389,7 @@ class Yuuki:
             elif 'Yuuki/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo)] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         self.sendText(self.sendToWho(ncMessage), _("Bye Bye"))
                         self.client.leaveGroup(self.Seq, GroupInfo.id)
