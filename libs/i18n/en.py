@@ -30,6 +30,7 @@ class English:
         "You are our blacklist. Bye~": "You are our blacklist. Bye~",
         "You had been blocked by our database.": "You had been blocked by our database.",
         "Kick Limit.": "Kick Limit.",
+        "Cancel Limit.": "Cancel Limit.",
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss",
         "Bye Bye": "Bye Bye",
