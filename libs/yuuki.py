@@ -385,7 +385,7 @@ class Yuuki:
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                     else:
-                        self.sendText(self.sendToWho(ncMessage), self.data.getGroup(GroupInfo.id)["Ext_Admin"])
+                        self.sendText(self.sendToWho(ncMessage), str(self.data.getGroup(GroupInfo.id)["Ext_Admin"]))
             elif 'Yuuki/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
