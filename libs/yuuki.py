@@ -279,7 +279,8 @@ class Yuuki:
             ToDo Type:
                 NOTIFIED_INVITE_INTO_GROUP (13)
         """
-        if self.checkInInvitationList(ncMessage):
+        BlockedIgnore = ncMessage.param2 in self.data.getData("BlackList")
+        if self.checkInInvitationList(ncMessage) and not BlockedIgnore:
             GroupID = ncMessage.param1
             Inviter = ncMessage.param2
             GroupInfo = self.client.getGroup(GroupID)
@@ -298,11 +299,12 @@ class Yuuki:
                     self.client.leaveGroup(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupID, "Not Join", Inviter))
-        for userId in self.Connect.helper_ids:
-            if self.checkInInvitationList(ncMessage, userId):
-                self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
-                # Log
-                self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
+        if not BlockedIgnore:
+            for userId in self.Connect.helper_ids:
+                if self.checkInInvitationList(ncMessage, userId):
+                    self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
+                    # Log
+                    self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
 
     def Commands(self, ncMessage):
@@ -310,7 +312,8 @@ class Yuuki:
             ToDo Type:
                 RECEIVE_MESSAGE (26)
         """
-        if 'BOT_CHECK' in ncMessage.message.contentMetadata:
+        BlockedIgnore = (ncMessage.message.to in self.data.getData("BlackList")) or (ncMessage.message.from_ in self.data.getData("BlackList"))
+        if ('BOT_CHECK' in ncMessage.message.contentMetadata) or BlockedIgnore:
             pass
         elif ncMessage.message.toType == MIDType.ROOM:
             self.client.leaveRoom(self.Seq, ncMessage.message.to)
@@ -433,6 +436,7 @@ class Yuuki:
                 if ncMessage.param3 == '4':
                     if not GroupInfo.preventJoinByTicket:
                         self.changeGroupUrlStatus(GroupInfo, False)
+                        self.sendText(GroupID, _("DO NOT TOUCH THE GROUP URL SETTINGs, see you..."))
                         Kicker = self.kickSomeone(GroupID, ncMessage.param2)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type))
@@ -448,9 +452,11 @@ class Yuuki:
                     Canceler = self.cancelSomeone(GroupID, ncMessage.param3)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, ncMessage.param3))
+                self.sendText(GroupID, _("Do not invite anyone...thanks"))
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
                 for userId in self.data.getData("BlackList"):
                     if userId == ncMessage.param2:
+                        self.sendText(GroupID, _("You are our blacklist. Bye~"))
                         Kicker = self.kickSomeone(GroupID, userId)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
@@ -468,24 +474,29 @@ class Yuuki:
                         except:
                             # Log
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type*10+3))
-                        self.data.updateData(self.data.getData("BlackList"), True, ncMessage.param2)
+                        self.data.updateData(self.data.getData("BlackList"), True, Action)
                         # Log
                         self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
+                        self.sendText(Action, _("You has been blocked by our database."))
                     else:
-                        self.sendText(GroupID, _("Bye Bye"))
+                        self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
                         Kicker = self.kickSomeone(GroupID, ncMessage.param2)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, ncMessage.param3, ncMessage.type))
         elif self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+                Canceler = "None"
                 for userId in self.data.getData("BlackList"):
                     if self.checkInInvitationList(ncMessage, userId):
                         Canceler = self.cancelSomeone(GroupID, userId)
                         # Log
                         self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, ncMessage.param3))
+                if Canceler != "None":
+                    self.sendText(GroupID, _("The User(s) was in our blacklist database."))
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
                 for userId in self.data.getData("BlackList"):
                     if userId == ncMessage.param2:
+                        self.sendText(GroupID, _("You are our blacklist. Bye~"))
                         Kicker = self.kickSomeone(GroupID, userId)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
