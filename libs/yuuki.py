@@ -168,10 +168,16 @@ class Yuuki:
             if AccountUserId == userId:
                 return Accounts[count]
 
-    def limitReset(self):
+    def limitReset(self, reconnect=False):
         for userId in [self.MyMID] + self.Connect.helper_ids:
-            self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
-            self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
+            if reconnect:
+                if userId not in self.data.getLimit("Kick"):
+                    self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
+                if userId not in self.data.getLimit("Cancel"):
+                    self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
+            else:
+                self.data.updateData(self.data.getLimit("Kick"), userId, self.KickLimit)
+                self.data.updateData(self.data.getLimit("Cancel"), userId, self.CancelLimit)
 
     def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
@@ -430,9 +436,9 @@ class Yuuki:
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 if "\x1e" in ncMessage.param3:
                     for userId in ncMessage.param3.split("\x1e"):
-                        if userId not in [self.MyMID] + self.Connect.helper_ids:
+                        if userId not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
                             self.cancelSomeone(GroupID, userId)
-                elif ncMessage.param3 not in [self.MyMID] + self.Connect.helper_ids:
+                elif ncMessage.param3 not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
                     self.cancelSomeone(GroupID, ncMessage.param3)
                 # Log
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
@@ -477,6 +483,8 @@ class Yuuki:
         Revision = self.client.getLastOpRevision()
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
+        if time.localtime().tm_hour == self.data.getData("Global")["LastResetLimitTime"]:
+            self.limitReset(True)
         while True:
             try:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
