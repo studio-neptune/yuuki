@@ -22,6 +22,7 @@ class English:
         "Wrong UserID or the guy is not in Group": "Wrong UserID or the guy is not in Group",
         "Disable without Initialize\nAdmin of the Group：\n%s": "Disable without Initialize\nAdmin of the Group：\n%s",
         "Sorry...\nThe number of members is not satisfied (%s needed)": "Sorry...\nThe number of members is not satisfied (%s needed)",
+        "Name：%s\nPicture URL：%s%s\nStatusMessage：\n%s\nLINE System UserID：%s": "Name：%s\nPicture URL：%s%s\nStatusMessage：\n%s\nLINE System UserID：%s",
         "LINE System UserID：\n": "LINE System UserID：\n",
         "DO NOT KICK, thank you ^^": "DO NOT KICK, thank you ^^",
         "DO NOT TOUCH THE GROUP URL SETTINGs, see you...": "DO NOT TOUCH THE GROUP URL SETTINGs, see you...",
@@ -34,6 +35,7 @@ class English:
         "Testing...": "Testing...",
         "Speed:\n%ss": "Speed:\n%ss",
         "Bye Bye": "Bye Bye",
+        "Not Found": "Not Found",
         "Okay": "Okay",
         "Exit.": "Exit."
     }

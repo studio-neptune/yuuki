@@ -371,8 +371,11 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                                self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], True, msgSep[2])
-                                self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                                if msgSep[2] not in self.data.getData("BlackList"):
+                                    self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], True, msgSep[2])
+                                    self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                                else:
+                                    self.sendText(self.sendToWho(ncMessage), _("The User(s) was in our blacklist database."))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
@@ -412,6 +415,18 @@ class Yuuki:
                 if ncMessage.message.from_ in self.Admin:
                     ComMsg = self.readCommandLine(msgSep[1:len(msgSep)])
                     self.sendText(self.sendToWho(ncMessage), str(eval(ComMsg)))
+        elif ncMessage.message.contentType == ContentType.CONTACT:
+            Catched = ncMessage.message.contentMetadata["mid"]
+            contactInfo = self.getContact(Catched)
+            if contactInfo == None or contactInfo == False:
+                msg = _("Not Found")
+            elif contactInfo.mid in self.data.getData("BlackList"):
+                msg = "{}\n{}".format(_("The User(s) was in our blacklist database."), contactInfo.mid)
+            else:
+                msg = _("Name：%s\nPicture URL：%s%s\nStatusMessage：\n%s\nLINE System UserID：%s") % \
+                      (contactInfo.displayName, self.LINE_Media_server, contactInfo.pictureStatus,
+                       contactInfo.statusMessage, contactInfo.mid)
+            self.sendText(self.sendToWho(ncMessage), msg)
 
     def Security(self, ncMessage):
         """
