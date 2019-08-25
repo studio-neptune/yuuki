@@ -128,9 +128,9 @@ class Yuuki_Data:
         if len(LimitInfo) != 2:
             LimitInfo = self.LimitType
         if Type == "Kick":
-            return LimitInfo["KickLimit"]
+            return int(LimitInfo["KickLimit"])
         elif Type == "Cancel":
-            return LimitInfo["CancelLimit"]
+            return int(LimitInfo["CancelLimit"])
 
     def getGroup(self, GroupID):
         Groups = self.getData("Group")

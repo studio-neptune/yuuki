@@ -185,10 +185,10 @@ class Yuuki:
                 return
             helper = self.MyMID
 
-        if self.data.getLimit("Cancel")[helper] > 0:
+        Limit = self.data.getLimit("Cancel")[helper]
+        if Limit > 0:
             self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupId, [userId])
-            self.data.getLimit("Cancel")[helper] -= 1
-            self.data.syncData()
+            self.data.updateData(self.data.getLimit("Cancel"), helper, Limit - 1)
         else:
             self.sendText(groupId, _("Cancel Limit."))
 
@@ -203,10 +203,10 @@ class Yuuki:
                 return
             helper = self.MyMID
 
-        if self.data.getLimit("Kick")[helper] > 0:
+        Limit = self.data.getLimit("Kick")[helper]
+        if Limit > 0:
             self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupId, [userId])
-            self.data.getLimit("Kick")[helper] -= 1
-            self.data.syncData()
+            self.data.updateData(self.data.getLimit("Kick"), helper, Limit - 1)
         else:
             self.sendText(groupId, _("Kick Limit."))
 
