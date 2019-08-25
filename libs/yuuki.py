@@ -369,20 +369,18 @@ class Yuuki:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid]
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
-                        if GroupInfo not in self.data.getData("Group"):
-                            self.data.updateData(self.data.Data, GroupInfo.id, self.data.GroupType)
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
                                 if msgSep[2] not in self.data.getData("BlackList"):
-                                    self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], True, msgSep[2])
+                                    self.data.updateData(self.data.getGroup(GroupInfo.id)["Ext_Admin"], True, msgSep[2])
                                     self.sendText(self.sendToWho(ncMessage), _("Okay"))
                                 else:
                                     self.sendText(self.sendToWho(ncMessage), _("The User(s) was in our blacklist database."))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
-                            if msgSep[2] in self.data.getData("Group")[GroupInfo.id]["Ext_Admin"]:
-                                self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], False, msgSep[2])
+                            if msgSep[2] in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+                                self.data.updateData(self.data.getGroup(GroupInfo.id)["Ext_Admin"], False, msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Not Found"))
