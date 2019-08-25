@@ -371,12 +371,12 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                                self.data.updateData(self.data.getData("Group")[GroupInfo.id], "Ext_Admin", msgSep[2])
+                                self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], True, msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
-                                self.data.updateData(self.data.getData("Group")[GroupInfo.id], "Ext_Admin", msgSep[2])
+                                self.data.updateData(self.data.getData("Group")[GroupInfo.id]["Ext_Admin"], False, msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                     else:
                         self.sendText(self.sendToWho(ncMessage), self.data.getGroup(GroupInfo.id)["Ext_Admin"])
