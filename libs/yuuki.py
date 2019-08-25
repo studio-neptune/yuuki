@@ -169,6 +169,8 @@ class Yuuki:
                 return Accounts[count]
 
     def limitReset(self, reconnect=False):
+        if len(self.data.getData("LimitInfo")) != 2:
+            self.data.updateData(self.data.getData("LimitInfo"), self.data.LimitType, self.KickLimit)
         for userId in [self.MyMID] + self.Connect.helper_ids:
             if reconnect:
                 if userId not in self.data.getLimit("Kick"):

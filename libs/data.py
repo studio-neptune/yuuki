@@ -125,8 +125,6 @@ class Yuuki_Data:
 
     def getLimit(self, Type):
         LimitInfo = self.getData("LimitInfo")
-        if len(LimitInfo) != 2:
-            LimitInfo = self.LimitType
         if Type == "Kick":
             Limit = {}
             for Mode in LimitInfo["KickLimit"]:
