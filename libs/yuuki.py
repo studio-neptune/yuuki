@@ -509,6 +509,8 @@ class Yuuki:
                             Kicker = self.kickSomeone(GroupID, Action, Another)
                             # Log
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
+                            GroupTicket = self.getClientByMid(Kicker).reissueGroupTicket(GroupID)
+                            self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         except:
                             # Log
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
