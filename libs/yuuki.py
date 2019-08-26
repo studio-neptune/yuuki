@@ -18,6 +18,13 @@ class Yuuki_Settings:
     """ Yuuki Custom Settings """
 
     config = {
+        "name": "Yuuki",
+        "version": "v6.5.0-alpha_RC1",
+        "project_url": "https://line.starinc.xyz/star-yuuki-bot/",
+        "man_page": "https://line.starinc.xyz/star-yuuki-bot/",
+        "privacy_page": "OpenSource - License under MPL 2.0",
+        "copyright": "(c)2019 Star Inc.",
+
         "Seq": 0,
         "Admin": [],
         "SecurityService": False,
@@ -288,7 +295,7 @@ class Yuuki:
             if GroupInfo.members:
                 self.client.acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
-                    self.sendText(GroupID, _("Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO"))
+                    self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\tYuuki/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.sybGetGroupCreator(GroupInfo).displayName,))
                     # Log
@@ -320,7 +327,12 @@ class Yuuki:
         elif ncMessage.message.contentType == ContentType.NONE:
             msgSep = ncMessage.message.text.split(" ")
             if 'Yuuki/Help' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), "v6.5.0-alpha")
+                self.sendText(self.sendToWho(ncMessage), _("%s\n\t%s\n\nCommands Info:%s\n\nPrivacy:\n%s\n\n%s\n%s") %
+                              (self.YuukiConfigs["name"], self.YuukiConfigs["version"],
+                               self.YuukiConfigs["man_page"], self.YuukiConfigs["privacy_page"],
+                               self.YuukiConfigs["project_url"], self.YuukiConfigs["copyright"]))
+            elif 'Yuuki/Version' == ncMessage.message.text:
+                self.sendText(self.sendToWho(ncMessage), self.YuukiConfigs["version"])
             elif 'Yuuki/UserID' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
             elif 'Yuuki/Speed' == ncMessage.message.text:
@@ -414,7 +426,7 @@ class Yuuki:
                         self.client.leaveGroup(self.Seq, GroupInfo.id)
                         for userId in self.Connect.helper_ids:
                             if userId in [member.mid for member in GroupInfo.members]:
-                                self.getClientByMid(userId).leaveGroup()
+                                self.getClientByMid(userId).leaveGroup(self.Seq, GroupInfo.id)
             elif 'Yuuki/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
                     self.sendText(self.sendToWho(ncMessage), _("Exit."))
