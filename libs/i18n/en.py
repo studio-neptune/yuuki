@@ -16,13 +16,14 @@
 class English:
 
     i18nText = {
-        "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO": "Helllo^^\nMy name is Yuuki ><\nNice to meet you OwO",
-        "Type:\n\tYuuki/Help\nto get more information\n\nAdmin of the Group:\n%s": "Type:\n\tYuuki/Help\nto get more information\n\nAdmin of the Group:\n%s",
+        "Helllo^^\nMy name is %s ><\nNice to meet you OwO": "Helllo^^\nMy name is %s ><\nNice to meet you OwO",
+        "Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s": "Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s",
+        "%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s": "%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s",
         "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s": "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s",
         "Wrong UserID or the guy is not in Group": "Wrong UserID or the guy is not in Group",
-        "Disable without Initialize\nAdmin of the Group：\n%s": "Disable without Initialize\nAdmin of the Group：\n%s",
+        "Default without Initialize\nAdmin of the Group：\n%s": "Default without Initialize\nAdmin of the Group：\n%s",
         "Sorry...\nThe number of members is not satisfied (%s needed)": "Sorry...\nThe number of members is not satisfied (%s needed)",
-        "Name：%s\nPicture URL：%s%s\nStatusMessage：\n%s\nLINE System UserID：%s": "Name：%s\nPicture URL：%s%s\nStatusMessage：\n%s\nLINE System UserID：%s",
+        "Name:%s\nPicture URL:%s/%s\nStatusMessage:\n%s\nLINE System UserID:%s": "Name:%s\nPicture URL:%s/%s\nStatusMessage:\n%s\nLINE System UserID:%s",
         "LINE System UserID：\n": "LINE System UserID：\n",
         "DO NOT KICK, thank you ^^": "DO NOT KICK, thank you ^^",
         "DO NOT TOUCH THE GROUP URL SETTINGs, see you...": "DO NOT TOUCH THE GROUP URL SETTINGs, see you...",

@@ -59,7 +59,7 @@ class Yuuki_Connect:
         return client, listen
 
     def helperConnect(self, LINE_ACCESS_KEY):
-        helper_ConnectHeader = self.con_header
+        helper_ConnectHeader = self.con_header.copy()
         helper_ConnectHeader["X-Line-Access"] = LINE_ACCESS_KEY
 
         transport = THttpClient.THttpClient(self.host + self.com_path)
