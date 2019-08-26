@@ -20,9 +20,9 @@ class Yuuki_Settings:
     config = {
         "name": "Yuuki",
         "version": "v6.5.0-alpha_RC1",
-        "project_url": "https://line.starinc.xyz/star-yuuki-bot/",
-        "man_page": "https://line.starinc.xyz/star-yuuki-bot/",
-        "privacy_page": "OpenSource - License under MPL 2.0",
+        "project_url": "https://tinyurl.com/syb-yuuki",
+        "man_page": "None",
+        "privacy_page": "OpenSource - Licensed under MPL 2.0",
         "copyright": "(c)2019 Star Inc.",
 
         "Seq": 0,
