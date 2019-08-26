@@ -17,8 +17,8 @@ class English:
 
     i18nText = {
         "Helllo^^\nMy name is %s ><\nNice to meet you OwO": "Helllo^^\nMy name is %s ><\nNice to meet you OwO",
-        "Type:\n\tYuuki/Help\nto get more information\n\nAdmin of the Group:\n%s": "Type:\n\tYuuki/Help\nto get more information\n\nAdmin of the Group:\n%s",
-        "%s\n\t%s\n\nCommands Info:%s\n\nPrivacy:\n%s\n\n%s\n%s": "%s\n\t%s\n\nCommands Info:%s\n\nPrivacy:\n%s\n\n%s\n%s",
+        "Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s": "Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s",
+        "%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s": "%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s",
         "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s": "URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s",
         "Wrong UserID or the guy is not in Group": "Wrong UserID or the guy is not in Group",
         "Default without Initialize\nAdmin of the Group：\n%s": "Default without Initialize\nAdmin of the Group：\n%s",
