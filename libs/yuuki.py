@@ -412,6 +412,9 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege:
                         self.sendText(self.sendToWho(ncMessage), _("Bye Bye"))
                         self.client.leaveGroup(self.Seq, GroupInfo.id)
+                        for userId in self.Connect.helper_ids:
+                            if userId in [member.mid for member in GroupInfo.members]:
+                                self.getClientByMid(userId).leaveGroup()
             elif 'Yuuki/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
                     self.sendText(self.sendToWho(ncMessage), _("Exit."))
