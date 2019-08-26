@@ -1,8 +1,8 @@
 Star Yuuki(pYthon) BOT - Yuuki
 ==================
-![Version](https://img.shields.io/badge/v6.3.2-OpenSource-33FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF8800.svg) ![Python](https://img.shields.io/badge/python-2.x-0066FF.svg)
+![Version](https://img.shields.io/badge/v6.5.0-OpenSource-33FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF8800.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg)
 
-A LINE Unofficial API  Python BOT by SA Kingdom and Star Inc.
+A Python BOT for LINE Group Protection with LINE Unofficial API.
 ![ICON](logo.png)
 
 ## Maybe you had seen it !
@@ -13,26 +13,42 @@ Now, it is OpenSource.
 This software using Mozilla Public License 2.0.
 
 ## Warning
-The project was stopped in 2017/06. So the latest stable version is "v6.3.2". Some function of old version maybe will make your LINE account be banned.
+The latest stable version is "v6.5.0".
 
-## Requires
-    python >= 2.6 (Python 3 Not Support)
-    thrift >= 0.11.0
+Some function of old version maybe will make your LINE account be banned.
 
-### Before v6.5.0:
-It was used the edited version of [carpedm20/LINE](https://github.com/carpedm20/LINE) API to run the Application. So you need to make the LINEAPI for it.
+## Requirement
+### [!] Run with GNU/Linux only
 
-### After (Future):
-You need the "LINE  Unofficial  API Python Core" only. (Ex:[olsb](https://github.com/star-inc/olsb_cores),  [akad](https://pypi.org/project/akad), [curve](https://pypi.org/project/curve) ...)
+Recommand Environment:
 
-## Old Version
-Maybe you want the history version of SYB. Click [it](https://github.com/star-inc/star_yuuki_bot/releases/tag/old-versions).
+    Ubuntu >= 18.04
+    python >= 3.7
+    pip >= 19.2
+
+You need the "LINE Unofficial API Core for Python". (Ex:[olsb](https://github.com/star-inc/olsb_cores),  [akad](https://pypi.org/project/akad), [curve](https://pypi.org/project/curve) ...)
+
+Please place the core directory in `./libs/`
+
+## Installation
+
++ Check your system environment(Operating System, Requirements..)
+
++ Exec:
+
+
+    pip install -Ur requirements.txt
 
 ## Usage
++ Config your connection infomations in `main.py`
+
++ Exec:
+
+
     python main.py
 
-### Notice
-The helpers of the project("syb-sc", "syb-ab") have not been  OpenSource. And "4syb" is a part of [StarNeptuneBOT](https://starinc.xyz/snb).
+## Old Version
+Maybe you want the source of history version. Click [it](https://github.com/star-inc/star_yuuki_bot/releases/tag/old-versions).
 
 ### Logo Copyright
 Copyright of the Image which was named "logo.png" belogs to "[ 	©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)".
