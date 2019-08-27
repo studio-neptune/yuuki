@@ -38,6 +38,12 @@ class Yuuki_Data:
             OpType.NOTIFIED_KICKOUT_FROM_GROUP:False
         }
 
+        self.initType = {
+            "Group":self.GroupType,
+            "LimitInfo":self.LimitType,
+            "SEGroup":self.SEGrouptype
+        }
+
         self.DataPath = "data/"
         self.DataName = "{}.json"
 
@@ -124,8 +130,22 @@ class Yuuki_Data:
         Time = time.localtime(time.time())
         return time.strftime(format, Time)
 
-    def getData(self, Type):
-        return self.Data[Type]
+    def getData(self, Type, Query=None, Level=2):
+        if Query != None:
+            if Level == 2:
+                if Query not in self.Data[Type]:
+                    self.Data[Type][Query] = self.initType[Query]
+                else:
+                    return self.Data[Type][Query]
+            elif Level == 3 and type(Query) == list:
+                if Query[1] not in self.Data[Type]:
+                    self.Data[Type][Query[0]][Query[1]] = self.initType[Query[1]]
+                else:
+                    return self.Data[Type][Query[0]][Query[1]]
+            else:
+                assert "Error Query Level"
+        else:
+            return self.Data[Type]
 
     def getLimit(self, Type):
         LimitInfo = self.getData("LimitInfo")
@@ -140,16 +160,6 @@ class Yuuki_Data:
         else:
             Limit = None
         return Limit
-
-    def getGroup(self, GroupID):
-        Groups = self.getData("Group")
-        if len(Groups) > 0:
-            GroupIDs = [Group for Group in Groups]
-            if GroupID not in GroupIDs:
-                Groups[GroupID] = self.GroupType
-        else:
-            Groups[GroupID] = self.GroupType
-        return Groups[GroupID]
 
     def getSEGroup(self, GroupID):
         SEMode = self.getGroup(GroupID)["SEGroup"]

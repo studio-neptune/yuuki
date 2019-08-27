@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-alpha_RC1",
+        "version": "v6.5.0-alpha_RC2",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "None",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -61,9 +61,6 @@ class Yuuki:
         self.SecurityService = self.YuukiConfigs["SecurityService"]
 
         self.MyMID = self.client.getProfile().mid
-
-        if len(self.data.getData("LimitInfo")) != 2:
-            self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
 
         global _
         _ = self.i18n._
@@ -129,7 +126,7 @@ class Yuuki:
         if 3 in status:
             group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP] = True
 
-        self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
+        self.data.updateData(self.data.getData("Group", groupId), "SEGroup", group_status)
 
     def disableSecurityStatus(self, groupId, status):
         group_status = self.data.SEGrouptype
@@ -142,7 +139,7 @@ class Yuuki:
         if 3 in status:
             group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP] = False
 
-        self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
+        self.data.updateData(self.data.getData("Group", groupId), "SEGroup", group_status)
 
     def cleanMyGroupInvitations(self):
         for cleanInvitations in self.client.getGroupIdsInvited():
@@ -176,27 +173,22 @@ class Yuuki:
                 return Accounts[count]
 
     def getGroupTicket(self, GroupID, userId):
-        GroupTicket = ""
-        if "GroupTicket" in self.data.getGroup(GroupID):
-            if self.data.getGroup(GroupID)["GroupTicket"] != "":
-                GroupTicket = self.data.getGroup(GroupID)["GroupTicket"]
-        else:
-            self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
+        GroupTicket = self.data.getData("Group", [GroupID, "GroupTicket"], 3)
         if GroupTicket == "":
             GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
-            self.data.updateData(self.data.getGroup(GroupID)["GroupTicket"], userId, GroupTicket)
+            self.data.updateData(self.data.getData("Group", [GroupID, "GroupTicket"], 3), userId, GroupTicket)
         return GroupTicket
 
     def limitReset(self, reconnect=False):
         for userId in [self.MyMID] + self.Connect.helper_ids:
             if reconnect:
                 if userId not in self.data.getLimit("Kick"):
-                    self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
+                    self.data.updateData(self.data.getData("LimitInfo", "KickLimit"), userId, self.KickLimit)
                 if userId not in self.data.getLimit("Cancel"):
-                    self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], userId, self.CancelLimit)
+                    self.data.updateData(self.data.getData("LimitInfo", "CancelLimit"), userId, self.CancelLimit)
             else:
-                self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
-                self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], userId, self.CancelLimit)
+                self.data.updateData(self.data.getData("LimitInfo", "KickLimit"), userId, self.KickLimit)
+                self.data.updateData(self.data.getData("LimitInfo", "CancelLimit"), userId, self.CancelLimit)
 
     def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
@@ -212,7 +204,7 @@ class Yuuki:
         Limit = self.data.getLimit("Cancel")[helper]
         if Limit > 0:
             self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupId, [userId])
-            self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
+            self.data.updateData(self.data.getData("LimitInfo", "CancelLimit"), helper, Limit - 1)
         else:
             self.sendText(groupId, _("Cancel Limit."))
 
@@ -230,7 +222,7 @@ class Yuuki:
         Limit = self.data.getLimit("Kick")[helper]
         if Limit > 0:
             self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupId, [userId])
-            self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
+            self.data.updateData(self.data.getData("LimitInfo", "KickLimit"), helper, Limit - 1)
         else:
             self.sendText(groupId, _("Kick Limit."))
         return helper
@@ -369,7 +361,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
                         for code in msgSep:
@@ -382,7 +374,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Disable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
                         for code in msgSep:
@@ -399,23 +391,23 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                                if msgSep[2] in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+                                if msgSep[2] in self.data.getData("Group", GroupInfo.id)["Ext_Admin"]:
                                     self.sendText(self.sendToWho(ncMessage), _("Added"))
                                 elif msgSep[2] not in self.data.getData("BlackList"):
-                                    self.data.updateData(self.data.getGroup(GroupInfo.id)["Ext_Admin"], True, msgSep[2])
+                                    self.data.updateData(self.data.getData("Group", GroupInfo.id)["Ext_Admin"], True, msgSep[2])
                                     self.sendText(self.sendToWho(ncMessage), _("Okay"))
                                 else:
                                     self.sendText(self.sendToWho(ncMessage), _("The User(s) was in our blacklist database."))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
-                            if msgSep[2] in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                                self.data.updateData(self.data.getGroup(GroupInfo.id)["Ext_Admin"], False, msgSep[2])
+                            if msgSep[2] in self.data.getData("Group", GroupInfo.id)["Ext_Admin"]:
+                                self.data.updateData(self.data.getData("Group", GroupInfo.id)["Ext_Admin"], False, msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                     else:
-                        self.sendText(self.sendToWho(ncMessage), str(self.data.getGroup(GroupInfo.id)["Ext_Admin"]))
+                        self.sendText(self.sendToWho(ncMessage), str(self.data.getData("Group", GroupInfo.id)["Ext_Admin"]))
             elif self.YuukiConfigs["name"] + '/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
@@ -436,7 +428,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         self.sendText(self.sendToWho(ncMessage), _("Bye Bye"))
                         self.client.leaveGroup(self.Seq, GroupInfo.id)
@@ -476,7 +468,7 @@ class Yuuki:
         SEGroup = self.data.getSEGroup(GroupID)
 
         GroupInfo = self.client.getGroup(GroupID)
-        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
 
         if Action in GroupPrivilege or Another in GroupPrivilege:
             return
@@ -568,13 +560,11 @@ class Yuuki:
         catchedNews = []
         ncMessage = Operation()
         Revision = self.client.getLastOpRevision()
-        if "LastResetLimitTime" not in self.data.getData("Global"):
-            self.data.getData("Global")["LastResetLimitTime"] = None
-        if time.localtime().tm_hour == self.data.getData("Global")["LastResetLimitTime"]:
+        if time.localtime().tm_hour == self.data.getData("Global", "LastResetLimitTime"):
             self.limitReset(True)
         while True:
             try:
-                if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
+                if time.localtime().tm_hour != self.data.getData("Global", "LastResetLimitTime"):
                     self.limitReset()
                     self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
                 if NoWork == 300:
