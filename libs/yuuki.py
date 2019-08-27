@@ -513,10 +513,10 @@ class Yuuki:
                             # Log
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
                             if GroupInfo.preventJoinByTicket:
-                                self.changeGroupUrlStatus(GroupInfo, True)
+                                self.changeGroupUrlStatus(GroupInfo, True, Kicker)
                             GroupTicket = self.getClientByMid(Kicker).reissueGroupTicket(GroupID)
                             if GroupInfo.preventJoinByTicket:
-                                self.changeGroupUrlStatus(GroupInfo, False)
+                                self.changeGroupUrlStatus(GroupInfo, False, Kicker)
                             self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         except:
                             # Log
