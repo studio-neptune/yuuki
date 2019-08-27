@@ -144,8 +144,8 @@ class Yuuki_Data:
                     if Type in self.initType:
                         self.Data[Type][Query[0]] = self.initType[Type]
                     else:
-                        self.Data[Type][Query[0]] = self.initType[Query]
-                if Query[1] not in self.Data[Type][Query]:
+                        self.Data[Type][Query[0]] = {}
+                if Query[1] not in self.Data[Type][Query[0]]:
                     if Type in self.initType:
                         self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
                     else:
