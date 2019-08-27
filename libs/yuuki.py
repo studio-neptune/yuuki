@@ -350,7 +350,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Version' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), self.YuukiConfigs["version"])
             elif self.YuukiConfigs["name"] + '/UserID' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), _("LINE System UserID：\n") + ncMessage.message.from_)
+                self.sendText(self.sendToWho(ncMessage), _("LINE System UserID:\n") + ncMessage.message.from_)
             elif self.YuukiConfigs["name"] + '/Speed' == ncMessage.message.text:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
@@ -421,11 +421,11 @@ class Yuuki:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
                     group_status = self.data.getSEGroup(ncMessage.message.to)
                     if group_status == None:
-                        status = _("Default without Initialize\nAdmin of the Group：\n%s") % (
+                        status = _("Default without Initialize\nAdmin of the Group:\n%s") % (
                             self.sybGetGroupCreator(GroupInfo).displayName,
                         )
                     else:
-                        status = _("URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group：\n%s") % (
+                        status = _("URL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nAdmin of the Group:\n%s") % (
                             group_status[OpType.NOTIFIED_UPDATE_GROUP],
                             group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
                             group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
