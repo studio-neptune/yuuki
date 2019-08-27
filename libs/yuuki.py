@@ -178,8 +178,8 @@ class Yuuki:
     def getGroupTicket(self, GroupID, userId):
         GroupTicket = ""
         if "GroupTicket" in self.data.getGroup(GroupID):
-            if self.data.getGroup(GroupID)["GroupTicket"] != "":
-                GroupTicket = self.data.getGroup(GroupID)["GroupTicket"]
+            if self.data.getGroup(GroupID)["GroupTicket"].get(userId) != None:
+                GroupTicket = self.data.getGroup(GroupID)["GroupTicket"].get(userId)
         else:
             self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
         if GroupTicket == "":
@@ -527,7 +527,7 @@ class Yuuki:
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
                             if GroupInfo.preventJoinByTicket:
                                 self.changeGroupUrlStatus(GroupInfo, True, Kicker)
-                            GroupTicket = self.getGroupTicket(GroupID)
+                            GroupTicket = self.getGroupTicket(GroupID, Kicker)
                             if GroupInfo.preventJoinByTicket:
                                 self.changeGroupUrlStatus(GroupInfo, False, Kicker)
                             self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
