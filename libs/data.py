@@ -170,11 +170,11 @@ class Yuuki_Data:
         if Type == "Kick":
             Limit = {}
             for userId in self.getData("LimitInfo", "KickLimit"):
-                Limit[userId] = int(self.getData("LimitInfo", ["KickLimit", userId], 3))
+                Limit[userId] = int(self.getData("LimitInfo", ["KickLimit", userId]))
         elif Type == "Cancel":
             Limit = {}
             for userId in self.getData("LimitInfo", "CancelLimit"):
-                Limit[userId] = int(self.getData("LimitInfo", ["CancelLimit", userId], 3))
+                Limit[userId] = int(self.getData("LimitInfo", ["CancelLimit", userId]))
         else:
             Limit = None
         return Limit
