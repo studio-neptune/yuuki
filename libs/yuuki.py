@@ -464,6 +464,8 @@ class Yuuki:
                 NOTIFIED_ACCEPT_GROUP_INVITATION (17)
                 NOTIFIED_KICKOUT_FROM_GROUP (19)
         """
+        Security_Access = False
+
         (GroupID, Action, Another) = self.securityForWhere(ncMessage)
         SEGroup = self.data.getSEGroup(GroupID)
 
@@ -474,9 +476,11 @@ class Yuuki:
             return
 
         if SEGroup == None:
-            return
+            Security_Access = self.SecurityService
+        elif SEGroup[ncMessage.type]:
+            Security_Access = SEGroup[ncMessage.type]
 
-        if SEGroup[ncMessage.type] and self.SecurityService:
+        if Security_Access and self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
                 if Another == '4':
                     if not GroupInfo.preventJoinByTicket:

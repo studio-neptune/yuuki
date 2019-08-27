@@ -148,21 +148,20 @@ class Yuuki_Data:
             return self.Data[Type]
 
     def getLimit(self, Type):
-        LimitInfo = self.getData("LimitInfo")
         if Type == "Kick":
             Limit = {}
-            for Mode in LimitInfo["KickLimit"]:
-                Limit[Mode] = int(LimitInfo["KickLimit"][Mode])
+            for Mode in self.getData("LimitInfo", "KickLimit"):
+                Limit[Mode] = int(self.getData("LimitInfo", ["KickLimit", Mode], 3))
         elif Type == "Cancel":
             Limit = {}
-            for Mode in LimitInfo["CancelLimit"]:
-                Limit[Mode] = int(LimitInfo["CancelLimit"][Mode])
+            for Mode in self.getData("LimitInfo", "CancelLimit"):
+                Limit[Mode] = int(self.getData("LimitInfo", ["CancelLimit", Mode], 3))
         else:
             Limit = None
         return Limit
 
     def getSEGroup(self, GroupID):
-        SEMode = self.getGroup(GroupID)["SEGroup"]
+        SEMode = self.getData("Group", GroupID)["SEGroup"]
         if SEMode == None:
             return None
         SEMode_ = {}
