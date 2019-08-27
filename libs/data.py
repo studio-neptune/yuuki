@@ -135,7 +135,7 @@ class Yuuki_Data:
             if type(Query) == str:
                 if Query not in self.Data[Type]:
                     if Type in self.initType:
-                        self.Data[Type][Query] = self.initType[Type]
+                        self.Data[Type] = self.initType[Type]
                     else:
                         assert "Unknown DataType"
                 return self.Data[Type][Query]
@@ -143,14 +143,14 @@ class Yuuki_Data:
                 # Level 2
                 if Query[0] not in self.Data[Type]:
                     if Type in self.initType:
-                        self.Data[Type][Query[0]] = self.initType[Type]
+                        self.Data[Type] = self.initType[Type]
                     else:
                         assert "Unknown DataType"
                 if Query[1] not in self.Data[Type][Query[0]]:
                     if Query[0] in self.initType:
-                        self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
+                        self.Data[Type][Query[0]] = self.initType[Query[0]]
                     elif Query[0] in self.DataType:
-                        self.Data[Type][Query[0]][Query[1]] = self.DataType[Query[0]]
+                        self.Data[Type][Query[0]] = self.DataType[Query[0]]
                     else:
                         assert "Unknown DataType"
                 if len(Query) == 2:
@@ -159,9 +159,9 @@ class Yuuki_Data:
                 if len(Query) >= 3:
                     if Query[2] not in self.Data[Type][Query[0]][Query[1]]:
                         if Query[1] in self.initType:
-                            self.Data[Type][Query[0]][Query[1]][Query[2]] = self.initType[Query[1]]
+                            self.Data[Type][Query[0]][Query[1]] = self.initType[Query[1]]
                         elif Query[1] in self.DataType:
-                            self.Data[Type][Query[0]][Query[1]][Query[2]] = self.DataType[Query[0]][Query[1]]
+                            self.Data[Type][Query[0]][Query[1]] = self.DataType[Query[0]][Query[1]]
                         else:
                             assert "Unknown DataType"
                     if len(Query) == 3:
