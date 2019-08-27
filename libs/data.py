@@ -130,18 +130,18 @@ class Yuuki_Data:
         Time = time.localtime(time.time())
         return time.strftime(format, Time)
 
-    def getData(self, Type, Query=None, Level=2):
-        if Query != None:
-            if Level == 2:
+    def getData(self, Type, Query=None):
+        if type(Query) == list:
+            if len(Query) == 1:
                 if Query not in self.Data[Type]:
-                    self.Data[Type][Query] = self.initType[Query]
-                else:
-                    return self.Data[Type][Query]
-            elif Level == 3 and type(Query) == list:
-                if Query[1] not in self.Data[Type]:
-                    self.Data[Type][Query[0]][Query[1]] = self.initType[Query[1]]
-                else:
-                    return self.Data[Type][Query[0]][Query[1]]
+                    self.Data[Type][Query] = self.initType[Type]
+                return self.Data[Type][Query]
+            elif len(Query) == 2:
+                if Query[0] not in self.Data[Type]:
+                    self.Data[Type][Query[0]] = self.initType[Type]
+                if Query[1] not in self.Data[Type][Query]:
+                    self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
+                return self.Data[Type][Query[0]][Query[1]]
             else:
                 assert "Error Query Level"
         else:
@@ -150,12 +150,12 @@ class Yuuki_Data:
     def getLimit(self, Type):
         if Type == "Kick":
             Limit = {}
-            for Mode in self.getData("LimitInfo", "KickLimit"):
-                Limit[Mode] = int(self.getData("LimitInfo", ["KickLimit", Mode], 3))
+            for userId in self.getData("LimitInfo", "KickLimit"):
+                Limit[userId] = int(self.getData("LimitInfo", ["KickLimit", userId], 3))
         elif Type == "Cancel":
             Limit = {}
-            for Mode in self.getData("LimitInfo", "CancelLimit"):
-                Limit[Mode] = int(self.getData("LimitInfo", ["CancelLimit", Mode], 3))
+            for userId in self.getData("LimitInfo", "CancelLimit"):
+                Limit[userId] = int(self.getData("LimitInfo", ["CancelLimit", userId], 3))
         else:
             Limit = None
         return Limit

@@ -173,10 +173,10 @@ class Yuuki:
                 return Accounts[count]
 
     def getGroupTicket(self, GroupID, userId):
-        GroupTicket = self.data.getData("Group", [GroupID, "GroupTicket"], 3)
+        GroupTicket = self.data.getData("Group", [GroupID, "GroupTicket"])
         if GroupTicket == "":
             GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
-            self.data.updateData(self.data.getData("Group", [GroupID, "GroupTicket"], 3), userId, GroupTicket)
+            self.data.updateData(self.data.getData("Group", [GroupID, "GroupTicket"]), userId, GroupTicket)
         return GroupTicket
 
     def limitReset(self, reconnect=False):
@@ -361,7 +361,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", [GroupInfo.id, "Ext_Admin"])
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
                         for code in msgSep:
@@ -374,7 +374,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Disable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", [GroupInfo.id, "Ext_Admin"])
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
                         for code in msgSep:
@@ -391,23 +391,23 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
                             if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                                if msgSep[2] in self.data.getData("Group", GroupInfo.id)["Ext_Admin"]:
+                                if msgSep[2] in self.data.getData("Group", [GroupInfo.id, "Ext_Admin"]):
                                     self.sendText(self.sendToWho(ncMessage), _("Added"))
                                 elif msgSep[2] not in self.data.getData("BlackList"):
-                                    self.data.updateData(self.data.getData("Group", GroupInfo.id)["Ext_Admin"], True, msgSep[2])
+                                    self.data.updateData(self.data.getData("Group", [GroupInfo.id, "Ext_Admin"]), True, msgSep[2])
                                     self.sendText(self.sendToWho(ncMessage), _("Okay"))
                                 else:
                                     self.sendText(self.sendToWho(ncMessage), _("The User(s) was in our blacklist database."))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
                         elif msgSep[1] == "delete":
-                            if msgSep[2] in self.data.getData("Group", GroupInfo.id)["Ext_Admin"]:
-                                self.data.updateData(self.data.getData("Group", GroupInfo.id)["Ext_Admin"], False, msgSep[2])
+                            if msgSep[2] in self.data.getData("Group", [GroupInfo.id, "Ext_Admin"]):
+                                self.data.updateData(self.data.getData("Group", [GroupInfo.id, "Ext_Admin"]), False, msgSep[2])
                                 self.sendText(self.sendToWho(ncMessage), _("Okay"))
                             else:
                                 self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                     else:
-                        self.sendText(self.sendToWho(ncMessage), str(self.data.getData("Group", GroupInfo.id)["Ext_Admin"]))
+                        self.sendText(self.sendToWho(ncMessage), str(self.data.getData("Group", [GroupInfo.id, "Ext_Admin"])))
             elif self.YuukiConfigs["name"] + '/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
@@ -428,7 +428,7 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.client.getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", [GroupInfo.id, "Ext_Admin"])
                     if ncMessage.message.from_ in GroupPrivilege:
                         self.sendText(self.sendToWho(ncMessage), _("Bye Bye"))
                         self.client.leaveGroup(self.Seq, GroupInfo.id)
@@ -470,7 +470,7 @@ class Yuuki:
         SEGroup = self.data.getSEGroup(GroupID)
 
         GroupInfo = self.client.getGroup(GroupID)
-        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", GroupInfo.id)["Ext_Admin"]
+        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getData("Group", [GroupInfo.id, "Ext_Admin"])
 
         if Action in GroupPrivilege or Another in GroupPrivilege:
             return
