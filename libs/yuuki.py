@@ -175,14 +175,14 @@ class Yuuki:
             if AccountUserId == userId:
                 return Accounts[count]
 
-    def getGroupTicket(self, GroupID, userId):
+    def getGroupTicket(self, GroupID, userId, renew=False):
         GroupTicket = ""
         if "GroupTicket" in self.data.getGroup(GroupID):
             if self.data.getGroup(GroupID)["GroupTicket"].get(userId) != None:
                 GroupTicket = self.data.getGroup(GroupID)["GroupTicket"].get(userId)
         else:
             self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
-        if GroupTicket == "":
+        if GroupTicket == "" or renew:
             GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
             self.data.updateData(self.data.getGroup(GroupID)["GroupTicket"], userId, GroupTicket)
         return GroupTicket
@@ -312,7 +312,7 @@ class Yuuki:
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
-                    self.getGroupTicket(GroupID, self.MyMID)
+                    self.getGroupTicket(GroupID, self.MyMID, True)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
@@ -325,7 +325,7 @@ class Yuuki:
             for userId in self.Connect.helper_ids:
                 if self.checkInInvitationList(ncMessage, userId):
                     self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
-                    self.getGroupTicket(ncMessage.param1, userId)
+                    self.getGroupTicket(ncMessage.param1, userId, True)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
@@ -534,7 +534,8 @@ class Yuuki:
                         GroupTicket = self.getGroupTicket(GroupID, Kicker)
                         self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         if not GroupInfo.preventJoinByTicket:
-                            self.changeGroupUrlStatus(GroupInfo, False, Kicker)
+                            self.changeGroupUrlStatus(GroupInfo, False, Another)
+                        self.getGroupTicket(GroupID, Another, True)
                     except:
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
