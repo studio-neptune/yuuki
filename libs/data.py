@@ -139,18 +139,28 @@ class Yuuki_Data:
                     else:
                         assert "Unknown DataType"
                 return self.Data[Type][Query]
-            elif type(Query) == list and len(Query) == 2:
-                if Query[0] not in self.Data[Type]:
-                    if Type in self.initType:
-                        self.Data[Type][Query[0]] = self.initType[Type]
-                    else:
-                        assert "Unknown DataType"
-                if Query[1] not in self.Data[Type][Query[0]]:
-                    if Type in self.initType:
-                        self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
-                    else:
-                        assert "Unknown DataType"
-                return self.Data[Type][Query[0]][Query[1]]
+            elif type(Query) == list:
+                if len(Query) >= 2:
+                    if Query[0] not in self.Data[Type]:
+                        if Type in self.initType:
+                            self.Data[Type][Query[0]] = self.initType[Type]
+                        else:
+                            assert "Unknown DataType"
+                    if Query[1] not in self.Data[Type][Query[0]]:
+                        if Type in self.initType:
+                            self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
+                        else:
+                            assert "Unknown DataType"
+                    if len(Query) == 2:
+                        return self.Data[Type][Query[0]][Query[1]]
+                if len(Query) >= 3:
+                    if Query[2] not in self.Data[Type][Query[0]][Query[1]]:
+                        if Type in self.initType:
+                            self.Data[Type][Query[0]][Query[1]][Query[2]] = self.initType[Query[0]]
+                        else:
+                            assert "Unknown DataType"
+                    if len(Query) == 3:
+                        return self.Data[Type][Query[0]][Query[1]][Query[2]]
             else:
                 assert "Error Query"
         else:

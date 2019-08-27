@@ -173,7 +173,7 @@ class Yuuki:
                 return Accounts[count]
 
     def getGroupTicket(self, GroupID, userId):
-        GroupTicket = self.data.getData("Group", [GroupID, "GroupTicket"])
+        GroupTicket = self.data.getData("Group", [GroupID, "GroupTicket", userId])
         if GroupTicket == "":
             GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
             self.data.updateData(self.data.getData("Group", [GroupID, "GroupTicket"]), userId, GroupTicket)
