@@ -107,14 +107,17 @@ class Yuuki:
             inList = False
         return inList
 
-    def changeGroupUrlStatus(self, group, stat):
+    def changeGroupUrlStatus(self, group, stat, AnotherID=None):
         if stat == True:
             us = False
         else:
             us = True
         group.members, group.invitee = None, None
         group.preventJoinByTicket = us
-        self.client.updateGroup(self.Seq, group)
+        if AnotherID != None:
+            self.getClientByMid(AnotherID).updateGroup(self.Seq, group)
+        else:
+            self.client.updateGroup(self.Seq, group)
 
     def enableSecurityStatus(self, groupId, status):
         group_status = self.data.SEGrouptype
@@ -509,7 +512,11 @@ class Yuuki:
                             Kicker = self.kickSomeone(GroupID, Action, Another)
                             # Log
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
+                            if GroupInfo.preventJoinByTicket:
+                                self.changeGroupUrlStatus(GroupInfo, True)
                             GroupTicket = self.getClientByMid(Kicker).reissueGroupTicket(GroupID)
+                            if GroupInfo.preventJoinByTicket:
+                                self.changeGroupUrlStatus(GroupInfo, False)
                             self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         except:
                             # Log
