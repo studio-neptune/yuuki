@@ -11,38 +11,31 @@ class Yuuki_Data:
 
         self.Data = {}
 
-        self.GlobalType = {
-            "LastResetLimitTime": None
+        self.DataType = {
+            "Global":{
+                "LastResetLimitTime":None,
+            },
+            "Group": {},
+            "LimitInfo":{},
+            "BlackList":[]
         }
 
         self.GroupType = {
-            "SEGroup": None,
-            "Ext_Admin": [],
-            "GroupTicket": {}
+            "SEGroup":None,
+            "Ext_Admin":[],
+            "GroupTicket":{}
         }
 
         self.LimitType = {
-            "KickLimit": {},
-            "CancelLimit": {}
+            "KickLimit":{},
+            "CancelLimit":{}
         }
 
-        self.SEGroupType = {
-            OpType.NOTIFIED_UPDATE_GROUP: False,
-            OpType.NOTIFIED_INVITE_INTO_GROUP: False,
-            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION: False,
-            OpType.NOTIFIED_KICKOUT_FROM_GROUP: False
-        }
-
-        self.DataType = {
-            "Global": self.GlobalType,
-            "Group": {},
-            "LimitInfo": {},
-            "BlackList": []
-        }
-
-        self.customData = {
-            "Group": self.GroupType,
-            "LimitInfo": self.LimitType
+        self.SEGrouptype = {
+            OpType.NOTIFIED_UPDATE_GROUP:False,
+            OpType.NOTIFIED_INVITE_INTO_GROUP:False,
+            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:False,
+            OpType.NOTIFIED_KICKOUT_FROM_GROUP:False
         }
 
         self.DataPath = "data/"
@@ -131,40 +124,35 @@ class Yuuki_Data:
         Time = time.localtime(time.time())
         return time.strftime(format, Time)
 
-    def getData(self, Type, Query=None):
-        if Query == None:
-            return self.Data[Type]
-        else:
-            lastkey = None
-            QueryData = self.Data[Type]
-            for key in Query:
-                if type(QueryData) == dict:
-                    Catch = QueryData.get(key)
-                    if lastkey in self.customData:
-                        if type(self.customData[lastkey]) == dict:
-                            QueryData[key] = self.customData[lastkey]
-                            return QueryData[key]
-                    elif key in Query:
-                        lastkey = key
-                        QueryData = Catch
-            return QueryData
+    def getData(self, Type):
+        return self.Data[Type]
 
     def getLimit(self, Type):
+        LimitInfo = self.getData("LimitInfo")
         if Type == "Kick":
             Limit = {}
-            for userId in self.getData("LimitInfo", "KickLimit"):
-                Limit[userId] = int(self.getData("LimitInfo", ["KickLimit", userId]))
+            for Mode in LimitInfo["KickLimit"]:
+                Limit[Mode] = int(LimitInfo["KickLimit"][Mode])
         elif Type == "Cancel":
             Limit = {}
-            for userId in self.getData("LimitInfo", "CancelLimit"):
-                Limit[userId] = int(self.getData("LimitInfo", ["CancelLimit", userId]))
+            for Mode in LimitInfo["CancelLimit"]:
+                Limit[Mode] = int(LimitInfo["CancelLimit"][Mode])
         else:
             Limit = None
         return Limit
 
+    def getGroup(self, GroupID):
+        Groups = self.getData("Group")
+        if len(Groups) > 0:
+            GroupIDs = [Group for Group in Groups]
+            if GroupID not in GroupIDs:
+                Groups[GroupID] = self.GroupType
+        else:
+            Groups[GroupID] = self.GroupType
+        return Groups[GroupID]
+
     def getSEGroup(self, GroupID):
-        Group = self.getData("Group", GroupID)
-        SEMode = Group["SEGroup"]
+        SEMode = self.getGroup(GroupID)["SEGroup"]
         if SEMode == None:
             return None
         SEMode_ = {}
