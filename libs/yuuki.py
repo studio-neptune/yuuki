@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-alpha_RC2",
+        "version": "v6.5.0-alpha_RC3",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "None",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
