@@ -2,12 +2,14 @@
 # coding=UTF-8
 
 from .en import English
+from .zh_TW import Traditional_Chinese
 
 class Yuuki_LangSetting:
     def __init__(self, default):
         self.default = default
         self.support = {
-            "en":English
+            "en":English,
+            "zh-tw":Traditional_Chinese
         }
 
     def gettext(self, text, lang=None):
