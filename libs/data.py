@@ -131,15 +131,15 @@ class Yuuki_Data:
         return time.strftime(format, Time)
 
     def getData(self, Type, Query=None):
-        if type(Query) == list:
-            if len(Query) == 1:
+        if Query != None:
+            if type(Query) == str:
                 if Query not in self.Data[Type]:
                     if Type in self.initType:
                         self.Data[Type][Query] = self.initType[Type]
                     else:
                         assert "Unknown DataType"
                 return self.Data[Type][Query]
-            elif len(Query) == 2:
+            elif type(Query) == list and len(Query) == 2:
                 if Query[0] not in self.Data[Type]:
                     if Type in self.initType:
                         self.Data[Type][Query[0]] = self.initType[Type]
@@ -152,7 +152,7 @@ class Yuuki_Data:
                         assert "Unknown DataType"
                 return self.Data[Type][Query[0]][Query[1]]
             else:
-                assert "Error Query Level"
+                assert "Error Query"
         else:
             return self.Data[Type]
 
