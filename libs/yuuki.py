@@ -19,10 +19,10 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-alpha_RC1",
-        "project_url": "https://line.starinc.xyz/star-yuuki-bot/",
-        "man_page": "https://line.starinc.xyz/star-yuuki-bot/",
-        "privacy_page": "OpenSource - License under MPL 2.0",
+        "version": "v6.5.0-alpha_RC2",
+        "project_url": "https://tinyurl.com/syb-yuuki",
+        "man_page": "None",
+        "privacy_page": "OpenSource - Licensed under MPL 2.0",
         "copyright": "(c)2019 Star Inc.",
 
         "Seq": 0,
@@ -107,14 +107,16 @@ class Yuuki:
             inList = False
         return inList
 
-    def changeGroupUrlStatus(self, group, stat):
-        if stat == True:
-            us = False
+    def changeGroupUrlStatus(self, group, status, userId=None):
+        if status == True:
+            group.preventJoinByTicket = False
         else:
-            us = True
+            group.preventJoinByTicket = True
         group.members, group.invitee = None, None
-        group.preventJoinByTicket = us
-        self.client.updateGroup(self.Seq, group)
+        if userId != None:
+            self.getClientByMid(userId).updateGroup(self.Seq, group)
+        else:
+            self.client.updateGroup(self.Seq, group)
 
     def enableSecurityStatus(self, groupId, status):
         group_status = self.data.SEGrouptype
@@ -172,6 +174,18 @@ class Yuuki:
         for count, AccountUserId in enumerate([self.MyMID] + self.Connect.helper_ids):
             if AccountUserId == userId:
                 return Accounts[count]
+
+    def getGroupTicket(self, GroupID, userId, renew=False):
+        GroupTicket = ""
+        if "GroupTicket" in self.data.getGroup(GroupID):
+            if self.data.getGroup(GroupID)["GroupTicket"].get(userId) != None:
+                GroupTicket = self.data.getGroup(GroupID)["GroupTicket"].get(userId)
+        else:
+            self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
+        if GroupTicket == "" or renew:
+            GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
+            self.data.updateData(self.data.getGroup(GroupID)["GroupTicket"], userId, GroupTicket)
+        return GroupTicket
 
     def limitReset(self, reconnect=False):
         for userId in [self.MyMID] + self.Connect.helper_ids:
@@ -298,6 +312,7 @@ class Yuuki:
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
+                    self.getGroupTicket(GroupID, self.MyMID, True)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
@@ -310,6 +325,7 @@ class Yuuki:
             for userId in self.Connect.helper_ids:
                 if self.checkInInvitationList(ncMessage, userId):
                     self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
+                    self.getGroupTicket(ncMessage.param1, userId, True)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
@@ -456,19 +472,24 @@ class Yuuki:
                 NOTIFIED_ACCEPT_GROUP_INVITATION (17)
                 NOTIFIED_KICKOUT_FROM_GROUP (19)
         """
+        Security_Access = False
+
         (GroupID, Action, Another) = self.securityForWhere(ncMessage)
         SEGroup = self.data.getSEGroup(GroupID)
 
         GroupInfo = self.client.getGroup(GroupID)
         GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
 
+
         if Action in GroupPrivilege or Another in GroupPrivilege:
             return
 
         if SEGroup == None:
-            return
+            Security_Access = self.SecurityService
+        elif SEGroup[ncMessage.type]:
+            Security_Access = SEGroup[ncMessage.type]
 
-        if SEGroup[ncMessage.type] and self.SecurityService:
+        if Security_Access and self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
                 if Another == '4':
                     if not GroupInfo.preventJoinByTicket:
@@ -502,25 +523,31 @@ class Yuuki:
                 if Action in self.Connect.helper_ids:
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, Action, Another, ncMessage.type*10+1))
+                elif Another in [self.MyMID] + self.Connect.helper_ids:
+                    Kicker = "None"
+                    try:
+                        Kicker = self.kickSomeone(GroupID, Action, Another)
+                        # Log
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
+                        if GroupInfo.preventJoinByTicket:
+                            self.changeGroupUrlStatus(GroupInfo, True, Kicker)
+                        GroupTicket = self.getGroupTicket(GroupID, Kicker)
+                        self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
+                        if not GroupInfo.preventJoinByTicket:
+                            self.changeGroupUrlStatus(GroupInfo, False, Another)
+                        self.getGroupTicket(GroupID, Another, True)
+                    except:
+                        # Log
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
+                    self.data.updateData(self.data.getData("BlackList"), True, Action)
+                    # Log
+                    self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
+                    self.sendText(Action, _("You had been blocked by our database."))
                 else:
-                    if Another in [self.MyMID] + self.Connect.helper_ids:
-                        Kicker = "None"
-                        try:
-                            Kicker = self.kickSomeone(GroupID, Action, Another)
-                            # Log
-                            self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
-                        except:
-                            # Log
-                            self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
-                        self.data.updateData(self.data.getData("BlackList"), True, Action)
-                        # Log
-                        self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
-                        self.sendText(Action, _("You had been blocked by our database."))
-                    else:
-                        self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
-                        Kicker = self.kickSomeone(GroupID, Action)
-                        # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+                    self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
+                    Kicker = self.kickSomeone(GroupID, Action)
+                    # Log
+                    self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
         elif self.SecurityService:
             if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 Canceler = "None"

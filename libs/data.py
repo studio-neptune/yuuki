@@ -22,7 +22,8 @@ class Yuuki_Data:
 
         self.GroupType = {
             "SEGroup":None,
-            "Ext_Admin":[]
+            "Ext_Admin":[],
+            "GroupTicket":{}
         }
 
         self.LimitType = {
