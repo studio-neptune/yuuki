@@ -11,37 +11,38 @@ class Yuuki_Data:
 
         self.Data = {}
 
-        self.DataType = {
-            "Global":{
-                "LastResetLimitTime":None,
-            },
-            "Group": {},
-            "LimitInfo":{},
-            "BlackList":[]
+        self.GlobalType = {
+            "LastResetLimitTime": None
         }
 
         self.GroupType = {
-            "SEGroup":None,
-            "Ext_Admin":[],
-            "GroupTicket":{}
+            "SEGroup": None,
+            "Ext_Admin": [],
+            "GroupTicket": {}
         }
 
         self.LimitType = {
-            "KickLimit":{},
-            "CancelLimit":{}
+            "KickLimit": {},
+            "CancelLimit": {}
         }
 
-        self.SEGrouptype = {
-            OpType.NOTIFIED_UPDATE_GROUP:False,
-            OpType.NOTIFIED_INVITE_INTO_GROUP:False,
-            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:False,
-            OpType.NOTIFIED_KICKOUT_FROM_GROUP:False
+        self.SEGroupType = {
+            OpType.NOTIFIED_UPDATE_GROUP: False,
+            OpType.NOTIFIED_INVITE_INTO_GROUP: False,
+            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION: False,
+            OpType.NOTIFIED_KICKOUT_FROM_GROUP: False
         }
 
-        self.initType = {
-            "Group":self.GroupType,
-            "LimitInfo":self.LimitType,
-            "SEGroup":self.SEGrouptype
+        self.DataType = {
+            "Global": self.GlobalType,
+            "Group": {},
+            "LimitInfo": {},
+            "BlackList": []
+        }
+
+        self.customData = {
+            "Group": self.GroupType,
+            "LimitInfo": self.LimitType
         }
 
         self.DataPath = "data/"
@@ -131,45 +132,22 @@ class Yuuki_Data:
         return time.strftime(format, Time)
 
     def getData(self, Type, Query=None):
-        if Query != None:
-            if type(Query) == str:
-                if Query not in self.Data[Type]:
-                    if Type in self.initType:
-                        self.Data[Type] = self.initType[Type]
-                    else:
-                        assert "Unknown DataType"
-                return self.Data[Type][Query]
-            elif type(Query) == list and len(Query) > 1:
-                # Level 2
-                if Query[0] not in self.Data[Type]:
-                    if Type in self.initType:
-                        self.Data[Type] = self.initType[Type]
-                    else:
-                        assert "Unknown DataType"
-                if Query[1] not in self.Data[Type][Query[0]]:
-                    if Query[0] in self.initType:
-                        self.Data[Type][Query[0]] = self.initType[Query[0]]
-                    elif Query[0] in self.DataType:
-                        self.Data[Type][Query[0]] = self.DataType[Query[0]]
-                    else:
-                        assert "Unknown DataType"
-                if len(Query) == 2:
-                    return self.Data[Type][Query[0]][Query[1]]
-                # Level 3
-                if len(Query) >= 3:
-                    if Query[2] not in self.Data[Type][Query[0]][Query[1]]:
-                        if Query[1] in self.initType:
-                            self.Data[Type][Query[0]][Query[1]] = self.initType[Query[1]]
-                        elif Query[1] in self.DataType:
-                            self.Data[Type][Query[0]][Query[1]] = self.DataType[Query[0]][Query[1]]
-                        else:
-                            assert "Unknown DataType"
-                    if len(Query) == 3:
-                        return self.Data[Type][Query[0]][Query[1]][Query[2]]
-            else:
-                assert "Error Query"
-        else:
+        if Query == None:
             return self.Data[Type]
+        else:
+            lastkey = None
+            QueryData = self.Data[Type]
+            for key in Query:
+                if type(QueryData) == dict:
+                    Catch = QueryData.get(key)
+                    if lastkey in self.customData:
+                        if type(self.customData[lastkey]) == dict:
+                            QueryData[key] = self.customData[lastkey]
+                            return QueryData[key]
+                    elif key in Query:
+                        lastkey = key
+                        QueryData = Catch
+            return QueryData
 
     def getLimit(self, Type):
         if Type == "Kick":

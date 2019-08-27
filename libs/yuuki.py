@@ -116,7 +116,7 @@ class Yuuki:
             self.client.updateGroup(self.Seq, group)
 
     def enableSecurityStatus(self, groupId, status):
-        group_status = self.data.SEGrouptype
+        group_status = self.data.SEGroupType
         if 0 in status:
             group_status[OpType.NOTIFIED_UPDATE_GROUP] = True
         if 1 in status:
@@ -129,7 +129,7 @@ class Yuuki:
         self.data.updateData(self.data.getData("Group", groupId), "SEGroup", group_status)
 
     def disableSecurityStatus(self, groupId, status):
-        group_status = self.data.SEGrouptype
+        group_status = self.data.SEGroupType
         if 0 in status:
             group_status[OpType.NOTIFIED_UPDATE_GROUP] = False
         if 1 in status:
