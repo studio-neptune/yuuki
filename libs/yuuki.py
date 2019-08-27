@@ -107,15 +107,14 @@ class Yuuki:
             inList = False
         return inList
 
-    def changeGroupUrlStatus(self, group, stat, AnotherID=None):
-        if stat == True:
-            us = False
+    def changeGroupUrlStatus(self, group, status, userId=None):
+        if status == True:
+            group.preventJoinByTicket = False
         else:
-            us = True
+            group.preventJoinByTicket = True
         group.members, group.invitee = None, None
-        group.preventJoinByTicket = us
-        if AnotherID != None:
-            self.getClientByMid(AnotherID).updateGroup(self.Seq, group)
+        if userId != None:
+            self.getClientByMid(userId).updateGroup(self.Seq, group)
         else:
             self.client.updateGroup(self.Seq, group)
 
@@ -175,6 +174,18 @@ class Yuuki:
         for count, AccountUserId in enumerate([self.MyMID] + self.Connect.helper_ids):
             if AccountUserId == userId:
                 return Accounts[count]
+
+    def getGroupTicket(self, GroupID, userId):
+        GroupTicket = ""
+        if "GroupTicket" in self.data.getGroup(GroupID):
+            if self.data.getGroup(GroupID)["GroupTicket"] != "":
+                GroupTicket = self.data.getGroup(GroupID)["GroupTicket"]
+        else:
+            self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
+        if GroupTicket == "":
+            GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
+            self.data.updateData(self.data.getGroup(GroupID)["GroupTicket"], userId, GroupTicket)
+        return GroupTicket
 
     def limitReset(self, reconnect=False):
         for userId in [self.MyMID] + self.Connect.helper_ids:
@@ -301,6 +312,7 @@ class Yuuki:
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
+                    self.getGroupTicket(GroupID, self.MyMID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
@@ -313,6 +325,7 @@ class Yuuki:
             for userId in self.Connect.helper_ids:
                 if self.checkInInvitationList(ncMessage, userId):
                     self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
+                    self.getGroupTicket(ncMessage.param1, userId)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
@@ -514,7 +527,7 @@ class Yuuki:
                             self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
                             if GroupInfo.preventJoinByTicket:
                                 self.changeGroupUrlStatus(GroupInfo, True, Kicker)
-                            GroupTicket = self.getClientByMid(Kicker).reissueGroupTicket(GroupID)
+                            GroupTicket = self.getGroupTicket(GroupID)
                             if GroupInfo.preventJoinByTicket:
                                 self.changeGroupUrlStatus(GroupInfo, False, Kicker)
                             self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
