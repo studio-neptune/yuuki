@@ -137,19 +137,19 @@ class Yuuki_Data:
                     if Type in self.initType:
                         self.Data[Type][Query] = self.initType[Type]
                     else:
-                        self.Data[Type][Query] = {}
+                        assert "Unknown DataType"
                 return self.Data[Type][Query]
             elif len(Query) == 2:
                 if Query[0] not in self.Data[Type]:
                     if Type in self.initType:
                         self.Data[Type][Query[0]] = self.initType[Type]
                     else:
-                        self.Data[Type][Query[0]] = {}
+                        assert "Unknown DataType"
                 if Query[1] not in self.Data[Type][Query[0]]:
                     if Type in self.initType:
                         self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
                     else:
-                        self.Data[Type][Query[0]][Query[1]] = {}
+                        assert "Unknown DataType"
                 return self.Data[Type][Query[0]][Query[1]]
             else:
                 assert "Error Query Level"
@@ -170,7 +170,8 @@ class Yuuki_Data:
         return Limit
 
     def getSEGroup(self, GroupID):
-        SEMode = self.getData("Group", GroupID)["SEGroup"]
+        Group = self.getData("Group", GroupID)
+        SEMode = Group["SEGroup"]
         if SEMode == None:
             return None
         SEMode_ = {}
