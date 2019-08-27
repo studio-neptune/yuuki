@@ -139,24 +139,29 @@ class Yuuki_Data:
                     else:
                         assert "Unknown DataType"
                 return self.Data[Type][Query]
-            elif type(Query) == list:
-                if len(Query) >= 2:
-                    if Query[0] not in self.Data[Type]:
-                        if Type in self.initType:
-                            self.Data[Type][Query[0]] = self.initType[Type]
-                        else:
-                            assert "Unknown DataType"
-                    if Query[1] not in self.Data[Type][Query[0]]:
-                        if Type in self.initType:
-                            self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
-                        else:
-                            assert "Unknown DataType"
-                    if len(Query) == 2:
-                        return self.Data[Type][Query[0]][Query[1]]
+            elif type(Query) == list and len(Query) > 1:
+                # Level 2
+                if Query[0] not in self.Data[Type]:
+                    if Type in self.initType:
+                        self.Data[Type][Query[0]] = self.initType[Type]
+                    else:
+                        assert "Unknown DataType"
+                if Query[1] not in self.Data[Type][Query[0]]:
+                    if Query[0] in self.initType:
+                        self.Data[Type][Query[0]][Query[1]] = self.initType[Query[0]]
+                    elif Query[0] in self.DataType:
+                        self.Data[Type][Query[0]][Query[1]] = self.DataType[Query[0]]
+                    else:
+                        assert "Unknown DataType"
+                if len(Query) == 2:
+                    return self.Data[Type][Query[0]][Query[1]]
+                # Level 3
                 if len(Query) >= 3:
                     if Query[2] not in self.Data[Type][Query[0]][Query[1]]:
-                        if Type in self.initType:
-                            self.Data[Type][Query[0]][Query[1]][Query[2]] = self.initType[Query[0]]
+                        if Query[1] in self.initType:
+                            self.Data[Type][Query[0]][Query[1]][Query[2]] = self.initType[Query[1]]
+                        elif Query[1] in self.DataType:
+                            self.Data[Type][Query[0]][Query[1]][Query[2]] = self.DataType[Query[0]][Query[1]]
                         else:
                             assert "Unknown DataType"
                     if len(Query) == 3:
