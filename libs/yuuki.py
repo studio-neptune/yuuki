@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-alpha_RC3",
+        "version": "v6.5.0-alpha_RC4",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "None",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -61,7 +61,7 @@ class Yuuki:
         self.SecurityService = self.YuukiConfigs["SecurityService"]
 
         self.MyMID = self.client.getProfile().mid
-        self.GroupJoined = self.client.getGroupIdsInvited()
+        self.GroupJoined = self.client.getGroupIdsJoined()
 
         if len(self.data.getData("LimitInfo")) != 2:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
