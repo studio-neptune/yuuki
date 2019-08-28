@@ -561,9 +561,9 @@ class Yuuki:
                     Kicker = "None"
                     try:
                         Kicker = self.kickSomeone(GroupInfo, Action, Another)
-                        assert Kicker == "None", "No Helper Found"
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
+                        assert Kicker != "None", "No Helper Found"
                         if GroupInfo.preventJoinByTicket:
                             self.changeGroupUrlStatus(GroupInfo, True, Kicker)
                         GroupTicket = self.getGroupTicket(GroupID, Kicker)
@@ -627,6 +627,10 @@ class Yuuki:
                 else:
                     NoWork = NoWork + 1
             except SystemExit:
+                print("System Exit.")
+                self.exit()
+            except KeyboardInterrupt:
+                print("Admin Exit.")
                 self.exit()
             except EOFError:
                 pass
