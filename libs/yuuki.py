@@ -208,10 +208,17 @@ class Yuuki:
                 self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
                 self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], userId, self.CancelLimit)
 
+    def dictShuffle(self, dict):
+        dict_key = [key for key in dict]
+        random.shuffle(dict_key)
+        result = {}
+        for key in dict_key:
+            result[key]=dict[key]
+        return result
+
     def cancelSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            accounts = self.data.getLimit("Cancel")
-            random.shuffle(accounts)
+            accounts = self.dictShuffle(self.data.getLimit("Cancel"))
             if exceptUserId:
                 accounts[exceptUserId] = -1
             helper = max(accounts, key=accounts.get)
@@ -229,8 +236,7 @@ class Yuuki:
 
     def kickSomeone(self, groupId, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            accounts = self.data.getLimit("Kick")
-            random.shuffle(accounts)
+            accounts = self.dictShuffle(self.data.getLimit("Kick"))
             if exceptUserId:
                 accounts[exceptUserId] = -1
             helper = max(accounts, key=accounts.get)
