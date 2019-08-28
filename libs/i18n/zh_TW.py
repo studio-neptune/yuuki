@@ -37,7 +37,7 @@ class Traditional_Chinese:
         "Speed:\n%ss": "速度為：\n%ss",
         "Bye Bye": "掰掰 ><",
         "Not Found": "404 不存在 0.0...",
-        "Okay": " 好的",
+        "Okay": "好的",
         "Exit.": "已退出",
         "Added": "已增加"
     }

@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import os, time,  \
-       requests,   \
-       json, ntpath,\
-       traceback
+import os, time,   \
+       requests,    \
+       json, ntpath, \
+       random, traceback
 
 
 from .core.TalkService import *
@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-alpha_RC3",
+        "version": "v6.5.0-alpha_RC4",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "None",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -61,6 +61,7 @@ class Yuuki:
         self.SecurityService = self.YuukiConfigs["SecurityService"]
 
         self.MyMID = self.client.getProfile().mid
+        self.GroupJoined = self.client.getGroupIdsJoined()
 
         if len(self.data.getData("LimitInfo")) != 2:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
@@ -144,10 +145,19 @@ class Yuuki:
 
         self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
 
+    def errorReport(self):
+        err1, err2, err3 = sys.exc_info()
+        traceback.print_tb(err3)
+        tb_info = traceback.extract_tb(err3)
+        filename, line, func, text = tb_info[-1]
+        ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
+        return err1, err2, err3, ErrorInfo
+
     def cleanMyGroupInvitations(self):
-        for cleanInvitations in self.client.getGroupIdsInvited():
-            self.client.acceptGroupInvitation(self.Seq, cleanInvitations)
-            self.client.leaveGroup(self.Seq, cleanInvitations)
+        for client in [self.client] + self.Connect.helper:
+            for cleanInvitations in client.getGroupIdsInvited():
+                client.acceptGroupInvitation(self.Seq, cleanInvitations)
+                client.leaveGroup(self.Seq, cleanInvitations)
 
     def getContact(self, userId):
         if len(userId) == len(self.MyMID) and userId[0] == "u":
@@ -198,27 +208,45 @@ class Yuuki:
                 self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
                 self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], userId, self.CancelLimit)
 
-    def cancelSomeone(self, groupId, userId, exceptUserId=None):
+    def dictShuffle(self, dict, requirement=None):
+        dict_key = [key for key in dict]
+        random.shuffle(dict_key)
+        result = {}
+        for key in dict_key:
+            if requirement == None:
+                result[key]=dict[key]
+            else:
+                if key in requirement:
+                    result[key] = dict[key]
+        return result
+
+    def cancelSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            accounts = self.data.getLimit("Cancel")
+            members = [member.mid for member in groupInfo.members]
+            accounts = self.dictShuffle(self.data.getLimit("Cancel"), members)
+            if len(accounts) == 0:
+                return "None"
             if exceptUserId:
                 accounts[exceptUserId] = -1
             helper = max(accounts, key=accounts.get)
         else:
             if exceptUserId == self.MyMID:
-                return
+                return "None"
             helper = self.MyMID
 
         Limit = self.data.getLimit("Cancel")[helper]
         if Limit > 0:
-            self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupId, [userId])
+            self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupInfo.id, [userId])
             self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
         else:
-            self.sendText(groupId, _("Cancel Limit."))
+            self.sendText(groupInfo.id, _("Cancel Limit."))
 
-    def kickSomeone(self, groupId, userId, exceptUserId=None):
+    def kickSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            accounts = self.data.getLimit("Kick")
+            members = [member.mid for member in groupInfo.members]
+            accounts = self.dictShuffle(self.data.getLimit("Kick"), members)
+            if len(accounts) == 0:
+                return "None"
             if exceptUserId:
                 accounts[exceptUserId] = -1
             helper = max(accounts, key=accounts.get)
@@ -229,10 +257,10 @@ class Yuuki:
 
         Limit = self.data.getLimit("Kick")[helper]
         if Limit > 0:
-            self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupId, [userId])
+            self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupInfo.id, [userId])
             self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
-            self.sendText(groupId, _("Kick Limit."))
+            self.sendText(groupInfo.id, _("Kick Limit."))
         return helper
 
     def sendToWho(self, Message):
@@ -306,13 +334,18 @@ class Yuuki:
             Inviter = ncMessage.param2
             GroupInfo = self.client.getGroup(GroupID)
             GroupMember = [Catched.mid for Catched in GroupInfo.members]
+            GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
             if GroupInfo.members:
                 self.client.acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
+                    self.GroupJoined.append(GroupID)
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
                     self.getGroupTicket(GroupID, self.MyMID, True)
+                    for userId in self.Connect.helper_ids:
+                        if userId in GroupInvite:
+                            self.getClientByMid(userId).acceptGroupInvitation(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
@@ -321,7 +354,7 @@ class Yuuki:
                     self.client.leaveGroup(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupID, "Not Join", Inviter))
-        if not BlockedIgnore:
+        if ncMessage.param1 in self.GroupJoined and not BlockedIgnore:
             for userId in self.Connect.helper_ids:
                 if self.checkInInvitationList(ncMessage, userId):
                     self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
@@ -443,6 +476,7 @@ class Yuuki:
                         for userId in self.Connect.helper_ids:
                             if userId in [member.mid for member in GroupInfo.members]:
                                 self.getClientByMid(userId).leaveGroup(self.Seq, GroupInfo.id)
+                    self.GroupJoined.remove(GroupInfo.id)
             elif self.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
                     self.sendText(self.sendToWho(ncMessage), _("Exit."))
@@ -489,25 +523,25 @@ class Yuuki:
         elif SEGroup[ncMessage.type]:
             Security_Access = SEGroup[ncMessage.type]
 
-        if Security_Access and self.SecurityService:
-            if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
+        if self.SecurityService:
+            if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP and Security_Access:
                 if Another == '4':
                     if not GroupInfo.preventJoinByTicket:
                         self.changeGroupUrlStatus(GroupInfo, False)
                         self.sendText(GroupID, _("DO NOT TOUCH THE GROUP URL SETTINGs, see you..."))
-                        Kicker = self.kickSomeone(GroupID, Action)
+                        Kicker = self.kickSomeone(GroupInfo, Action)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
-            elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+            elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP and Security_Access:
                 Canceler = "None"
                 if "\x1e" in Another:
                     for userId in Another.split("\x1e"):
                         if userId not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
-                            Canceler = self.cancelSomeone(GroupID, userId)
+                            Canceler = self.cancelSomeone(GroupInfo, userId)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
-                    Canceler = self.cancelSomeone(GroupID, Another)
+                    Canceler = self.cancelSomeone(GroupInfo, Another)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
                 if Canceler != "None":
@@ -516,7 +550,7 @@ class Yuuki:
                 for userId in self.data.getData("BlackList"):
                     if userId == Action:
                         self.sendText(GroupID, _("You are our blacklist. Bye~"))
-                        Kicker = self.kickSomeone(GroupID, userId)
+                        Kicker = self.kickSomeone(GroupInfo, userId)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
@@ -526,9 +560,10 @@ class Yuuki:
                 elif Another in [self.MyMID] + self.Connect.helper_ids:
                     Kicker = "None"
                     try:
-                        Kicker = self.kickSomeone(GroupID, Action, Another)
+                        Kicker = self.kickSomeone(GroupInfo, Action, Another)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
+                        assert Kicker != "None", "No Helper Found"
                         if GroupInfo.preventJoinByTicket:
                             self.changeGroupUrlStatus(GroupInfo, True, Kicker)
                         GroupTicket = self.getGroupTicket(GroupID, Kicker)
@@ -537,34 +572,24 @@ class Yuuki:
                             self.changeGroupUrlStatus(GroupInfo, False, Another)
                         self.getGroupTicket(GroupID, Another, True)
                     except:
+                        (err1, err2, err3, ErrorInfo) = self.errorReport()
+                        for Root in self.Admin:
+                            self.sendText(Root, "Star Yuuki BOT - SecurityService Error...\nError:\n%s\n%s\n%s\n\n%s" %
+                                          (err1, err2, err3, ErrorInfo))
+                        if Another == self.MyMID:
+                            self.GroupJoined.remove(GroupID)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
-                    self.data.updateData(self.data.getData("BlackList"), True, Action)
-                    # Log
-                    self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
-                    self.sendText(Action, _("You had been blocked by our database."))
-                else:
+                    if Action not in self.data.getData("BlackList"):
+                        self.data.updateData(self.data.getData("BlackList"), True, Action)
+                        # Log
+                        self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
+                        self.sendText(Action, _("You had been blocked by our database."))
+                elif Security_Access:
                     self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
-                    Kicker = self.kickSomeone(GroupID, Action)
+                    Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
-        elif self.SecurityService:
-            if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                Canceler = "None"
-                for userId in self.data.getData("BlackList"):
-                    if self.checkInInvitationList(ncMessage, userId):
-                        Canceler = self.cancelSomeone(GroupID, userId)
-                        # Log
-                        self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
-                if Canceler != "None":
-                    self.sendText(GroupID, _("The User(s) was in our blacklist database."))
-            elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-                for userId in self.data.getData("BlackList"):
-                    if userId == Action:
-                        self.sendText(GroupID, _("You are our blacklist. Bye~"))
-                        Kicker = self.kickSomeone(GroupID, userId)
-                        # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
 
     # Main
 
@@ -603,15 +628,15 @@ class Yuuki:
                 else:
                     NoWork = NoWork + 1
             except SystemExit:
+                print("System Exit.")
+                self.exit()
+            except KeyboardInterrupt:
+                print("\nAdmin Exit.")
                 self.exit()
             except EOFError:
                 pass
             except:
-                err1, err2, err3 = sys.exc_info()
-                traceback.print_tb(err3)
-                tb_info = traceback.extract_tb(err3)
-                filename, line, func, text = tb_info[-1]
-                ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
+                (err1, err2, err3, ErrorInfo) = self.errorReport()
                 try:
                     if catchedNews and ncMessage:
                         Finded = False
