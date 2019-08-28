@@ -582,7 +582,8 @@ class Yuuki:
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
                     self.data.updateData(self.data.getData("BlackList"), True, Action)
                     # Log
-                    self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
+                    if Action not in self.data.getData("BlackList"):
+                        self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
                     self.sendText(Action, _("You had been blocked by our database."))
                 elif Security_Access:
                     self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
@@ -630,7 +631,7 @@ class Yuuki:
                 print("System Exit.")
                 self.exit()
             except KeyboardInterrupt:
-                print("Admin Exit.")
+                print("\nAdmin Exit.")
                 self.exit()
             except EOFError:
                 pass
