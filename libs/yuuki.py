@@ -580,11 +580,11 @@ class Yuuki:
                             self.GroupJoined.remove(GroupID)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
-                    self.data.updateData(self.data.getData("BlackList"), True, Action)
-                    # Log
                     if Action not in self.data.getData("BlackList"):
+                        self.data.updateData(self.data.getData("BlackList"), True, Action)
+                        # Log
                         self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
-                    self.sendText(Action, _("You had been blocked by our database."))
+                        self.sendText(Action, _("You had been blocked by our database."))
                 elif Security_Access:
                     self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
                     Kicker = self.kickSomeone(GroupInfo, Action)
