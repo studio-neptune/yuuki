@@ -145,6 +145,14 @@ class Yuuki:
 
         self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
 
+    def errorReport(self):
+        err1, err2, err3 = sys.exc_info()
+        traceback.print_tb(err3)
+        tb_info = traceback.extract_tb(err3)
+        filename, line, func, text = tb_info[-1]
+        ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
+        return err1, err2, err3, ErrorInfo
+
     def cleanMyGroupInvitations(self):
         for client in [self.client] + self.Connect.helper:
             for cleanInvitations in client.getGroupIdsInvited():
@@ -547,6 +555,10 @@ class Yuuki:
                             self.changeGroupUrlStatus(GroupInfo, False, Another)
                         self.getGroupTicket(GroupID, Another, True)
                     except:
+                        (err1, err2, err3, ErrorInfo) = self.errorReport()
+                        for Root in self.Admin:
+                            self.sendText(Root, "Star Yuuki BOT - SecurityService Error...\nError:\n%s\n%s\n%s\n\n%s" %
+                                          (err1, err2, err3, ErrorInfo))
                         if Another == self.MyMID:
                             self.GroupJoined.remove(GroupID)
                         # Log
@@ -602,11 +614,7 @@ class Yuuki:
             except EOFError:
                 pass
             except:
-                err1, err2, err3 = sys.exc_info()
-                traceback.print_tb(err3)
-                tb_info = traceback.extract_tb(err3)
-                filename, line, func, text = tb_info[-1]
-                ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
+                (err1, err2, err3, ErrorInfo) = self.errorReport()
                 try:
                     if catchedNews and ncMessage:
                         Finded = False
