@@ -4,8 +4,12 @@
 import os, time, json
 from .core.ttypes import OpType
 
+from .thread_control import Yuuki_Thread
+
 class Yuuki_Data:
-    def __init__(self):
+    def __init__(self, threading=False):
+        self.threading = threading
+        self.ThreadControl = Yuuki_Thread()
 
         # Data
 
@@ -95,6 +99,14 @@ class Yuuki_Data:
                 with open(name, "w") as f:
                     f.write(self.initHeader.format(Type))
 
+    def ThreadExec(self, Function, args):
+        if self.threading:
+            self.ThreadControl.lock.acquire()
+            self.ThreadControl.add(Function, args)
+            self.ThreadControl.lock.release()
+        else:
+            Function(*args)
+
     def file(self, Type, Mode, Format):
         if Format == "Data":
             return open(self.DataPath + self.DataName.format(Type), Mode)
@@ -107,6 +119,12 @@ class Yuuki_Data:
                 f.write(json.dumps(self.Data[Type]))
 
     def updateData(self, Object, Input, Data):
+        if self.threading:
+            self.ThreadExec(self._updateData, (Object, Input, Data))
+        else:
+            self._updateData(Object, Input, Data)
+
+    def _updateData(self, Object, Input, Data):
         if type(Object) == list:
             if Input:
                 Object.append(Data)
@@ -117,6 +135,12 @@ class Yuuki_Data:
         self.syncData()
 
     def updateLog(self, Type, Data):
+        if self.threading:
+            self.ThreadExec(self._updateLog, (Type, Data))
+        else:
+            self._updateLog(Type, Data)
+
+    def _updateLog(self, Type, Data):
         with self.file(Type, "a", "Log") as f:
             f.write(self.LogType[Type] % Data)
 
@@ -152,7 +176,7 @@ class Yuuki_Data:
         return Groups[GroupID]
 
     def getSEGroup(self, GroupID):
-        SEMode = self.getGroup(GroupID)["SEGroup"]
+        SEMode = self.getGroup(GroupID).get("SEGroup")
         if SEMode == None:
             return None
         SEMode_ = {}

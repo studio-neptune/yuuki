@@ -14,6 +14,8 @@ from .data import Yuuki_Data
 
 from .i18n import Yuuki_LangSetting
 
+from .thread_control import Yuuki_MultiPross
+
 class Yuuki_Settings:
     """ Yuuki Custom Settings """
 
@@ -38,6 +40,9 @@ class Yuuki_Settings:
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection):
         self.YuukiConfigs = Yuuki_Settings.config
+
+        self.Threading = False
+        self.Thread_Control = Yuuki_MultiPross()
 
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
@@ -70,6 +75,18 @@ class Yuuki:
         _ = self.i18n._
 
     # Basic Func
+
+    def getClient(self, userId):
+        if self.Threading:
+            if userId == self.MyMID:
+                return self.Connect.connect()
+            else:
+                return self.Connect.helperThreadConnect(userId)
+        else:
+            Accounts = [self.client] + self.Connect.helper
+            for count, AccountUserId in enumerate([self.MyMID] + self.Connect.helper_ids):
+                if AccountUserId == userId:
+                    return Accounts[count]
 
     def exit(self, restart=False):
         if restart:
@@ -115,9 +132,9 @@ class Yuuki:
             group.preventJoinByTicket = True
         group.members, group.invitee = None, None
         if userId != None:
-            self.getClientByMid(userId).updateGroup(self.Seq, group)
+            self.getClient(userId).updateGroup(self.Seq, group)
         else:
-            self.client.updateGroup(self.Seq, group)
+            self.getClient(self.MyMID).updateGroup(self.Seq, group)
 
     def enableSecurityStatus(self, groupId, status):
         group_status = self.data.SEGrouptype
@@ -154,7 +171,7 @@ class Yuuki:
         return err1, err2, err3, ErrorInfo
 
     def cleanMyGroupInvitations(self):
-        for client in [self.client] + self.Connect.helper:
+        for client in [self.getClient(self.MyMID)] + self.Connect.helper:
             for cleanInvitations in client.getGroupIdsInvited():
                 client.acceptGroupInvitation(self.Seq, cleanInvitations)
                 client.leaveGroup(self.Seq, cleanInvitations)
@@ -162,7 +179,7 @@ class Yuuki:
     def getContact(self, userId):
         if len(userId) == len(self.MyMID) and userId[0] == "u":
             try:
-                contactInfo = self.client.getContact(userId)
+                contactInfo = self.getClient(self.MyMID).getContact(userId)
             except:
                 contactInfo = False
         else:
@@ -179,12 +196,6 @@ class Yuuki:
         elif Message.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
             return Message.param1, Message.param2, Message.param3
 
-    def getClientByMid(self, userId):
-        Accounts = [self.client] + self.Connect.helper
-        for count, AccountUserId in enumerate([self.MyMID] + self.Connect.helper_ids):
-            if AccountUserId == userId:
-                return Accounts[count]
-
     def getGroupTicket(self, GroupID, userId, renew=False):
         GroupTicket = ""
         if "GroupTicket" in self.data.getGroup(GroupID):
@@ -193,7 +204,7 @@ class Yuuki:
         else:
             self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
         if GroupTicket == "" or renew:
-            GroupTicket = self.getClientByMid(userId).reissueGroupTicket(GroupID)
+            GroupTicket = self.getClient(userId).reissueGroupTicket(GroupID)
             self.data.updateData(self.data.getGroup(GroupID)["GroupTicket"], userId, GroupTicket)
         return GroupTicket
 
@@ -236,7 +247,7 @@ class Yuuki:
 
         Limit = self.data.getLimit("Cancel")[helper]
         if Limit > 0:
-            self.getClientByMid(helper).cancelGroupInvitation(self.Seq, groupInfo.id, [userId])
+            self.getClient(helper).cancelGroupInvitation(self.Seq, groupInfo.id, [userId])
             self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Cancel Limit."))
@@ -257,7 +268,7 @@ class Yuuki:
 
         Limit = self.data.getLimit("Kick")[helper]
         if Limit > 0:
-            self.getClientByMid(helper).kickoutFromGroup(self.Seq, groupInfo.id, [userId])
+            self.getClient(helper).kickoutFromGroup(self.Seq, groupInfo.id, [userId])
             self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Kick Limit."))
@@ -273,7 +284,7 @@ class Yuuki:
 
     def sendText(self, toid, msg):
         message = Message(to=toid, text=msg)
-        self.client.sendMessage(self.Seq, message)
+        self.getClient(self.MyMID).sendMessage(self.Seq, message)
 
     def sendUser(self, toid, userId):
         message = Message(
@@ -285,7 +296,7 @@ class Yuuki:
             },
             to=toid
         )
-        self.client.sendMessage(self.Seq, message)
+        self.getClient(self.MyMID).sendMessage(self.Seq, message)
 
     def sendMedia(self, toid, type, path):
         if os.path.exists(path):
@@ -302,7 +313,7 @@ class Yuuki:
                 media_name = file_name
             else:
                 media_name = 'media'
-            message_id = self.client.sendMessage(self.Seq, message).id
+            message_id = self.getClient(self.MyMID).sendMessage(self.Seq, message).id
             files = {
                 'file': open(path, 'rb'),
             }
@@ -321,6 +332,12 @@ class Yuuki:
             if r.status_code != 201:
                 self.sendText(toid, "Error!")
 
+    def Thread_Exec(self, Function, args):
+        if self.Threading:
+            self.Thread_Control.add(Function, args)
+        else:
+            Function(*args)
+
     # Task
 
     def JoinGroup(self, ncMessage):
@@ -332,11 +349,11 @@ class Yuuki:
         if self.checkInInvitationList(ncMessage) and not BlockedIgnore:
             GroupID = ncMessage.param1
             Inviter = ncMessage.param2
-            GroupInfo = self.client.getGroup(GroupID)
+            GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
             GroupMember = [Catched.mid for Catched in GroupInfo.members]
             GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
             if GroupInfo.members:
-                self.client.acceptGroupInvitation(self.Seq, GroupID)
+                self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
                     self.GroupJoined.append(GroupID)
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
@@ -345,19 +362,19 @@ class Yuuki:
                     self.getGroupTicket(GroupID, self.MyMID, True)
                     for userId in self.Connect.helper_ids:
                         if userId in GroupInvite:
-                            self.getClientByMid(userId).acceptGroupInvitation(self.Seq, GroupID)
+                            self.getClient(userId).acceptGroupInvitation(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
                     self.sendText(GroupID, _("Sorry...\nThe number of members is not satisfied (%s needed)") %
                                   (self.YuukiConfigs["GroupMebers_Demand"],))
-                    self.client.leaveGroup(self.Seq, GroupID)
+                    self.getClient(self.MyMID).leaveGroup(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupID, "Not Join", Inviter))
         if ncMessage.param1 in self.GroupJoined and not BlockedIgnore:
             for userId in self.Connect.helper_ids:
                 if self.checkInInvitationList(ncMessage, userId):
-                    self.getClientByMid(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
+                    self.getClient(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
                     self.getGroupTicket(ncMessage.param1, userId, True)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
@@ -372,7 +389,7 @@ class Yuuki:
         if ('BOT_CHECK' in ncMessage.message.contentMetadata) or BlockedIgnore:
             pass
         elif ncMessage.message.toType == MIDType.ROOM:
-            self.client.leaveRoom(self.Seq, ncMessage.message.to)
+            self.getClient(self.MyMID).leaveRoom(self.Seq, ncMessage.message.to)
         elif ncMessage.message.contentType == ContentType.NONE:
             msgSep = ncMessage.message.text.split(" ")
             if self.YuukiConfigs["name"] + '/Help' == ncMessage.message.text:
@@ -401,7 +418,7 @@ class Yuuki:
                         self.sendText(self.sendToWho(ncMessage), str(bool(self.SecurityService)))
             elif self.YuukiConfigs["name"] + '/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    GroupInfo = self.client.getGroup(ncMessage.message.to)
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
@@ -414,7 +431,7 @@ class Yuuki:
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
             elif self.YuukiConfigs["name"] + '/Disable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    GroupInfo = self.client.getGroup(ncMessage.message.to)
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         status = []
@@ -427,7 +444,7 @@ class Yuuki:
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
             elif self.YuukiConfigs["name"] + '/ExtAdmin' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    GroupInfo = self.client.getGroup(ncMessage.message.to)
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid]
                     if ncMessage.message.from_ in GroupPrivilege and len(msgSep) == 3:
                         if msgSep[1] == "add":
@@ -451,7 +468,7 @@ class Yuuki:
                         self.sendText(self.sendToWho(ncMessage), str(self.data.getGroup(GroupInfo.id)["Ext_Admin"]))
             elif self.YuukiConfigs["name"] + '/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    GroupInfo = self.client.getGroup(ncMessage.message.to)
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     group_status = self.data.getSEGroup(ncMessage.message.to)
                     if group_status == None:
                         status = _("Default without Initialize\nAdmin of the Group:\n%s") % (
@@ -468,14 +485,14 @@ class Yuuki:
                     self.sendText(self.sendToWho(ncMessage), status)
             elif self.YuukiConfigs["name"] + '/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
-                    GroupInfo = self.client.getGroup(ncMessage.message.to)
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         self.sendText(self.sendToWho(ncMessage), _("Bye Bye"))
-                        self.client.leaveGroup(self.Seq, GroupInfo.id)
+                        self.getClient(self.MyMID).leaveGroup(self.Seq, GroupInfo.id)
                         for userId in self.Connect.helper_ids:
                             if userId in [member.mid for member in GroupInfo.members]:
-                                self.getClientByMid(userId).leaveGroup(self.Seq, GroupInfo.id)
+                                self.getClient(userId).leaveGroup(self.Seq, GroupInfo.id)
                     self.GroupJoined.remove(GroupInfo.id)
             elif self.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
@@ -511,7 +528,7 @@ class Yuuki:
         (GroupID, Action, Another) = self.securityForWhere(ncMessage)
         SEGroup = self.data.getSEGroup(GroupID)
 
-        GroupInfo = self.client.getGroup(GroupID)
+        GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
         GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
 
 
@@ -567,7 +584,7 @@ class Yuuki:
                         if GroupInfo.preventJoinByTicket:
                             self.changeGroupUrlStatus(GroupInfo, True, Kicker)
                         GroupTicket = self.getGroupTicket(GroupID, Kicker)
-                        self.getClientByMid(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
+                        self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         if not GroupInfo.preventJoinByTicket:
                             self.changeGroupUrlStatus(GroupInfo, False, Another)
                         self.getGroupTicket(GroupID, Another, True)
@@ -593,48 +610,64 @@ class Yuuki:
 
     # Main
 
-    def Main(self):
+    def Main(self, threading=False):
         NoWork = 0
+        fetchNum = 50
         catchedNews = []
         ncMessage = Operation()
-        Revision = self.client.getLastOpRevision()
+
+        sybExec = self.Thread_Exec
+
+        Revision = self.getClient(self.MyMID).getLastOpRevision()
+
+        if threading:
+            self.Threading = threading
+            fetchNum = 1
+
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
+
         if time.localtime().tm_hour == self.data.getData("Global")["LastResetLimitTime"]:
             self.limitReset(True)
+
         while True:
             try:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
                     self.limitReset()
                     self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
-                if NoWork == 300:
-                    Revision = self.client.getLastOpRevision()
-                catchedNews = self.listen.fetchOperations(Revision, 50)
+                    if NoWork >= 300:
+                        Revision = self.getClient(self.MyMID).getLastOpRevision()
+
+                catchedNews = self.listen.fetchOperations(Revision, fetchNum)
                 if catchedNews:
                     NoWork = 0
                     for ncMessage in catchedNews:
                         if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                            self.JoinGroup(ncMessage)
+                            sybExec(self.JoinGroup, (ncMessage,))
                         elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-                            self.Security(ncMessage)
+                            sybExec(self.Security, (ncMessage,))
                         elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-                            self.Security(ncMessage)
+                            sybExec(self.Security, (ncMessage,))
                         elif ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-                            self.Security(ncMessage)
+                            sybExec(self.Security, (ncMessage,))
                         elif ncMessage.type == OpType.RECEIVE_MESSAGE:
-                            self.Commands(ncMessage)
+                            sybExec(self.Commands, (ncMessage,))
                         if ncMessage.reqSeq != -1:
                             Revision = max(Revision, ncMessage.revision)
                 else:
                     NoWork = NoWork + 1
+
             except SystemExit:
                 print("System Exit.")
                 self.exit()
+
             except KeyboardInterrupt:
                 print("\nAdmin Exit.")
                 self.exit()
+
             except EOFError:
                 pass
+
             except:
                 (err1, err2, err3, ErrorInfo) = self.errorReport()
                 try:
@@ -647,7 +680,7 @@ class Yuuki:
                                 Revision = Catched.revision
                                 break
                         if not Finded:
-                            Revision = self.client.getLastOpRevision()
+                            Revision = self.getClient(self.MyMID).getLastOpRevision()
                     for Root in self.Admin:
                         self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
                                      (err1, err2, err3, ErrorInfo))

@@ -39,6 +39,7 @@ class Yuuki_Connect:
 
         self.helper = []
         self.helper_ids = []
+        self.helper_authTokens = {}
 
     def connect(self):
         transport = THttpClient.THttpClient(self.host + self.com_path)
@@ -73,7 +74,25 @@ class Yuuki_Connect:
 
             self.helper.append(client)
             self.helper_ids.append(profile.mid)
+            self.helper_authTokens[profile.mid] = LINE_ACCESS_KEY
 
             return True
         except:
             print("Error:\n%s\nNot Acceptable\n" % (LINE_ACCESS_KEY,))
+
+    def helperThreadConnect(self, userId):
+        if userId in self.helper_authTokens:
+            LINE_ACCESS_KEY = self.helper_authTokens.get(userId)
+        else:
+            return None
+
+        helper_ConnectHeader = self.con_header.copy()
+        helper_ConnectHeader["X-Line-Access"] = LINE_ACCESS_KEY
+
+        transport = THttpClient.THttpClient(self.host + self.com_path)
+        transport.setCustomHeaders(helper_ConnectHeader)
+        protocol = TCompactProtocol.TCompactProtocol(transport)
+        client = Client(protocol)
+        transport.open()
+
+        return client
