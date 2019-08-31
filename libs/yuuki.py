@@ -4,16 +4,13 @@
 import os, time, \
        json, ntpath, \
        random, requests, \
-       platform, traceback, \
-       multiprocessing
+       platform, traceback
 
 from .core.TalkService import *
+
 from .connection import Yuuki_Connect
-
 from .data import Yuuki_Data
-
 from .i18n import Yuuki_LangSetting
-
 from .thread_control import Yuuki_MultiPross
 
 class Yuuki_Settings:
@@ -46,7 +43,7 @@ class Yuuki:
 
         self.Threading = threading
         self.Thread_Control = Yuuki_MultiPross()
-
+ 
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
 
@@ -64,14 +61,11 @@ class Yuuki:
         self.data = Yuuki_Data(self.Threading)
 
         if self.Threading:
-            self.DynamicVariableManager = multiprocessing.Manager()
-            self.YuukiVariable = self.DynamicVariableManager.dict()
-            self.YuukiData = self.DynamicVariableManager.dict()
+            self.YuukiVariable = self.Thread_Control.dataManager().dict()
         else:
             self.YuukiVariable = {}
-            self.YuukiData = {}
 
-        self.YuukiData["sync"] = self.data.Data
+        self.YuukiVariable["sync"] = self.data.Data
         self.YuukiVariable["Power"] = True
         self.YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
 
@@ -422,7 +416,7 @@ class Yuuki:
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
-        self.YuukiData["sync"] = self.data.Data
+        self.YuukiVariable["sync"] = self.data.Data
 
     def Commands(self, ncMessage):
         """
@@ -561,7 +555,7 @@ class Yuuki:
                       (contactInfo.displayName, self.LINE_Media_server, contactInfo.pictureStatus,
                        contactInfo.statusMessage, contactInfo.mid)
             self.sendText(self.sendToWho(ncMessage), msg)
-        self.YuukiData["sync"] = self.data.Data
+        self.YuukiVariable["sync"] = self.data.Data
 
     def Security(self, ncMessage):
         """
@@ -657,7 +651,7 @@ class Yuuki:
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
-        self.YuukiData["sync"] = self.data.Data
+        self.YuukiVariable["sync"] = self.data.Data
 
     # Main
 
@@ -692,11 +686,11 @@ class Yuuki:
                 else:
                     NoWork += 1
 
-                self.data.Data = self.YuukiData["sync"]
-                self.data.syncData()
+                if self.data.Data != self.YuukiVariable["sync"]:
+                    self.data.Data = self.YuukiVariable["sync"]
+                    self.data.syncData()
 
             except KeyboardInterrupt:
-                print("\nSystem Exit")
                 self.exit()
 
             except EOFError:
