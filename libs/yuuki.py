@@ -342,6 +342,19 @@ class Yuuki:
 
     # Task
 
+    def taskDemux(self, catchedNews):
+        for ncMessage in catchedNews:
+            if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+                self.Thread_Exec(self.JoinGroup, (ncMessage,))
+            elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+                self.Thread_Exec(self.Security, (ncMessage,))
+            elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+                self.Thread_Exec(self.Security, (ncMessage,))
+            elif ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
+                self.Thread_Exec(self.Security, (ncMessage,))
+            elif ncMessage.type == OpType.RECEIVE_MESSAGE:
+                self.Thread_Exec(self.Commands, (ncMessage,))
+
     def JoinGroup(self, ncMessage):
         """
             ToDo Type:
@@ -614,11 +627,8 @@ class Yuuki:
 
     def Main(self):
         NoWork = 0
+        NoWorkLimit = 300
         fetchNum = 50
-        catchedNews = []
-        ncMessage = Operation()
-
-        sybExec = self.Thread_Exec
 
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
@@ -631,27 +641,17 @@ class Yuuki:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
                     self.limitReset()
                     self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
-                    if NoWork >= 300:
+                    if NoWork >= NoWorkLimit:
                         self.revision = self.getClient(self.MyMID).getLastOpRevision()
 
                 catchedNews = self.listen.fetchOperations(self.revision, fetchNum)
                 if catchedNews:
                     NoWork = 0
-                    for ncMessage in catchedNews:
-                        if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                            sybExec(self.JoinGroup, (ncMessage,))
-                        elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-                            sybExec(self.Security, (ncMessage,))
-                        elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-                            sybExec(self.Security, (ncMessage,))
-                        elif ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-                            sybExec(self.Security, (ncMessage,))
-                        elif ncMessage.type == OpType.RECEIVE_MESSAGE:
-                            sybExec(self.Commands, (ncMessage,))
-                        if ncMessage.reqSeq != -1:
-                            self.revision = max(self.revision, ncMessage.revision)
+                    self.Thread_Exec(self.taskDemux, (catchedNews,))
+                    if len(catchedNews) > 1:
+                        self.revision = max(catchedNews[-1].revision, catchedNews[-2].revision)
                 else:
-                    NoWork = NoWork + 1
+                    NoWork += 1
 
             except SystemExit:
                 print("System Exit.")
@@ -667,16 +667,6 @@ class Yuuki:
             except:
                 (err1, err2, err3, ErrorInfo) = self.errorReport()
                 try:
-                    if catchedNews and ncMessage:
-                        Finded = False
-                        for Catched in catchedNews:
-                            if Catched.revision == ncMessage.revision:
-                                Finded = True
-                            if Finded:
-                                self.revision = Catched.revision
-                                break
-                        if not Finded:
-                            self.revision = self.getClient(self.MyMID).getLastOpRevision()
                     for Root in self.Admin:
                         self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
                                      (err1, err2, err3, ErrorInfo))
