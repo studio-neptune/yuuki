@@ -65,10 +65,6 @@ class Yuuki:
         else:
             self.YuukiVariable = {}
 
-        self.YuukiVariable["sync"] = self.data.Data
-        self.YuukiVariable["Power"] = True
-        self.YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
-
         # Initialize
 
         (self.client, self.listen) = self.Connect.connect()
@@ -79,10 +75,14 @@ class Yuuki:
 
         self.MyMID = self.client.getProfile().mid
         self.revision = self.client.getLastOpRevision()
-        self.YuukiVariable["GroupJoined"] = self.client.getGroupIdsJoined()
 
         if len(self.data.getData("LimitInfo")) != 2:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
+
+        self.YuukiVariable["Power"] = True
+        self.YuukiVariable["sync"] = self.data.Data
+        self.YuukiVariable["GroupJoined"] = self.client.getGroupIdsJoined()
+        self.YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
 
         global _
         _ = self.i18n._
