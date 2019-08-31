@@ -630,6 +630,9 @@ class Yuuki:
         NoWorkLimit = 300
         fetchNum = 50
 
+        catchedNews = []
+        ncMessage = Operation()
+
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
 
@@ -667,6 +670,12 @@ class Yuuki:
             except:
                 (err1, err2, err3, ErrorInfo) = self.errorReport()
                 try:
+                    for ncMessage in catchedNews:
+                        if ncMessage.reqSeq != -1 and ncMessage.revision > self.revision:
+                            self.revision = ncMessage.revision
+                            break
+                    if ncMessage.revision != self.revision:
+                        self.revision = self.client.getLastOpRevision()
                     for Root in self.Admin:
                         self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
                                      (err1, err2, err3, ErrorInfo))
