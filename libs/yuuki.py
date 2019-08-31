@@ -21,7 +21,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-alpha_RC4",
+        "version": "v6.5.0-beta",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "None",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -620,10 +620,6 @@ class Yuuki:
         sybExec = self.Thread_Exec
 
         Revision = self.getClient(self.MyMID).getLastOpRevision()
-
-        if threading:
-            self.Threading = threading
-            fetchNum = 1
 
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
