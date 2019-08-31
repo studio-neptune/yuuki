@@ -66,6 +66,7 @@ class Yuuki:
         self.SecurityService = self.YuukiConfigs["SecurityService"]
 
         self.MyMID = self.client.getProfile().mid
+        self.revision = self.client.getLastOpRevision()
         self.GroupJoined = self.client.getGroupIdsJoined()
 
         if len(self.data.getData("LimitInfo")) != 2:
@@ -619,7 +620,8 @@ class Yuuki:
 
         sybExec = self.Thread_Exec
 
-        Revision = self.getClient(self.MyMID).getLastOpRevision()
+        if threading:
+            self.Threading = threading
 
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None
@@ -633,9 +635,9 @@ class Yuuki:
                     self.limitReset()
                     self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
                     if NoWork >= 300:
-                        Revision = self.getClient(self.MyMID).getLastOpRevision()
+                        self.revision = self.getClient(self.MyMID).getLastOpRevision()
 
-                catchedNews = self.listen.fetchOperations(Revision, fetchNum)
+                catchedNews = self.listen.fetchOperations(self.revision, fetchNum)
                 if catchedNews:
                     NoWork = 0
                     for ncMessage in catchedNews:
@@ -650,7 +652,7 @@ class Yuuki:
                         elif ncMessage.type == OpType.RECEIVE_MESSAGE:
                             sybExec(self.Commands, (ncMessage,))
                         if ncMessage.reqSeq != -1:
-                            Revision = max(Revision, ncMessage.revision)
+                            self.revision = max(self.revision, ncMessage.revision)
                 else:
                     NoWork = NoWork + 1
 
@@ -674,10 +676,10 @@ class Yuuki:
                             if Catched.revision == ncMessage.revision:
                                 Finded = True
                             if Finded:
-                                Revision = Catched.revision
+                                self.revision = Catched.revision
                                 break
                         if not Finded:
-                            Revision = self.getClient(self.MyMID).getLastOpRevision()
+                            self.revision = self.getClient(self.MyMID).getLastOpRevision()
                     for Root in self.Admin:
                         self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
                                      (err1, err2, err3, ErrorInfo))
