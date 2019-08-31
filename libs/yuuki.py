@@ -79,7 +79,8 @@ class Yuuki:
     def getClient(self, userId):
         if self.Threading:
             if userId == self.MyMID:
-                return self.Connect.connect()
+                (client, _) = self.Connect.connect()
+                return client
             else:
                 return self.Connect.helperThreadConnect(userId)
         else:
