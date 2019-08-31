@@ -20,3 +20,6 @@ class Yuuki_MultiPross:
     def add(self, Yuuki_Func, args=()):
         added_multiprocess = multiprocessing.Process(name=Yuuki_Func.__name__, target=Yuuki_Func, args=args)
         added_multiprocess.start()
+
+    def dataManager(self):
+        return multiprocessing.Manager()

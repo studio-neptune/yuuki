@@ -18,7 +18,6 @@ The latest stable version is "v6.5.0".
 Some function of old version maybe will make your LINE account be banned.
 
 ## Requirement
-### [!] Run with GNU/Linux only
 
 Recommand Environment:
 
@@ -30,7 +29,7 @@ You need the "LINE Unofficial API Core for Python". (Ex:[olsb](https://github.co
 
 Please place the core directory in `./libs/`
 
-## Installation
+## Setup
 
 + Check your system environment(Operating System, Requirements..)
 

@@ -1,19 +1,16 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import os, time,   \
-       requests,    \
+import os, time, \
        json, ntpath, \
-       random, traceback
-
+       random, requests, \
+       platform, traceback
 
 from .core.TalkService import *
+
 from .connection import Yuuki_Connect
-
 from .data import Yuuki_Data
-
 from .i18n import Yuuki_LangSetting
-
 from .thread_control import Yuuki_MultiPross
 
 class Yuuki_Settings:
@@ -21,7 +18,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-beta_RC1",
+        "version": "v6.5.0-beta_RC2",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "None",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -39,23 +36,40 @@ class Yuuki_Settings:
 
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
+
+        # Static Variable
+
         self.YuukiConfigs = Yuuki_Settings.config
 
         self.Threading = threading
         self.Thread_Control = Yuuki_MultiPross()
-
+ 
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
 
         self.KickLimit = self.YuukiConfigs["Hour_KickLimit"]
         self.CancelLimit = self.YuukiConfigs["Hour_CancelLimit"]
 
-        self.data = Yuuki_Data(self.Threading)
         self.i18n = Yuuki_LangSetting(self.YuukiConfigs["Default_Language"])
 
         self.LINE_Media_server = "https://obs.line-apps.com"
 
         self.Connect = Yuuki_Connect(Yuuki_Connection)
+
+        # Dynamic Variable
+
+        self.data = Yuuki_Data(self.Threading)
+
+        if self.Threading:
+            self.YuukiVariable = self.Thread_Control.dataManager().dict()
+        else:
+            self.YuukiVariable = {}
+
+        self.YuukiVariable["sync"] = self.data.Data
+        self.YuukiVariable["Power"] = True
+        self.YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
+
+        # Initialize
 
         (self.client, self.listen) = self.Connect.connect()
         self.connectHeader = Yuuki_Connection.connectHeader
@@ -63,11 +77,9 @@ class Yuuki:
         for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
             self.Connect.helperConnect(access)
 
-        self.SecurityService = self.YuukiConfigs["SecurityService"]
-
         self.MyMID = self.client.getProfile().mid
         self.revision = self.client.getLastOpRevision()
-        self.GroupJoined = self.client.getGroupIdsJoined()
+        self.YuukiVariable["GroupJoined"] = self.client.getGroupIdsJoined()
 
         if len(self.data.getData("LimitInfo")) != 2:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
@@ -91,14 +103,22 @@ class Yuuki:
                     return Accounts[count]
 
     def exit(self, restart=False):
+        print("System Exit")
+        self.YuukiVariable["Power"] = False
         if restart:
-            with open(".cache.sh", "w") as c:
-                c.write(sys.executable + " ./main.py")
-            os.system("sh .cache.sh")
-            os.system("rm .cache.sh")
-            sys.exit(0)
-        else:
-            sys.exit(0)
+            if platform.system() == "Windows":
+                with open("cache.bat", "w") as c:
+                    c.write(sys.executable + " ./main.py")
+                os.system("start cache.bat")
+                os.system("del cache.bat")
+            elif platform.system() == "Linux":
+                with open(".cache.sh", "w") as c:
+                    c.write(sys.executable + " ./main.py")
+                os.system("sh .cache.sh")
+                os.system("rm .cache.sh")
+            else:
+                print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
+        sys.exit(0)
 
     def sybGetGroupCreator(self, group):
         if group.creator == None:
@@ -370,7 +390,9 @@ class Yuuki:
             if GroupInfo.members:
                 self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
-                    self.GroupJoined.append(GroupID)
+                    GroupJoined_ = self.YuukiVariable["GroupJoined"]
+                    GroupJoined_.append(GroupID)
+                    self.YuukiVariable["GroupJoined"] = GroupJoined_
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nAdmin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
@@ -386,7 +408,7 @@ class Yuuki:
                     self.getClient(self.MyMID).leaveGroup(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupID, "Not Join", Inviter))
-        if ncMessage.param1 in self.GroupJoined and not BlockedIgnore:
+        if ncMessage.param1 in self.YuukiVariable["GroupJoined"] and not BlockedIgnore:
             for userId in self.Connect.helper_ids:
                 if self.checkInInvitationList(ncMessage, userId):
                     self.getClient(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
@@ -394,6 +416,7 @@ class Yuuki:
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
+        self.YuukiVariable["sync"] = self.data.Data
 
     def Commands(self, ncMessage):
         """
@@ -426,11 +449,12 @@ class Yuuki:
                     if len(msgSep) == 2:
                         try:
                             status = int(msgSep[1])
-                            self.SecurityService = bool(status)
+                            self.YuukiVariable["SecurityService"] = bool(status)
                         except:
                             pass
+                        self.sendText(self.sendToWho(ncMessage), _("Okay"))
                     else:
-                        self.sendText(self.sendToWho(ncMessage), str(bool(self.SecurityService)))
+                        self.sendText(self.sendToWho(ncMessage), str(bool(self.YuukiVariable["SecurityService"])))
             elif self.YuukiConfigs["name"] + '/Enable' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -508,7 +532,9 @@ class Yuuki:
                         for userId in self.Connect.helper_ids:
                             if userId in [member.mid for member in GroupInfo.members]:
                                 self.getClient(userId).leaveGroup(self.Seq, GroupInfo.id)
-                    self.GroupJoined.remove(GroupInfo.id)
+                    GroupJoined_ = self.YuukiVariable["GroupJoined"]
+                    GroupJoined_.remove(GroupInfo.id)
+                    self.YuukiVariable["GroupJoined"] = GroupJoined_
             elif self.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
                     self.sendText(self.sendToWho(ncMessage), _("Exit."))
@@ -529,6 +555,7 @@ class Yuuki:
                       (contactInfo.displayName, self.LINE_Media_server, contactInfo.pictureStatus,
                        contactInfo.statusMessage, contactInfo.mid)
             self.sendText(self.sendToWho(ncMessage), msg)
+        self.YuukiVariable["sync"] = self.data.Data
 
     def Security(self, ncMessage):
         """
@@ -551,11 +578,11 @@ class Yuuki:
             return
 
         if SEGroup == None:
-            Security_Access = self.SecurityService
+            Security_Access = self.YuukiVariable["SecurityService"]
         elif SEGroup[ncMessage.type]:
             Security_Access = SEGroup[ncMessage.type]
 
-        if self.SecurityService:
+        if self.YuukiVariable["SecurityService"]:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP and Security_Access:
                 if Another == '4':
                     if not GroupInfo.preventJoinByTicket:
@@ -606,10 +633,12 @@ class Yuuki:
                     except:
                         (err1, err2, err3, ErrorInfo) = self.errorReport()
                         for Root in self.Admin:
-                            self.sendText(Root, "Star Yuuki BOT - SecurityService Error...\nError:\n%s\n%s\n%s\n\n%s" %
+                            self.sendText(Root, "Star Yuuki BOT - SecurityService Failure\n\n%s\n%s\n%s\n\n%s" %
                                           (err1, err2, err3, ErrorInfo))
                         if Another == self.MyMID:
-                            self.GroupJoined.remove(GroupID)
+                            GroupJoined_ = self.YuukiVariable["GroupJoined"]
+                            GroupJoined_.remove(GroupID)
+                            self.YuukiVariable["GroupJoined"] = GroupJoined_
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
                     if Action not in self.data.getData("BlackList"):
@@ -622,6 +651,7 @@ class Yuuki:
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+        self.YuukiVariable["sync"] = self.data.Data
 
     # Main
 
@@ -639,7 +669,7 @@ class Yuuki:
         if time.localtime().tm_hour == self.data.getData("Global")["LastResetLimitTime"]:
             self.limitReset(True)
 
-        while True:
+        while self.YuukiVariable["Power"]:
             try:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
                     self.limitReset()
@@ -656,12 +686,11 @@ class Yuuki:
                 else:
                     NoWork += 1
 
-            except SystemExit:
-                print("System Exit.")
-                self.exit()
+                if self.data.Data != self.YuukiVariable["sync"]:
+                    self.data.Data = self.YuukiVariable["sync"]
+                    self.data.syncData()
 
             except KeyboardInterrupt:
-                print("\nAdmin Exit.")
                 self.exit()
 
             except EOFError:
