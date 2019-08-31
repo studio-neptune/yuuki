@@ -38,10 +38,10 @@ class Yuuki_Settings:
     }
 
 class Yuuki:
-    def __init__(self, Yuuki_Settings, Yuuki_Connection):
+    def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
         self.YuukiConfigs = Yuuki_Settings.config
 
-        self.Threading = False
+        self.Threading = threading
         self.Thread_Control = Yuuki_MultiPross()
 
         self.Seq = self.YuukiConfigs["Seq"]
@@ -50,7 +50,7 @@ class Yuuki:
         self.KickLimit = self.YuukiConfigs["Hour_KickLimit"]
         self.CancelLimit = self.YuukiConfigs["Hour_CancelLimit"]
 
-        self.data = Yuuki_Data()
+        self.data = Yuuki_Data(self.Threading)
         self.i18n = Yuuki_LangSetting(self.YuukiConfigs["Default_Language"])
 
         self.LINE_Media_server = "https://obs.line-apps.com"
@@ -612,16 +612,13 @@ class Yuuki:
 
     # Main
 
-    def Main(self, threading=False):
+    def Main(self):
         NoWork = 0
         fetchNum = 50
         catchedNews = []
         ncMessage = Operation()
 
         sybExec = self.Thread_Exec
-
-        if threading:
-            self.Threading = threading
 
         if "LastResetLimitTime" not in self.data.getData("Global"):
             self.data.getData("Global")["LastResetLimitTime"] = None

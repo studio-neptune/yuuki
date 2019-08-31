@@ -7,7 +7,7 @@ from .core.ttypes import OpType
 from .thread_control import Yuuki_Thread
 
 class Yuuki_Data:
-    def __init__(self, threading=False):
+    def __init__(self, threading):
         self.threading = threading
         self.ThreadControl = Yuuki_Thread()
 
