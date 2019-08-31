@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import os, time,   \
-       requests,    \
+import os, time, \
        json, ntpath, \
-       random, traceback
-
+       random, requests, \
+       platform, traceback, \
+       multiprocessing
 
 from .core.TalkService import *
 from .connection import Yuuki_Connect
@@ -39,6 +39,7 @@ class Yuuki_Settings:
 
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
+        self.Yuuki_Power = True
         self.YuukiConfigs = Yuuki_Settings.config
 
         self.Threading = threading
@@ -50,6 +51,7 @@ class Yuuki:
         self.KickLimit = self.YuukiConfigs["Hour_KickLimit"]
         self.CancelLimit = self.YuukiConfigs["Hour_CancelLimit"]
 
+        self.dataTask = multiprocessing.Queue()
         self.data = Yuuki_Data(self.Threading)
         self.i18n = Yuuki_LangSetting(self.YuukiConfigs["Default_Language"])
 
@@ -91,14 +93,21 @@ class Yuuki:
                     return Accounts[count]
 
     def exit(self, restart=False):
+        self.Yuuki_Power = False
         if restart:
-            with open(".cache.sh", "w") as c:
-                c.write(sys.executable + " ./main.py")
-            os.system("sh .cache.sh")
-            os.system("rm .cache.sh")
-            sys.exit(0)
-        else:
-            sys.exit(0)
+            if platform.system() == "Windows":
+                with open("cache.bat", "w") as c:
+                    c.write(sys.executable + " ./main.py")
+                os.system("start cache.bat")
+                os.system("del cache.bat")
+            elif platform.system() == "Linux":
+                with open(".cache.sh", "w") as c:
+                    c.write(sys.executable + " ./main.py")
+                os.system("sh .cache.sh")
+                os.system("rm .cache.sh")
+            else:
+                print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
+        sys.exit(0)
 
     def sybGetGroupCreator(self, group):
         if group.creator == None:
@@ -606,7 +615,7 @@ class Yuuki:
                     except:
                         (err1, err2, err3, ErrorInfo) = self.errorReport()
                         for Root in self.Admin:
-                            self.sendText(Root, "Star Yuuki BOT - SecurityService Error...\nError:\n%s\n%s\n%s\n\n%s" %
+                            self.sendText(Root, "Star Yuuki BOT - SecurityService Failure\n\n%s\n%s\n%s\n\n%s" %
                                           (err1, err2, err3, ErrorInfo))
                         if Another == self.MyMID:
                             self.GroupJoined.remove(GroupID)
@@ -639,7 +648,7 @@ class Yuuki:
         if time.localtime().tm_hour == self.data.getData("Global")["LastResetLimitTime"]:
             self.limitReset(True)
 
-        while True:
+        while self.Yuuki_Power:
             try:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
                     self.limitReset()
