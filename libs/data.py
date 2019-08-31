@@ -132,7 +132,6 @@ class Yuuki_Data:
                 Object.remove(Data)
         elif type(Object) == dict:
             Object[Input] = Data
-        self.syncData()
 
     def updateLog(self, Type, Data):
         if self.threading:
