@@ -18,7 +18,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0",
+        "version": "v6.5.1",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -148,17 +148,20 @@ class Yuuki:
         return inList
 
     def changeGroupUrlStatus(self, group, status, userId=None):
+        result = Group()
+        for key in group.__dict__:
+            if key != "members" or key != "invitee":
+                result.__dict__[key] = group.__dict__[key]
         if status == True:
-            group.preventJoinByTicket = False
+            result.preventJoinByTicket = False
         else:
-            group.preventJoinByTicket = True
-        group.members, group.invitee = None, None
+            result.preventJoinByTicket = True
         if userId != None:
-            self.getClient(userId).updateGroup(self.Seq, group)
+            self.getClient(userId).updateGroup(self.Seq, result)
         else:
-            self.getClient(self.MyMID).updateGroup(self.Seq, group)
+            self.getClient(self.MyMID).updateGroup(self.Seq, result)
 
-    def enableSecurityStatus(self, groupId, status):
+    def configSecurityStatus(self, groupId, status):
         group_status = self.data.SEGrouptype
         if 0 in status:
             group_status[OpType.NOTIFIED_UPDATE_GROUP] = True
@@ -168,19 +171,6 @@ class Yuuki:
             group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION] = True
         if 3 in status:
             group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP] = True
-
-        self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
-
-    def disableSecurityStatus(self, groupId, status):
-        group_status = self.data.SEGrouptype
-        if 0 in status:
-            group_status[OpType.NOTIFIED_UPDATE_GROUP] = False
-        if 1 in status:
-            group_status[OpType.NOTIFIED_INVITE_INTO_GROUP] = False
-        if 2 in status:
-            group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION] = False
-        if 3 in status:
-            group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP] = False
 
         self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
 
@@ -247,7 +237,7 @@ class Yuuki:
         result = {}
         for key in dict_key:
             if requirement == None:
-                result[key]=dict[key]
+                result[key] = dict[key]
             else:
                 if key in requirement:
                     result[key] = dict[key]
@@ -455,7 +445,7 @@ class Yuuki:
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
                     else:
                         self.sendText(self.sendToWho(ncMessage), str(bool(self.YuukiVariable["SecurityService"])))
-            elif self.YuukiConfigs["name"] + '/Enable' == msgSep[0]:
+            elif self.YuukiConfigs["name"] + '/Switch' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
@@ -469,12 +459,12 @@ class Yuuki:
                                 status.append(int(code))
                             except:
                                 pass
-                        self.enableSecurityStatus(ncMessage.message.to, status)
+                        self.configSecurityStatus(ncMessage.message.to, status)
                         if status != []:
                             self.sendText(self.sendToWho(ncMessage), _("Okay"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))
-            elif self.YuukiConfigs["name"] + '/Disable' == msgSep[0]:
+            elif self.YuukiConfigs["name"] + '/DisableAll' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
@@ -482,17 +472,8 @@ class Yuuki:
                         self.sendText(self.sendToWho(ncMessage),
                                       _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
                     elif ncMessage.message.from_ in GroupPrivilege:
-                        status = []
-                        for code in msgSep:
-                            try:
-                                status.append(int(code))
-                            except:
-                                pass
-                        self.disableSecurityStatus(ncMessage.message.to, status)
-                        if status != []:
-                            self.sendText(self.sendToWho(ncMessage), _("Okay"))
-                        else:
-                            self.sendText(self.sendToWho(ncMessage), _("Not Found"))
+                        self.configSecurityStatus(ncMessage.message.to, [])
+                        self.sendText(self.sendToWho(ncMessage), _("Okay"))
             elif self.YuukiConfigs["name"] + '/ExtAdmin' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -655,8 +636,12 @@ class Yuuki:
                         if GroupInfo.preventJoinByTicket:
                             self.changeGroupUrlStatus(GroupInfo, True, Kicker)
                         GroupTicket = self.getGroupTicket(GroupID, Kicker)
-                        self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
-                        if not GroupInfo.preventJoinByTicket:
+                        try:
+                            self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
+                        except:
+                            GroupTicket = self.getGroupTicket(GroupID, Kicker, True)
+                            self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
+                        if GroupInfo.preventJoinByTicket:
                             self.changeGroupUrlStatus(GroupInfo, False, Another)
                         self.getGroupTicket(GroupID, Another, True)
                     except:

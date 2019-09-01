@@ -1,6 +1,6 @@
 Star Yuuki(pYthon) BOT - Yuuki
 ==================
-![Version](https://img.shields.io/badge/v6.5.0-OpenSource-33FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF8800.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg)
+![Version](https://img.shields.io/badge/v6.5.1-OpenSource-33FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF8800.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg)
 
 A Python BOT for LINE Group Protection with LINE Unofficial API.
 ![ICON](logo.png)
@@ -13,12 +13,9 @@ Now, it is OpenSource.
 The software licensed under Mozilla Public LICENSE 2.0.
 
 ## Warning
-The latest stable version is "v6.5.0".
-
 Some function of old version maybe will make your LINE account be banned.
 
 ## Requirement
-
 Recommand Environment:
 
     Ubuntu >= 18.04
@@ -30,8 +27,7 @@ You need the "LINE Unofficial API Core for Python". (Ex:[olsb](https://github.co
 Please place the core directory in `./libs/`
 
 ## Setup
-
-+ Check your system environment(Operating System, Requirements..)
++ Check your system environment(Operating System, Requirements...)
 
 + Exec:
 
@@ -39,7 +35,7 @@ Please place the core directory in `./libs/`
     pip install -Ur requirements.txt
 
 ## Usage
-+ Configure your connection information in `main.py`
++ Configure your connection in `main.py`
 
 + Exec:
 
