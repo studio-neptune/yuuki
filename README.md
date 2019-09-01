@@ -10,7 +10,7 @@ Yeah! This is the BOT which was the first Chinese LINE Group Security BOT.
 Now, it is OpenSource.
 
 ## License
-This software using Mozilla Public License 2.0.
+The software licensed under Mozilla Public LICENSE 2.0.
 
 ## Warning
 The latest stable version is "v6.5.0".
@@ -39,7 +39,7 @@ Please place the core directory in `./libs/`
     pip install -Ur requirements.txt
 
 ## Usage
-+ Config your connection infomations in `main.py`
++ Configure your connection information in `main.py`
 
 + Exec:
 
@@ -50,4 +50,4 @@ Please place the core directory in `./libs/`
 Maybe you want the source of history version. Click [it](https://github.com/star-inc/star_yuuki_bot/releases/tag/old-versions).
 
 ### Logo Copyright
-Copyright of the Image which was named "logo.png" belogs to "[ 	©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)".
+Copyright of the Image which was named "logo.png" belongs to "[©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)".
