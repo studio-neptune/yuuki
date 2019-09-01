@@ -8,8 +8,8 @@ class Yuuki_LangSetting:
     def __init__(self, default):
         self.default = default
         self.support = {
-            "en":English,
-            "zh-tw":Traditional_Chinese
+            "en": English,
+            "zh-tw": Traditional_Chinese
         }
 
     def gettext(self, text, lang=None):
