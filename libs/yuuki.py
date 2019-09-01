@@ -18,7 +18,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.0-beta_RC3",
+        "version": "v6.5.0",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -109,7 +109,7 @@ class Yuuki:
             if platform.system() == "Windows":
                 with open("cache.bat", "w") as c:
                     c.write(sys.executable + " ./main.py")
-                os.system("start cache.bat")
+                os.system("cache.bat")
                 os.system("del cache.bat")
             elif platform.system() == "Linux":
                 with open(".cache.sh", "w") as c:
