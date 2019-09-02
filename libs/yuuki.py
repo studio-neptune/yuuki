@@ -81,7 +81,7 @@ class Yuuki:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
 
         self.YuukiVariable["Power"] = True
-        self.YuukiVariable["sync"] = self.data.Data
+        self.YuukiVariable["Sync"] = self.data.Data
         self.YuukiVariable["GroupJoined"] = self.client.getGroupIdsJoined()
         self.YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
 
@@ -403,7 +403,7 @@ class Yuuki:
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
-        self.YuukiVariable["sync"] = self.data.Data
+        self.YuukiVariable["Sync"] = self.data.Data
 
     def Commands(self, ncMessage):
         """
@@ -569,7 +569,7 @@ class Yuuki:
                       (contactInfo.displayName, self.LINE_Media_server, contactInfo.pictureStatus,
                        contactInfo.statusMessage, contactInfo.mid)
             self.sendText(self.sendToWho(ncMessage), msg)
-        self.YuukiVariable["sync"] = self.data.Data
+        self.YuukiVariable["Sync"] = self.data.Data
 
     def Security(self, ncMessage):
         """
@@ -669,7 +669,7 @@ class Yuuki:
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
-        self.YuukiVariable["sync"] = self.data.Data
+        self.YuukiVariable["Sync"] = self.data.Data
 
     # Main
 
@@ -709,8 +709,8 @@ class Yuuki:
                     if len(catchedNews) > 1:
                         self.revision = max(catchedNews[-1].revision, catchedNews[-2].revision)
 
-                if self.data.Data != self.YuukiVariable["sync"]:
-                    self.data.Data = self.YuukiVariable["sync"]
+                if self.data.Data != self.YuukiVariable["Sync"]:
+                    self.data.Data = self.YuukiVariable["Sync"]
                     self.data.syncData()
 
             except KeyboardInterrupt:
