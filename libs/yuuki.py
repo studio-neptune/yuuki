@@ -600,8 +600,8 @@ class Yuuki:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP and Security_Access:
                 if Another == '4':
                     if not GroupInfo.preventJoinByTicket:
-                        self.changeGroupUrlStatus(GroupInfo, False)
-                        self.sendText(GroupID, _("DO NOT ENABLE THE GROUP URL STATUS, see you..."))
+                        self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, False))
+                        self.Thread_Exec(self.sendText, (GroupID, _("DO NOT ENABLE THE GROUP URL STATUS, see you...")))
                         Kicker = self.kickSomeone(GroupInfo, Action)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
@@ -622,7 +622,7 @@ class Yuuki:
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION and Security_Access:
                 for userId in self.data.getData("BlackList"):
                     if userId == Action:
-                        self.sendText(GroupID, _("You are our blacklist. Bye~"))
+                        self.Thread_Exec(self.sendText, (GroupID, _("You are our blacklist. Bye~")))
                         Kicker = self.kickSomeone(GroupInfo, userId)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
@@ -638,15 +638,17 @@ class Yuuki:
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
                         assert Kicker != "None", "No Helper Found"
                         if GroupInfo.preventJoinByTicket:
-                            self.changeGroupUrlStatus(GroupInfo, True, Kicker)
+                            self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, True, Kicker))
                         GroupTicket = self.getGroupTicket(GroupID, Kicker)
                         try:
                             self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         except:
+                            if GroupInfo.preventJoinByTicket:
+                                self.changeGroupUrlStatus(GroupInfo, True, Another)
                             GroupTicket = self.getGroupTicket(GroupID, Kicker, True)
                             self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         if GroupInfo.preventJoinByTicket:
-                            self.changeGroupUrlStatus(GroupInfo, False, Another)
+                            self.Thread_Exec(self.changeGroupUrlStatus(GroupInfo, False, Another))
                         self.getGroupTicket(GroupID, Another, True)
                     except:
                         (err1, err2, err3, ErrorInfo) = self.errorReport()
@@ -663,9 +665,9 @@ class Yuuki:
                         self.data.updateData(self.data.getData("BlackList"), True, Action)
                         # Log
                         self.data.updateLog("BlackList", (self.data.getTime(), Action, GroupID))
-                        self.sendText(Action, _("You had been blocked by our database."))
+                        self.Thread_Exec(self.sendText, (Action, _("You had been blocked by our database.")))
                 elif Security_Access:
-                    self.sendText(GroupID, _("DO NOT KICK, thank you ^^"))
+                    self.Thread_Exec(self.sendText, (GroupID, _("DO NOT KICK, thank you ^^")))
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
