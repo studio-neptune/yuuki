@@ -426,6 +426,13 @@ class Yuuki:
                 self.sendText(self.sendToWho(ncMessage), self.YuukiConfigs["version"])
             elif self.YuukiConfigs["name"] + '/UserID' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("LINE System UserID:\n") + ncMessage.message.from_)
+            elif self.YuukiConfigs["name"] + '/GetAllHelper' == ncMessage.message.text:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    if ncMessage.message.from_ in GroupPrivilege:
+                        for userId in self.Connect.helper_ids:
+                            self.sendUser(self.sendToWho(ncMessage), userId)
             elif self.YuukiConfigs["name"] + '/Speed' == ncMessage.message.text:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
