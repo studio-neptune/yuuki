@@ -140,7 +140,7 @@ class Yuuki:
         if ncMessage.param3 == userId:
             inList = True
         elif "\x1e" in ncMessage.param3:
-            if self.MyMID in ncMessage.param3.split("\x1e"):
+            if userId in ncMessage.param3.split("\x1e"):
                 inList = True
             else:
                 inList = False
@@ -377,7 +377,6 @@ class Yuuki:
             Inviter = ncMessage.param2
             GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
             GroupMember = [Catched.mid for Catched in GroupInfo.members]
-            GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
             if GroupInfo.members:
                 self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
@@ -388,9 +387,6 @@ class Yuuki:
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
                     self.getGroupTicket(GroupID, self.MyMID, True)
-                    for userId in self.Connect.helper_ids:
-                        if userId in GroupInvite:
-                            self.getClient(userId).acceptGroupInvitation(self.Seq, GroupID)
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
