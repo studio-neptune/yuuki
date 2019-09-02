@@ -41,9 +41,11 @@ class Yuuki_Connect:
         self.helper_ids = []
         self.helper_authTokens = {}
 
-    def connect(self):
+    def connect(self, listen_timeout=600000):
         transport = THttpClient.THttpClient(self.host + self.com_path)
         transport_in = THttpClient.THttpClient(self.host + self.poll_path)
+
+        transport_in.setTimeout(listen_timeout)
 
         transport.setCustomHeaders(self.con_header)
         transport_in.setCustomHeaders(self.con_header)

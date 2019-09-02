@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import os, time, \
+import socket, \
+       os, time,  \
        json, ntpath, \
        random, requests, \
        platform, traceback
@@ -18,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.1",
+        "version": "v6.5.1_RC1",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -671,9 +672,9 @@ class Yuuki:
 
     def Main(self):
         NoWork = 0
-        NoWorkLimit = 300
-        fetchNum = 50
+        NoWorkLimit = 5
 
+        fetchNum = 50
         catchedNews = []
         ncMessage = Operation()
 
@@ -688,17 +689,22 @@ class Yuuki:
                 if time.localtime().tm_hour != self.data.getData("Global")["LastResetLimitTime"]:
                     self.limitReset()
                     self.data.updateData(self.data.getData("Global"), "LastResetLimitTime", time.localtime().tm_hour)
-                    if NoWork >= NoWorkLimit:
-                        self.revision = self.getClient(self.MyMID).getLastOpRevision()
 
-                catchedNews = self.listen.fetchOperations(self.revision, fetchNum)
+                if NoWork >= NoWorkLimit:
+                    NoWork = 0
+                    self.revision = self.client.getLastOpRevision()
+
+                try:
+                    catchedNews = self.listen.fetchOperations(self.revision, fetchNum)
+                except socket.timeout:
+                    print("Timeout")
+                    NoWork += 1
+
                 if catchedNews:
                     NoWork = 0
                     self.Thread_Exec(self.taskDemux, (catchedNews,))
                     if len(catchedNews) > 1:
                         self.revision = max(catchedNews[-1].revision, catchedNews[-2].revision)
-                else:
-                    NoWork += 1
 
                 if self.data.Data != self.YuukiVariable["sync"]:
                     self.data.Data = self.YuukiVariable["sync"]
