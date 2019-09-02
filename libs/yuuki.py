@@ -644,11 +644,11 @@ class Yuuki:
                             self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         except:
                             if GroupInfo.preventJoinByTicket:
-                                self.changeGroupUrlStatus(GroupInfo, True, Another)
+                                self.changeGroupUrlStatus(GroupInfo, True, Kicker)
                             GroupTicket = self.getGroupTicket(GroupID, Kicker, True)
                             self.getClient(Another).acceptGroupInvitationByTicket(self.Seq, GroupID, GroupTicket)
                         if GroupInfo.preventJoinByTicket:
-                            self.Thread_Exec(self.changeGroupUrlStatus(GroupInfo, False, Another))
+                            self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, False, Another))
                         self.getGroupTicket(GroupID, Another, True)
                     except:
                         (err1, err2, err3, ErrorInfo) = self.errorReport()
