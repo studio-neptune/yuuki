@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.1_RC1",
+        "version": "v6.5.1_RC2",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -437,7 +437,7 @@ class Yuuki:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
-                self.sendText(self.sendToWho(ncMessage), _("Speed:\n%ss") % (Time2 - Time1,))
+                self.sendText(self.sendToWho(ncMessage), _("Speed:\n %s com/s") % (Time2 - Time1,))
             elif self.YuukiConfigs["name"] + '/SecurityMode' == msgSep[0]:
                 if ncMessage.message.from_ in self.Admin:
                     if len(msgSep) == 2:
@@ -458,16 +458,26 @@ class Yuuki:
                                       _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
                     elif ncMessage.message.from_ in GroupPrivilege:
                         status = []
+                        unknown_msg = []
+                        unknown_msgtext = ""
                         for code in msgSep:
                             try:
                                 status.append(int(code))
                             except:
-                                pass
+                                unknown_msg.append(code.replace(" ", ""))
                         self.configSecurityStatus(ncMessage.message.to, status)
+                        if unknown_msg != []:
+                            for count, msg in enumerate(unknown_msg):
+                                if count+1 == len(unknown_msg) and count != 0:
+                                    unknown_msgtext += msg
+                                elif count != 0:
+                                    unknown_msgtext += (msg + ", ")
                         if status != []:
                             self.sendText(self.sendToWho(ncMessage), _("Okay"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))
+                        if unknown_msgtext != "":
+                            self.sendText(self.sendToWho(ncMessage), _("Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext))
             elif self.YuukiConfigs["name"] + '/DisableAll' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -511,7 +521,7 @@ class Yuuki:
                                     status_added.append(member.mid)
                             for userId in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
                                 if userId not in status_added:
-                                    status += "Unknown: {}\n".format(userId)
+                                    status += "{}: {}\n".format(_("Unknown"), userId)
                             self.sendText(self.sendToWho(ncMessage), status + _("\nExtend Administrator(s)"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))

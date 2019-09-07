@@ -27,6 +27,7 @@ class English:
         "LINE System UserID:\n": "LINE System UserID:\n",
         "SecurityService of %s was disable": "SecurityService of %s was disable",
         "DO NOT KICK, thank you ^^": "DO NOT KICK, thank you ^^",
+        "Notice: Unknown command line argument(s)": "Notice: Unknown command line argument(s)",
         "DO NOT ENABLE THE GROUP URL STATUS, see you...": "DO NOT ENABLE THE GROUP URL STATUS, see you...",
         "Do not invite anyone...thanks": "Do not invite anyone...thanks",
         "The User(s) was in our blacklist database.": "The User(s) was in our blacklist database.",
@@ -36,10 +37,11 @@ class English:
         "Kick Limit.": "Kick Limit.",
         "Cancel Limit.": "Cancel Limit.",
         "Testing...": "Testing...",
-        "Speed:\n%ss": "Speed:\n%ss",
+        "Speed:\n %s com/s": "Speed:\n %s com/s",
         "Bye Bye": "Bye Bye",
         "Not Found": "Not Found",
         "Okay": "Okay",
+        "Unknown": "Unknown",
         "Exit.": "Exit.",
         "Added": "Added"
     }
