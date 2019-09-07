@@ -462,7 +462,10 @@ class Yuuki:
                         unknown_msgtext = ""
                         for code in msgSep:
                             try:
-                                status.append(int(code))
+                                if int(code) <= 3:
+                                    status.append(int(code))
+                                else:
+                                    unknown_msg.append(code.replace(" ", ""))
                             except:
                                 unknown_msg.append(code.replace(" ", ""))
                         self.configSecurityStatus(ncMessage.message.to, status)
@@ -546,6 +549,24 @@ class Yuuki:
                             self.sybGetGroupCreator(GroupInfo).displayName,
                         )
                     self.sendText(self.sendToWho(ncMessage), status)
+            elif self.YuukiConfigs["name"] + '/GroupBackup' == ncMessage.message.text:
+                if ncMessage.message.toType == MIDType.GROUP:
+                    GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    if ncMessage.message.from_ in GroupPrivilege:
+                        GroupMembers = [User.mid for User in GroupInfo.members]
+                        GroupInvites = None
+                        if GroupInfo.invitee:
+                            GroupInvites = [User.mid for User in GroupInfo.invitee]
+                        LayoutInfo = {
+                            "OriginID": GroupInfo.id,
+                            "Members": GroupMembers,
+                            "Invites": GroupInvites
+                        }
+                        self.sendText(ncMessage.message.from_, GroupInfo.name)
+                        self.sendText(ncMessage.message.from_, json.dumps(LayoutInfo))
+                        self.sendText(ncMessage.message.to, _("Okay"))
+
             elif self.YuukiConfigs["name"] + '/Quit' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
