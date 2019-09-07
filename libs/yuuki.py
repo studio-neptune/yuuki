@@ -135,7 +135,7 @@ class Yuuki:
         return replymsg
 
     def checkInInvitationList(self, ncMessage, userId=None):
-        if userId == None:
+        if userId is None:
             userId = self.MyMID
         if ncMessage.param3 == userId:
             inList = True
@@ -153,11 +153,11 @@ class Yuuki:
         for key in group.__dict__:
             if key != "members" or key != "invitee":
                 result.__dict__[key] = group.__dict__[key]
-        if status == True:
+        if status:
             result.preventJoinByTicket = False
         else:
             result.preventJoinByTicket = True
-        if userId != None:
+        if userId is not None:
             self.getClient(userId).updateGroup(self.Seq, result)
         else:
             self.getClient(self.MyMID).updateGroup(self.Seq, result)
@@ -199,20 +199,20 @@ class Yuuki:
             contactInfo = False
         return contactInfo
 
-    def securityForWhere(self, Message):
-        if Message.type == OpType.NOTIFIED_UPDATE_GROUP:
-            return Message.param1, Message.param2, Message.param3
-        elif Message.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-            return Message.param1, Message.param2, Message.param3
-        elif Message.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-            return Message.param1, Message.param2, Message.param3
-        elif Message.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-            return Message.param1, Message.param2, Message.param3
+    def securityForWhere(self, ncMessage):
+        if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
+            return ncMessage.param1, ncMessage.param2, ncMessage.param3
+        elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+            return ncMessage.param1, ncMessage.param2, ncMessage.param3
+        elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+            return ncMessage.param1, ncMessage.param2, ncMessage.param3
+        elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+            return ncMessage.param1, ncMessage.param2, ncMessage.param3
 
     def getGroupTicket(self, GroupID, userId, renew=False):
         GroupTicket = ""
         if "GroupTicket" in self.data.getGroup(GroupID):
-            if self.data.getGroup(GroupID)["GroupTicket"].get(userId) != None:
+            if self.data.getGroup(GroupID)["GroupTicket"].get(userId) is not None:
                 GroupTicket = self.data.getGroup(GroupID)["GroupTicket"].get(userId)
         else:
             self.data.updateData(self.data.getGroup(GroupID), "GroupTicket", self.data.GroupType["GroupTicket"])
@@ -232,16 +232,16 @@ class Yuuki:
                 self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
                 self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], userId, self.CancelLimit)
 
-    def dictShuffle(self, dict, requirement=None):
-        dict_key = [key for key in dict]
+    def dictShuffle(self, dict_object, requirement=None):
+        dict_key = [key for key in dict_object]
         random.shuffle(dict_key)
         result = {}
         for key in dict_key:
-            if requirement == None:
-                result[key] = dict[key]
+            if requirement is None:
+                result[key] = dict_object[key]
             else:
                 if key in requirement:
-                    result[key] = dict[key]
+                    result[key] = dict_object[key]
         return result
 
     def cancelSomeone(self, groupInfo, userId, exceptUserId=None):
@@ -287,13 +287,13 @@ class Yuuki:
             self.sendText(groupInfo.id, _("Kick Limit."))
         return helper
 
-    def sendToWho(self, Message):
-        if Message.message.toType == MIDType.USER:
-            return Message.message.from_
-        elif Message.message.toType == MIDType.ROOM:
-            return Message.message.to
-        elif Message.message.toType == MIDType.GROUP:
-            return Message.message.to
+    def sendToWho(self, ncMessage):
+        if ncMessage.message.toType == MIDType.USER:
+            return ncMessage.message.from_
+        elif ncMessage.message.toType == MIDType.ROOM:
+            return ncMessage.message.to
+        elif ncMessage.message.toType == MIDType.GROUP:
+            return ncMessage.message.to
 
     def sendText(self, toid, msg):
         message = Message(to=toid, text=msg)
@@ -311,18 +311,18 @@ class Yuuki:
         )
         self.getClient(self.MyMID).sendMessage(self.Seq, message)
 
-    def sendMedia(self, toid, type, path):
+    def sendMedia(self, send_to, send_type, path):
         if os.path.exists(path):
             file_name = ntpath.basename(path)
             file_size = len(open(path, 'rb').read())
-            message = Message(to=toid, text=None)
-            message.contentType = type
+            message = Message(to=send_to, text=None)
+            message.contentType = send_type
             message.contentPreview = None
             message.contentMetadata = {
                 'FILE_NAME': str(file_name),
                 'FILE_SIZE': str(file_size),
             }
-            if type == ContentType.FILE:
+            if send_type == ContentType.FILE:
                 media_name = file_name
             else:
                 media_name = 'media'
@@ -334,7 +334,7 @@ class Yuuki:
                 'name': media_name,
                 'oid': message_id,
                 'size': file_size,
-                'type': ContentType._VALUES_TO_NAMES[type].lower(),
+                'type': ContentType._VALUES_TO_NAMES[send_type].lower(),
                 'ver': '1.0',
             }
             data = {
@@ -343,7 +343,7 @@ class Yuuki:
             url = self.LINE_Media_server + '/talk/m/upload.nhn'
             r = requests.post(url, headers=self.connectHeader, data=data, files=files)
             if r.status_code != 201:
-                self.sendText(toid, "Error!")
+                self.sendText(send_to, "Error!")
 
     def Thread_Exec(self, Function, args):
         if self.Threading:
@@ -469,13 +469,13 @@ class Yuuki:
                             except:
                                 unknown_msg.append(code.replace(" ", ""))
                         self.configSecurityStatus(ncMessage.message.to, status)
-                        if unknown_msg != []:
+                        if unknown_msg:
                             for count, msg in enumerate(unknown_msg):
                                 if count+1 == len(unknown_msg) and count != 0:
                                     unknown_msgtext += msg
                                 elif count != 0:
                                     unknown_msgtext += (msg + ", ")
-                        if status != []:
+                        if status:
                             self.sendText(self.sendToWho(ncMessage), _("Okay"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))
@@ -515,7 +515,7 @@ class Yuuki:
                                 else:
                                     self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                     else:
-                        if self.data.getGroup(GroupInfo.id)["Ext_Admin"] != []:
+                        if self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
                             status = ""
                             status_added = []
                             for member in GroupInfo.members:
@@ -536,7 +536,7 @@ class Yuuki:
                         status = _("SecurityService of %s was disable") % (
                             self.YuukiConfigs["name"],
                         )
-                    elif group_status == None:
+                    elif group_status is None:
                         status = _("Default without Initialize\nMain Admin of the Group:\n%s") % (
                             self.sybGetGroupCreator(GroupInfo).displayName,
                         )
@@ -591,7 +591,7 @@ class Yuuki:
         elif ncMessage.message.contentType == ContentType.CONTACT:
             Catched = ncMessage.message.contentMetadata["mid"]
             contactInfo = self.getContact(Catched)
-            if contactInfo == False:
+            if not contactInfo:
                 msg = _("Not Found")
             elif contactInfo.mid in self.data.getData("BlackList"):
                 msg = "{}\n{}".format(_("The User(s) was in our blacklist database."), contactInfo.mid)
@@ -618,11 +618,13 @@ class Yuuki:
         GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
         GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
 
-
         if Action in GroupPrivilege or Another in GroupPrivilege:
-            return
+            if ncMessage.type != OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+                return
+            elif Action in GroupPrivilege:
+                return
 
-        if SEGroup == None:
+        if SEGroup is None:
             Security_Access = self.YuukiVariable["SecurityService"]
         elif SEGroup[ncMessage.type]:
             Security_Access = SEGroup[ncMessage.type]
