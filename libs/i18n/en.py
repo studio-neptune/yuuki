@@ -34,6 +34,7 @@ class English:
         "You are our blacklist. Bye~": "You are our blacklist. Bye~",
         "You had been blocked by our database.": "You had been blocked by our database.",
         "\nExtend Administrator(s)": "\nExtend Administrator(s)",
+        "The one who was been kicked:": "The one who was been kicked:",
         "Kick Limit.": "Kick Limit.",
         "Cancel Limit.": "Cancel Limit.",
         "Testing...": "Testing...",

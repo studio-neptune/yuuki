@@ -704,6 +704,8 @@ class Yuuki:
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+                    self.Thread_Exec(self.sendText, (GroupID, _("The one who was been kicked:")))
+                    self.Thread_Exec(self.sendUser, (GroupID, Another))
         self.YuukiVariable["Sync"] = self.data.Data
 
     # Main
