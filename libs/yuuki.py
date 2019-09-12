@@ -730,12 +730,16 @@ class Yuuki:
 
                 if NoWork >= NoWorkLimit:
                     NoWork = 0
-                    self.revision = self.client.getLastOpRevision()
+                    for ncMessage in catchedNews:
+                        if ncMessage.reqSeq != -1 and ncMessage.revision > self.revision:
+                            self.revision = ncMessage.revision
+                            break
+                    if ncMessage.revision != self.revision:
+                        self.revision = self.client.getLastOpRevision()
 
                 try:
                     catchedNews = self.listen.fetchOperations(self.revision, fetchNum)
                 except socket.timeout:
-                    print("Timeout")
                     NoWork += 1
 
                 if catchedNews:
