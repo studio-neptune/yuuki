@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.1_RC2",
+        "version": "v6.5.1_RC3",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -121,14 +121,16 @@ class Yuuki:
                 print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
         sys.exit(0)
 
-    def sybGetGroupCreator(self, group):
-        if group.creator == None:
+    @staticmethod
+    def sybGetGroupCreator(group):
+        if group.creator is None:
             contact = group.members[0]
         else:
             contact = group.creator
         return contact
 
-    def readCommandLine(self, msgs):
+    @staticmethod
+    def readCommandLine(msgs):
         replymsg = ""
         for msg in msgs:
             replymsg = replymsg + " " + msg
@@ -175,7 +177,8 @@ class Yuuki:
 
         self.data.updateData(self.data.getGroup(groupId), "SEGroup", group_status)
 
-    def errorReport(self):
+    @staticmethod
+    def errorReport():
         err1, err2, err3 = sys.exc_info()
         traceback.print_tb(err3)
         tb_info = traceback.extract_tb(err3)
@@ -199,7 +202,8 @@ class Yuuki:
             contactInfo = False
         return contactInfo
 
-    def securityForWhere(self, ncMessage):
+    @staticmethod
+    def securityForWhere(ncMessage):
         if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
             return ncMessage.param1, ncMessage.param2, ncMessage.param3
         elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
@@ -232,7 +236,8 @@ class Yuuki:
                 self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
                 self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], userId, self.CancelLimit)
 
-    def dictShuffle(self, dict_object, requirement=None):
+    @staticmethod
+    def dictShuffle(dict_object, requirement=None):
         dict_key = [key for key in dict_object]
         random.shuffle(dict_key)
         result = {}
@@ -287,7 +292,8 @@ class Yuuki:
             self.sendText(groupInfo.id, _("Kick Limit."))
         return helper
 
-    def sendToWho(self, ncMessage):
+    @staticmethod
+    def sendToWho(ncMessage):
         if ncMessage.message.toType == MIDType.USER:
             return ncMessage.message.from_
         elif ncMessage.message.toType == MIDType.ROOM:
@@ -416,16 +422,21 @@ class Yuuki:
         elif ncMessage.message.toType == MIDType.ROOM:
             self.getClient(self.MyMID).leaveRoom(self.Seq, ncMessage.message.to)
         elif ncMessage.message.contentType == ContentType.NONE:
+
             msgSep = ncMessage.message.text.split(" ")
+
             if self.YuukiConfigs["name"] + '/Help' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s") %
                               (self.YuukiConfigs["name"], self.YuukiConfigs["version"],
                                self.YuukiConfigs["man_page"], self.YuukiConfigs["privacy_page"],
                                self.YuukiConfigs["project_url"], self.YuukiConfigs["copyright"]))
+
             elif self.YuukiConfigs["name"] + '/Version' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), self.YuukiConfigs["version"])
+
             elif self.YuukiConfigs["name"] + '/UserID' == ncMessage.message.text:
                 self.sendText(self.sendToWho(ncMessage), _("LINE System UserID:\n") + ncMessage.message.from_)
+
             elif self.YuukiConfigs["name"] + '/GetAllHelper' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -433,22 +444,24 @@ class Yuuki:
                     if ncMessage.message.from_ in GroupPrivilege:
                         for userId in self.Connect.helper_ids:
                             self.sendUser(self.sendToWho(ncMessage), userId)
+
             elif self.YuukiConfigs["name"] + '/Speed' == ncMessage.message.text:
                 Time1 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Testing..."))
                 Time2 = time.time()
                 self.sendText(self.sendToWho(ncMessage), _("Speed:\n %s com/s") % (Time2 - Time1,))
+
             elif self.YuukiConfigs["name"] + '/SecurityMode' == msgSep[0]:
                 if ncMessage.message.from_ in self.Admin:
                     if len(msgSep) == 2:
-                        try:
-                            status = int(msgSep[1])
-                            self.YuukiVariable["SecurityService"] = bool(status)
-                        except:
-                            pass
-                        self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                        if msgSep[1].isdigit() and 1 >= int(msgSep[1]) >= 0:
+                            self.YuukiVariable["SecurityService"] = bool(msgSep[1])
+                            self.sendText(self.sendToWho(ncMessage), _("Okay"))
+                        else:
+                            self.sendText(self.sendToWho(ncMessage), _("Enable(True): 1\nDisable(False): 0"))
                     else:
                         self.sendText(self.sendToWho(ncMessage), str(bool(self.YuukiVariable["SecurityService"])))
+
             elif self.YuukiConfigs["name"] + '/Switch' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -461,26 +474,20 @@ class Yuuki:
                         unknown_msg = []
                         unknown_msgtext = ""
                         for code in msgSep:
-                            try:
-                                if int(code) <= 3:
-                                    status.append(int(code))
-                                else:
-                                    unknown_msg.append(code.replace(" ", ""))
-                            except:
-                                unknown_msg.append(code.replace(" ", ""))
+                            if code.isdigit() and 3 >= int(code) >= 0:
+                                status.append(int(code))
+                            else:
+                                unknown_msg.append(code.strip())
                         self.configSecurityStatus(ncMessage.message.to, status)
                         if unknown_msg:
-                            for count, msg in enumerate(unknown_msg):
-                                if count+1 == len(unknown_msg) and count != 0:
-                                    unknown_msgtext += msg
-                                elif count != 0:
-                                    unknown_msgtext += (msg + ", ")
+                            unknown_msgtext = ", ".join(unknown_msg)
                         if status:
                             self.sendText(self.sendToWho(ncMessage), _("Okay"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                         if unknown_msgtext != "":
                             self.sendText(self.sendToWho(ncMessage), _("Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext))
+
             elif self.YuukiConfigs["name"] + '/DisableAll' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -491,6 +498,7 @@ class Yuuki:
                     elif ncMessage.message.from_ in GroupPrivilege:
                         self.configSecurityStatus(ncMessage.message.to, [])
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
+
             elif self.YuukiConfigs["name"] + '/ExtAdmin' == msgSep[0]:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -528,6 +536,7 @@ class Yuuki:
                             self.sendText(self.sendToWho(ncMessage), status + _("\nExtend Administrator(s)"))
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))
+
             elif self.YuukiConfigs["name"] + '/Status' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -549,6 +558,7 @@ class Yuuki:
                             self.sybGetGroupCreator(GroupInfo).displayName,
                         )
                     self.sendText(self.sendToWho(ncMessage), status)
+
             elif self.YuukiConfigs["name"] + '/GroupBackup' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
@@ -580,14 +590,17 @@ class Yuuki:
                     GroupJoined_ = self.YuukiVariable["GroupJoined"]
                     GroupJoined_.remove(GroupInfo.id)
                     self.YuukiVariable["GroupJoined"] = GroupJoined_
+
             elif self.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
                     self.sendText(self.sendToWho(ncMessage), _("Exit."))
                     self.exit()
+
             elif self.YuukiConfigs["name"] + '/Com' == msgSep[0] and len(msgSep) != 1:
                 if ncMessage.message.from_ in self.Admin:
                     ComMsg = self.readCommandLine(msgSep[1:len(msgSep)])
                     self.sendText(self.sendToWho(ncMessage), str(eval(ComMsg)))
+
         elif ncMessage.message.contentType == ContentType.CONTACT:
             Catched = ncMessage.message.contentMetadata["mid"]
             contactInfo = self.getContact(Catched)
@@ -715,7 +728,7 @@ class Yuuki:
         NoWorkLimit = 5
 
         fetchNum = 50
-        catchedNews = []
+        cacheOperations = []
         ncMessage = Operation()
 
         if "LastResetLimitTime" not in self.data.getData("Global"):
@@ -732,7 +745,7 @@ class Yuuki:
 
                 if NoWork >= NoWorkLimit:
                     NoWork = 0
-                    for ncMessage in catchedNews:
+                    for ncMessage in cacheOperations:
                         if ncMessage.reqSeq != -1 and ncMessage.revision > self.revision:
                             self.revision = ncMessage.revision
                             break
@@ -740,15 +753,15 @@ class Yuuki:
                         self.revision = self.client.getLastOpRevision()
 
                 try:
-                    catchedNews = self.listen.fetchOperations(self.revision, fetchNum)
+                    cacheOperations = self.listen.fetchOperations(self.revision, fetchNum)
                 except socket.timeout:
                     NoWork += 1
 
-                if catchedNews:
+                if cacheOperations:
                     NoWork = 0
-                    self.Thread_Exec(self.taskDemux, (catchedNews,))
-                    if len(catchedNews) > 1:
-                        self.revision = max(catchedNews[-1].revision, catchedNews[-2].revision)
+                    self.Thread_Exec(self.taskDemux, (cacheOperations,))
+                    if len(cacheOperations) > 1:
+                        self.revision = max(cacheOperations[-1].revision, cacheOperations[-2].revision)
 
                 if self.data.Data != self.YuukiVariable["Sync"]:
                     self.data.Data = self.YuukiVariable["Sync"]
@@ -763,7 +776,7 @@ class Yuuki:
             except:
                 (err1, err2, err3, ErrorInfo) = self.errorReport()
                 try:
-                    for ncMessage in catchedNews:
+                    for ncMessage in cacheOperations:
                         if ncMessage.reqSeq != -1 and ncMessage.revision > self.revision:
                             self.revision = ncMessage.revision
                             break
