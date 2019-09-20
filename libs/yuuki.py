@@ -251,7 +251,7 @@ class Yuuki:
 
     def cancelSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members]
+            members = [member.mid for member in groupInfo.members if member in self.Connect.helper_ids]
             accounts = self.dictShuffle(self.data.getLimit("Cancel"), members)
             if len(accounts) == 0:
                 return "None"
@@ -269,10 +269,12 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Cancel Limit."))
+        self.YuukiVariable["Sync"] = self.data.Data
+        return helper
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members]
+            members = [member.mid for member in groupInfo.members if member in self.Connect.helper_ids]
             accounts = self.dictShuffle(self.data.getLimit("Kick"), members)
             if len(accounts) == 0:
                 return "None"
@@ -290,6 +292,7 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Kick Limit."))
+        self.YuukiVariable["Sync"] = self.data.Data
         return helper
 
     @staticmethod
@@ -473,10 +476,10 @@ class Yuuki:
                         status = []
                         unknown_msg = []
                         unknown_msgtext = ""
-                        for code in msgSep:
+                        for count, code in enumerate(msgSep):
                             if code.isdigit() and 3 >= int(code) >= 0:
                                 status.append(int(code))
-                            else:
+                            elif count != 0:
                                 unknown_msg.append(code.strip())
                         self.configSecurityStatus(ncMessage.message.to, status)
                         if unknown_msg:
