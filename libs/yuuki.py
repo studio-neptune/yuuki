@@ -251,7 +251,7 @@ class Yuuki:
 
     def cancelSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members if member in self.Connect.helper_ids]
+            members = [member.mid for member in groupInfo.members if member.mid in self.Connect.helper_ids]
             accounts = self.dictShuffle(self.data.getLimit("Cancel"), members)
             if len(accounts) == 0:
                 return "None"
@@ -274,7 +274,7 @@ class Yuuki:
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members if member in self.Connect.helper_ids]
+            members = [member.mid for member in groupInfo.members if member.mid in self.Connect.helper_ids]
             accounts = self.dictShuffle(self.data.getLimit("Kick"), members)
             if len(accounts) == 0:
                 return "None"
