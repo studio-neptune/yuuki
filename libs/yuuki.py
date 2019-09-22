@@ -470,7 +470,7 @@ class Yuuki:
                     else:
                         self.sendText(self.sendToWho(ncMessage), str(bool(YuukiVariable["SecurityService"])))
 
-            elif self.YuukiConfigs["name"] + '/Switch' == msgSep[0]:
+            elif self.YuukiConfigs["name"] + '/Switch' == msgSep[0] and len(msgSep) != 1:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
