@@ -38,6 +38,8 @@ class Yuuki_Settings:
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
 
+        global _, YuukiVariable
+
         # Static Variable
 
         self.YuukiConfigs = Yuuki_Settings.config
@@ -81,8 +83,6 @@ class Yuuki:
 
         if len(self.data.getData("LimitInfo")) != 2:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
-
-        global _, YuukiVariable
 
         YuukiVariable["Power"] = True
         YuukiVariable["Sync"] = self.data.Data
