@@ -77,6 +77,8 @@ class Yuuki:
         self.MyMID = self.client.getProfile().mid
         self.revision = self.client.getLastOpRevision()
 
+        self.AllAccountIds = [self.MyMID] + self.Connect.helper_ids
+
         if len(self.data.getData("LimitInfo")) != 2:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
 
@@ -99,7 +101,7 @@ class Yuuki:
                 return self.Connect.helperThreadConnect(userId)
         else:
             Accounts = [self.client] + self.Connect.helper
-            for count, AccountUserId in enumerate([self.MyMID] + self.Connect.helper_ids):
+            for count, AccountUserId in enumerate(self.AllAccountIds):
                 if AccountUserId == userId:
                     return Accounts[count]
 
@@ -226,7 +228,7 @@ class Yuuki:
         return GroupTicket
 
     def limitReset(self, reconnect=False):
-        for userId in [self.MyMID] + self.Connect.helper_ids:
+        for userId in self.AllAccountIds:
             if reconnect:
                 if userId not in self.data.getLimit("Kick"):
                     self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], userId, self.KickLimit)
@@ -251,7 +253,7 @@ class Yuuki:
 
     def cancelSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members if member.mid in self.Connect.helper_ids]
+            members = [member.mid for member in groupInfo.members if member.mid in self.AllAccountIds]
             accounts = self.dictShuffle(self.data.getLimit("Cancel"), members)
             if len(accounts) == 0:
                 return "None"
@@ -274,7 +276,7 @@ class Yuuki:
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members if member.mid in self.Connect.helper_ids]
+            members = [member.mid for member in groupInfo.members if member.mid in self.AllAccountIds]
             accounts = self.dictShuffle(self.data.getLimit("Kick"), members)
             if len(accounts) == 0:
                 return "None"
@@ -658,11 +660,11 @@ class Yuuki:
                 Canceler = "None"
                 if "\x1e" in Another:
                     for userId in Another.split("\x1e"):
-                        if userId not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
+                        if userId not in self.AllAccountIds + GroupPrivilege:
                             Canceler = self.cancelSomeone(GroupInfo, userId)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
-                elif Another not in [self.MyMID] + self.Connect.helper_ids + GroupPrivilege:
+                elif Another not in self.AllAccountIds + GroupPrivilege:
                     Canceler = self.cancelSomeone(GroupInfo, Another)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
@@ -679,7 +681,7 @@ class Yuuki:
                 if Action in self.Connect.helper_ids:
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, Action, Another, ncMessage.type*10+1))
-                elif Another in [self.MyMID] + self.Connect.helper_ids:
+                elif Another in self.AllAccountIds:
                     Kicker = "None"
                     try:
                         Kicker = self.kickSomeone(GroupInfo, Action, Another)
