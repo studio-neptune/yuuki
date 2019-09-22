@@ -383,12 +383,14 @@ class Yuuki:
             ToDo Type:
                 NOTIFIED_INVITE_INTO_GROUP (13)
         """
+        GroupInvite = []
         BlockedIgnore = ncMessage.param2 in self.data.getData("BlackList")
         if self.checkInInvitationList(ncMessage) and not BlockedIgnore:
             GroupID = ncMessage.param1
             Inviter = ncMessage.param2
             GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
             GroupMember = [Catched.mid for Catched in GroupInfo.members]
+            GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
             if GroupInfo.members:
                 self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
@@ -409,7 +411,7 @@ class Yuuki:
                     self.data.updateLog("JoinGroup", (self.data.getTime(), GroupID, "Not Join", Inviter))
         if ncMessage.param1 in YuukiVariable["GroupJoined"] and not BlockedIgnore:
             for userId in self.Connect.helper_ids:
-                if self.checkInInvitationList(ncMessage, userId):
+                if self.checkInInvitationList(ncMessage, userId) or userId in GroupInvite:
                     self.getClient(userId).acceptGroupInvitation(self.Seq, ncMessage.param1)
                     self.getGroupTicket(ncMessage.param1, userId, True)
                     # Log
