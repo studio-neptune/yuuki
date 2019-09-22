@@ -268,11 +268,9 @@ class Yuuki:
         Limit = self.data.getLimit("Cancel")[helper]
         if Limit > 0:
             self.getClient(helper).cancelGroupInvitation(self.Seq, groupInfo.id, [userId])
-            self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Cancel Limit."))
-        self.YuukiVariable["Sync"] = self.data.Data
-        return helper
+        return helper, Limit
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Connect.helper) >= 1:
@@ -291,11 +289,9 @@ class Yuuki:
         Limit = self.data.getLimit("Kick")[helper]
         if Limit > 0:
             self.getClient(helper).kickoutFromGroup(self.Seq, groupInfo.id, [userId])
-            self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Kick Limit."))
-        self.YuukiVariable["Sync"] = self.data.Data
-        return helper
+        return helper, Limit
 
     @staticmethod
     def sendToWho(ncMessage):
@@ -653,7 +649,8 @@ class Yuuki:
                     if not GroupInfo.preventJoinByTicket:
                         self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, False))
                         self.Thread_Exec(self.sendText, (GroupID, _("DO NOT ENABLE THE GROUP URL STATUS, see you...")))
-                        Kicker = self.kickSomeone(GroupInfo, Action)
+                        (Kicker, Limit) = self.kickSomeone(GroupInfo, Action)
+                        self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], Kicker, Limit - 1)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP and Security_Access:
@@ -661,11 +658,13 @@ class Yuuki:
                 if "\x1e" in Another:
                     for userId in Another.split("\x1e"):
                         if userId not in self.AllAccountIds + GroupPrivilege:
-                            Canceler = self.cancelSomeone(GroupInfo, userId)
+                            (Canceler, Limit) = self.cancelSomeone(GroupInfo, userId)
+                            self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], Canceler, Limit - 1)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.AllAccountIds + GroupPrivilege:
-                    Canceler = self.cancelSomeone(GroupInfo, Another)
+                    (Canceler, Limit) = self.cancelSomeone(GroupInfo, Another)
+                    self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], Canceler, Limit - 1)
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
                 if Canceler != "None":
@@ -674,7 +673,8 @@ class Yuuki:
                 for userId in self.data.getData("BlackList"):
                     if userId == Action:
                         self.Thread_Exec(self.sendText, (GroupID, _("You are our blacklist. Bye~")))
-                        Kicker = self.kickSomeone(GroupInfo, userId)
+                        (Kicker, Limit) = self.kickSomeone(GroupInfo, Action)
+                        self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], Kicker, Limit - 1)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
@@ -684,7 +684,8 @@ class Yuuki:
                 elif Another in self.AllAccountIds:
                     Kicker = "None"
                     try:
-                        Kicker = self.kickSomeone(GroupInfo, Action, Another)
+                        (Kicker, Limit) = self.kickSomeone(GroupInfo, Action, Another)
+                        self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], Kicker, Limit - 1)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
                         assert Kicker != "None", "No Helper Found"
@@ -719,7 +720,8 @@ class Yuuki:
                         self.Thread_Exec(self.sendText, (Action, _("You had been blocked by our database.")))
                 elif Security_Access:
                     self.Thread_Exec(self.sendText, (GroupID, _("DO NOT KICK, thank you ^^")))
-                    Kicker = self.kickSomeone(GroupInfo, Action)
+                    (Kicker, Limit) = self.kickSomeone(GroupInfo, Action)
+                    self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], Kicker, Limit - 1)
                     # Log
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
                     self.Thread_Exec(self.sendText, (GroupID, _("The one who was been kicked:")))
