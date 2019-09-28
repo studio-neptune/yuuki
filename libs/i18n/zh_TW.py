@@ -34,6 +34,7 @@ class Traditional_Chinese:
         "You are our blacklist. Bye~": "再見了～黑名單用戶。",
         "You had been blocked by our database.": "您目前已被本程序封鎖。",
         "\nExtend Administrator(s)": "\n延伸管理員",
+        "Enable(True): 1\nDisable(False): 0": "開啟(True): 1\n關閉(False): 0",
         "The one who was been kicked:": "這是那個被踢的可憐孩子：",
         "Kick Limit.": "踢人次數已達上限",
         "Cancel Limit.": "取消次數已達上限",

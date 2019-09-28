@@ -57,7 +57,7 @@ class Yuuki_Data:
             else:
                 with open(name, "r") as f:
                     try:
-                        json.loads(f.read())
+                        json.load(f)
                         Type = 0
                     except ValueError:
                         Type = 1
