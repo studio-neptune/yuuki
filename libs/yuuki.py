@@ -667,18 +667,18 @@ class Yuuki:
                             if userId in [user.mid for user in GroupInfo.invitee]:
                                 Canceler = self.cancelSomeone(GroupInfo, userId)
                             else:
-                                Kicker = self.kickSomeone(GroupInfo, userId)
+                                Canceler = self.kickSomeone(GroupInfo, userId)
                                 # Log
-                                self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, userId, ncMessage.type*10))
+                                self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId, ncMessage.type*10))
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.AllAccountIds + GroupPrivilege:
                     if Another in [user.mid for user in GroupInfo.invitee]:
                         Canceler = self.cancelSomeone(GroupInfo, Another)
                     else:
-                        Kicker = self.kickSomeone(GroupInfo, Another)
+                        Canceler = self.kickSomeone(GroupInfo, Another)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10))
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another, ncMessage.type*10))
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
                 if Canceler != "None":
