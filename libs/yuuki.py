@@ -19,7 +19,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.1_RC3",
+        "version": "v6.5.1_RC4",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -653,7 +653,7 @@ class Yuuki:
         if YuukiVariable["SecurityService"]:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP and Security_Access:
                 if Another == '4':
-                    if not GroupInfo.preventJoinByTicket:
+                    if not GroupInfo.preventJoinByTicket and Action not in self.Connect.helper_ids:
                         self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, False))
                         self.Thread_Exec(self.sendText, (GroupID, _("DO NOT ENABLE THE GROUP URL STATUS, see you...")))
                         Kicker = self.kickSomeone(GroupInfo, Action)
