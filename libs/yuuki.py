@@ -12,7 +12,7 @@ from .core.TalkService import *
 from .connection import Yuuki_Connect
 from .data import Yuuki_Data
 from .i18n import Yuuki_LangSetting
-from .thread_control import Yuuki_MultiPross
+from .thread_control import Yuuki_Multiprocess
 
 class Yuuki_Settings:
     """ Yuuki Custom Settings """
@@ -45,7 +45,7 @@ class Yuuki:
         self.YuukiConfigs = Yuuki_Settings.config
 
         self.Threading = threading
-        self.Thread_Control = Yuuki_MultiPross()
+        self.Thread_Control = Yuuki_Multiprocess()
  
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
@@ -64,7 +64,7 @@ class Yuuki:
         self.data = Yuuki_Data(self.Threading)
 
         if self.Threading:
-            YuukiVariable = self.Thread_Control.dataManager().dict()
+            YuukiVariable = self.Thread_Control.dataManager.dict()
         else:
             YuukiVariable = {}
 
@@ -393,9 +393,7 @@ class Yuuki:
                     GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
                 self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
-                    GroupJoined_ = YuukiVariable["GroupJoined"]
-                    GroupJoined_.append(GroupID)
-                    YuukiVariable["GroupJoined"] = GroupJoined_
+                    YuukiVariable["GroupJoined"].append(GroupID)
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
@@ -499,8 +497,7 @@ class Yuuki:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if not YuukiVariable["SecurityService"]:
-                        self.sendText(self.sendToWho(ncMessage),
-                                      _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
+                        self.sendText(self.sendToWho(ncMessage), _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
                     elif ncMessage.message.from_ in GroupPrivilege:
                         self.configSecurityStatus(ncMessage.message.to, [])
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
@@ -593,9 +590,7 @@ class Yuuki:
                         for userId in self.Connect.helper_ids:
                             if userId in [member.mid for member in GroupInfo.members]:
                                 self.getClient(userId).leaveGroup(self.Seq, GroupInfo.id)
-                    GroupJoined_ = YuukiVariable["GroupJoined"]
-                    GroupJoined_.remove(GroupInfo.id)
-                    YuukiVariable["GroupJoined"] = GroupJoined_
+                    YuukiVariable["GroupJoined"].remove(GroupInfo.id)
 
             elif self.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
@@ -717,9 +712,7 @@ class Yuuki:
                             self.sendText(Root, "Star Yuuki BOT - SecurityService Failure\n\n%s\n%s\n%s\n\n%s" %
                                           (err1, err2, err3, ErrorInfo))
                         if Another == self.MyMID:
-                            GroupJoined_ = YuukiVariable["GroupJoined"]
-                            GroupJoined_.remove(GroupID)
-                            YuukiVariable["GroupJoined"] = GroupJoined_
+                            YuukiVariable["GroupJoined"].remove(GroupID)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
                     if Action not in self.data.getData("BlackList"):

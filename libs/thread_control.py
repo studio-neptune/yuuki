@@ -16,10 +16,10 @@ class Yuuki_Thread:
         print(threading.enumerate())
         print("{} add Threading\n".format(threading.current_thread()))
 
-class Yuuki_MultiPross:
+class Yuuki_Multiprocess:
+    def __init__(self):
+        self.dataManager = multiprocessing.Manager()
+
     def add(self, Yuuki_Func, args=()):
         added_multiprocess = multiprocessing.Process(name=Yuuki_Func.__name__, target=Yuuki_Func, args=args)
         added_multiprocess.start()
-
-    def dataManager(self):
-        return multiprocessing.Manager()
