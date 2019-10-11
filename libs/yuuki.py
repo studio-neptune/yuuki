@@ -38,6 +38,9 @@ class Yuuki_Settings:
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
 
+        # Enforce Disable Threading in v6.5.1_RC4
+        threading = False
+
         global _, YuukiVariable
 
         # Static Variable
