@@ -389,9 +389,11 @@ class Yuuki:
             GroupID = ncMessage.param1
             Inviter = ncMessage.param2
             GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
-            GroupMember = [Catched.mid for Catched in GroupInfo.members]
-            GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
             if GroupInfo.members:
+                GroupMember = [Catched.mid for Catched in GroupInfo.members]
+                GroupInfo.invitee = []
+                if GroupInfo.invitee:
+                    GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
                 self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
                     GroupJoined_ = YuukiVariable["GroupJoined"]
@@ -664,7 +666,7 @@ class Yuuki:
                 if "\x1e" in Another:
                     for userId in Another.split("\x1e"):
                         if userId not in self.AllAccountIds + GroupPrivilege:
-                            if userId in [user.mid for user in GroupInfo.invitee]:
+                            if GroupInfo.invitee and userId in [user.mid for user in GroupInfo.invitee]:
                                 Canceler = self.cancelSomeone(GroupInfo, userId)
                             else:
                                 Canceler = self.kickSomeone(GroupInfo, userId)
@@ -673,7 +675,7 @@ class Yuuki:
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.AllAccountIds + GroupPrivilege:
-                    if Another in [user.mid for user in GroupInfo.invitee]:
+                    if GroupInfo.invitee and Another in [user.mid for user in GroupInfo.invitee]:
                         Canceler = self.cancelSomeone(GroupInfo, Another)
                     else:
                         Canceler = self.kickSomeone(GroupInfo, Another)
@@ -781,9 +783,7 @@ class Yuuki:
                     if len(cacheOperations) > 1:
                         self.revision = max(cacheOperations[-1].revision, cacheOperations[-2].revision)
 
-                if self.data.Data != YuukiVariable["Sync"]:
-                    self.data.Data = YuukiVariable["Sync"]
-                    self.data.syncData()
+                self.data.syncData()
 
             except KeyboardInterrupt:
                 self.exit()
