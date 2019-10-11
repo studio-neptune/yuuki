@@ -85,7 +85,6 @@ class Yuuki:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
 
         YuukiVariable["Power"] = True
-        YuukiVariable["Sync"] = self.data.Data
         YuukiVariable["GroupJoined"] = self.client.getGroupIdsJoined()
         YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
 
@@ -272,7 +271,6 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Cancel Limit."))
-        YuukiVariable["Sync"] = self.data.Data
         return helper
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
@@ -295,7 +293,6 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Kick Limit."))
-        YuukiVariable["Sync"] = self.data.Data
         return helper
 
     @staticmethod
@@ -419,7 +416,6 @@ class Yuuki:
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
-        YuukiVariable["Sync"] = self.data.Data
 
     def Commands(self, ncMessage):
         """
@@ -623,7 +619,6 @@ class Yuuki:
                       (contactInfo.displayName, self.LINE_Media_server, contactInfo.pictureStatus,
                        contactInfo.statusMessage, contactInfo.mid)
             self.sendText(self.sendToWho(ncMessage), msg)
-        YuukiVariable["Sync"] = self.data.Data
 
     def Security(self, ncMessage):
         """
@@ -739,7 +734,6 @@ class Yuuki:
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
                     self.Thread_Exec(self.sendText, (GroupID, _("The one who was been kicked:")))
                     self.Thread_Exec(self.sendUser, (GroupID, Another))
-        YuukiVariable["Sync"] = self.data.Data
 
     # Main
 
