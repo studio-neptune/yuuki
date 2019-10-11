@@ -12,14 +12,14 @@ from .core.TalkService import *
 from .connection import Yuuki_Connect
 from .data import Yuuki_Data
 from .i18n import Yuuki_LangSetting
-from .thread_control import Yuuki_MultiPross
+from .thread_control import Yuuki_Multiprocess
 
 class Yuuki_Settings:
     """ Yuuki Custom Settings """
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.1_RC3",
+        "version": "v6.5.1_RC4",
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
         "privacy_page": "OpenSource - Licensed under MPL 2.0",
@@ -38,6 +38,9 @@ class Yuuki_Settings:
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
 
+        # Enforce Disable Threading in v6.5.1_RC4
+        threading = False
+
         global _, YuukiVariable
 
         # Static Variable
@@ -45,7 +48,7 @@ class Yuuki:
         self.YuukiConfigs = Yuuki_Settings.config
 
         self.Threading = threading
-        self.Thread_Control = Yuuki_MultiPross()
+        self.Thread_Control = Yuuki_Multiprocess()
  
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
@@ -64,7 +67,7 @@ class Yuuki:
         self.data = Yuuki_Data(self.Threading)
 
         if self.Threading:
-            YuukiVariable = self.Thread_Control.dataManager().dict()
+            YuukiVariable = self.Thread_Control.dataManager.dict()
         else:
             YuukiVariable = {}
 
@@ -85,7 +88,6 @@ class Yuuki:
             self.data.updateData(self.data.Data, "LimitInfo", self.data.LimitType)
 
         YuukiVariable["Power"] = True
-        YuukiVariable["Sync"] = self.data.Data
         YuukiVariable["GroupJoined"] = self.client.getGroupIdsJoined()
         YuukiVariable["SecurityService"] = self.YuukiConfigs["SecurityService"]
 
@@ -272,7 +274,6 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["CancelLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Cancel Limit."))
-        YuukiVariable["Sync"] = self.data.Data
         return helper
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
@@ -295,7 +296,6 @@ class Yuuki:
             self.data.updateData(self.data.getData("LimitInfo")["KickLimit"], helper, Limit - 1)
         else:
             self.sendText(groupInfo.id, _("Kick Limit."))
-        YuukiVariable["Sync"] = self.data.Data
         return helper
 
     @staticmethod
@@ -389,14 +389,14 @@ class Yuuki:
             GroupID = ncMessage.param1
             Inviter = ncMessage.param2
             GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
-            GroupMember = [Catched.mid for Catched in GroupInfo.members]
-            GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
             if GroupInfo.members:
+                GroupMember = [Catched.mid for Catched in GroupInfo.members]
+                GroupInfo.invitee = []
+                if GroupInfo.invitee:
+                    GroupInvite = [Catched.mid for Catched in GroupInfo.invitee]
                 self.getClient(self.MyMID).acceptGroupInvitation(self.Seq, GroupID)
                 if len(GroupMember) >= self.YuukiConfigs["GroupMebers_Demand"]:
-                    GroupJoined_ = YuukiVariable["GroupJoined"]
-                    GroupJoined_.append(GroupID)
-                    YuukiVariable["GroupJoined"] = GroupJoined_
+                    YuukiVariable["GroupJoined"].append(GroupID)
                     self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
                     self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
@@ -417,7 +417,6 @@ class Yuuki:
                     # Log
                     self.data.updateLog("JoinGroup", (self.data.getTime(), ncMessage.param1, userId, ncMessage.param2))
         self.Security(ncMessage)
-        YuukiVariable["Sync"] = self.data.Data
 
     def Commands(self, ncMessage):
         """
@@ -501,8 +500,7 @@ class Yuuki:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
                     GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if not YuukiVariable["SecurityService"]:
-                        self.sendText(self.sendToWho(ncMessage),
-                                      _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
+                        self.sendText(self.sendToWho(ncMessage), _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
                     elif ncMessage.message.from_ in GroupPrivilege:
                         self.configSecurityStatus(ncMessage.message.to, [])
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
@@ -595,9 +593,7 @@ class Yuuki:
                         for userId in self.Connect.helper_ids:
                             if userId in [member.mid for member in GroupInfo.members]:
                                 self.getClient(userId).leaveGroup(self.Seq, GroupInfo.id)
-                    GroupJoined_ = YuukiVariable["GroupJoined"]
-                    GroupJoined_.remove(GroupInfo.id)
-                    YuukiVariable["GroupJoined"] = GroupJoined_
+                    YuukiVariable["GroupJoined"].remove(GroupInfo.id)
 
             elif self.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
                 if ncMessage.message.from_ in self.Admin:
@@ -621,7 +617,6 @@ class Yuuki:
                       (contactInfo.displayName, self.LINE_Media_server, contactInfo.pictureStatus,
                        contactInfo.statusMessage, contactInfo.mid)
             self.sendText(self.sendToWho(ncMessage), msg)
-        YuukiVariable["Sync"] = self.data.Data
 
     def Security(self, ncMessage):
         """
@@ -653,7 +648,7 @@ class Yuuki:
         if YuukiVariable["SecurityService"]:
             if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP and Security_Access:
                 if Another == '4':
-                    if not GroupInfo.preventJoinByTicket:
+                    if not GroupInfo.preventJoinByTicket and Action not in self.Connect.helper_ids:
                         self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, False))
                         self.Thread_Exec(self.sendText, (GroupID, _("DO NOT ENABLE THE GROUP URL STATUS, see you...")))
                         Kicker = self.kickSomeone(GroupInfo, Action)
@@ -664,11 +659,21 @@ class Yuuki:
                 if "\x1e" in Another:
                     for userId in Another.split("\x1e"):
                         if userId not in self.AllAccountIds + GroupPrivilege:
-                            Canceler = self.cancelSomeone(GroupInfo, userId)
+                            if GroupInfo.invitee and userId in [user.mid for user in GroupInfo.invitee]:
+                                Canceler = self.cancelSomeone(GroupInfo, userId)
+                            else:
+                                Canceler = self.kickSomeone(GroupInfo, userId)
+                                # Log
+                                self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId, ncMessage.type*10))
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.AllAccountIds + GroupPrivilege:
-                    Canceler = self.cancelSomeone(GroupInfo, Another)
+                    if GroupInfo.invitee and Another in [user.mid for user in GroupInfo.invitee]:
+                        Canceler = self.cancelSomeone(GroupInfo, Another)
+                    else:
+                        Canceler = self.kickSomeone(GroupInfo, Another)
+                        # Log
+                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another, ncMessage.type*10))
                     # Log
                     self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
                 if Canceler != "None":
@@ -710,9 +715,7 @@ class Yuuki:
                             self.sendText(Root, "Star Yuuki BOT - SecurityService Failure\n\n%s\n%s\n%s\n\n%s" %
                                           (err1, err2, err3, ErrorInfo))
                         if Another == self.MyMID:
-                            GroupJoined_ = YuukiVariable["GroupJoined"]
-                            GroupJoined_.remove(GroupID)
-                            YuukiVariable["GroupJoined"] = GroupJoined_
+                            YuukiVariable["GroupJoined"].remove(GroupID)
                         # Log
                         self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
                     if Action not in self.data.getData("BlackList"):
@@ -727,7 +730,6 @@ class Yuuki:
                     self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
                     self.Thread_Exec(self.sendText, (GroupID, _("The one who was been kicked:")))
                     self.Thread_Exec(self.sendUser, (GroupID, Another))
-        YuukiVariable["Sync"] = self.data.Data
 
     # Main
 
@@ -771,9 +773,7 @@ class Yuuki:
                     if len(cacheOperations) > 1:
                         self.revision = max(cacheOperations[-1].revision, cacheOperations[-2].revision)
 
-                if self.data.Data != YuukiVariable["Sync"]:
-                    self.data.Data = YuukiVariable["Sync"]
-                    self.data.syncData()
+                self.data.syncData()
 
             except KeyboardInterrupt:
                 self.exit()

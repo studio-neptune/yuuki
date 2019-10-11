@@ -5,15 +5,19 @@ import os, time, json
 from .core.ttypes import OpType
 
 from .thread_control import Yuuki_Thread
+from .thread_control import Yuuki_Multiprocess
 
 class Yuuki_Data:
     def __init__(self, threading):
         self.threading = threading
         self.ThreadControl = Yuuki_Thread()
+        self.MpDataControl = Yuuki_Multiprocess()
 
         # Data
-
-        self.Data = {}
+        if self.threading:
+            self.Data = self.MpDataControl.dataManager.dict()
+        else:
+            self.Data = {}
 
         self.DataType = {
             "Global":{
