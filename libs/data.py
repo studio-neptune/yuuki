@@ -146,7 +146,8 @@ class Yuuki_Data:
                 }
             )
             over = mds.json()
-            assert over["status"] == 200, "mds - ERROR\n{} on {}".format(do, path)
+            assert_result = "mds - ERROR\n{} on {}".format(do, path)
+            assert over["status"] == 200, assert_result
             return over
         else:
             status = {"status" : 0}
@@ -201,11 +202,10 @@ class Yuuki_Data:
             self._updateData(path, data)
 
     def _updateData(self, path, data):
-        if not path:
-            assert "Empty path - updateData"
-        elif len(path) == 1:
+        assert path and type(path) is list, "Empty path - updateData"
+        if len(path) == 1:
             origin = self.getData([]).copy()
-            origin[path] = data
+            origin[path[0]] = data
             data = origin
         else:
             origin = self.getData(path[:-1]).copy()
