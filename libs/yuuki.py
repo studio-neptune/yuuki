@@ -254,9 +254,10 @@ class Yuuki:
 
     def getGroupTicket(self, GroupID, userId, renew=False):
         GroupTicket = ""
-        if "GroupTicket" in self.data.getGroup(GroupID):
-            if self.data.getGroup(GroupID)["GroupTicket"].get(userId) is not None:
-                GroupTicket = self.data.getGroup(GroupID)["GroupTicket"].get(userId)
+        GroupData = self.data.getGroup(GroupID)
+        if "GroupTicket" in GroupData:
+            if GroupData["GroupTicket"].get(userId) is not None:
+                GroupTicket = GroupData["GroupTicket"].get(userId)
         else:
             assert "Error JSON data type - GroupTicket"
         if GroupTicket == "" or renew:
