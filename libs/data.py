@@ -250,7 +250,8 @@ class Yuuki_Data:
         return self.getData(["Group", GroupID])
 
     def getSEGroup(self, GroupID):
-        SEMode = self.getGroup(GroupID).get("SEGroup")
+        Group = self.getGroup(GroupID)
+        SEMode = Group.get("SEGroup")
         if SEMode is None:
             return None
         SEMode_ = {}
