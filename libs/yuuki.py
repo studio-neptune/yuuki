@@ -299,7 +299,7 @@ class Yuuki:
         Limit = self.data.getData(["LimitInfo", "CancelLimit", helper])
         if Limit > 0:
             self.getClient(helper).cancelGroupInvitation(self.Seq, groupInfo.id, [userId])
-            self.data.updateData(["LimitInfo", "CancelLimit", helper], Limit - 1)
+            self.data.limitDecrease("CancelLimit", helper)
         else:
             self.sendText(groupInfo.id, _("Cancel Limit."))
         return helper
@@ -321,7 +321,7 @@ class Yuuki:
         Limit = self.data.getData(["LimitInfo", "KickLimit", helper])
         if Limit > 0:
             self.getClient(helper).kickoutFromGroup(self.Seq, groupInfo.id, [userId])
-            self.data.updateData(["LimitInfo", "KickLimit", helper], Limit - 1)
+            self.data.limitDecrease("KickLimit", helper)
         else:
             self.sendText(groupInfo.id, _("Kick Limit."))
         return helper
@@ -789,9 +789,6 @@ class Yuuki:
 
         if "LastResetLimitTime" not in self.data.getData(["Global"]):
             self.data.updateData(["Global", "LastResetLimitTime"], None)
-
-        if time.localtime().tm_hour == self.data.getData(["Global", "LastResetLimitTime"]):
-            self.limitReset()
 
         while self.data.getData(["Global","Power"]):
             try:

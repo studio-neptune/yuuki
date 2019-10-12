@@ -258,3 +258,9 @@ class Yuuki_Data:
         for Mode in SEMode:
             SEMode_[int(Mode)] = SEMode[Mode]
         return SEMode_
+
+    def limitDecrease(self, limit_type, userId):
+        if self.threading:
+            self._mdsShake("YLD", limit_type, userId)
+        else:
+            self.Data["LimitInfo"][limit_type][userId] -= 1

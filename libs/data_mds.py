@@ -79,13 +79,22 @@ def sync(path, null=None):
     except:
         return {"status": 500}
 
+def yuukiLimitDecrease(path, userId):
+    global switch_data
+    try:
+        switch_data["LimitInfo"][path][userId] -= 1
+        return {"status" : 200}
+    except:
+        return {"status": 500}
+
 # Works
 _work = {
     "EXT": mds_exit,
     "UPT": update,
     "DEL": delete,
     "GET": query,
-    "SYC": sync
+    "SYC": sync,
+    "YLD": yuukiLimitDecrease
 }
 
 class IndexHandler(RequestHandler):
