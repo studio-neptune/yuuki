@@ -1,8 +1,15 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import os, time, json
+import \
+    os, \
+    time,\
+    json, \
+    random,\
+    requests
 from .core.ttypes import OpType
+
+from .data_mds import listen as msd_listen
 
 from .thread_control import Yuuki_Thread
 from .thread_control import Yuuki_Multiprocess
@@ -11,13 +18,10 @@ class Yuuki_Data:
     def __init__(self, threading):
         self.threading = threading
         self.ThreadControl = Yuuki_Thread()
-        self.MpDataControl = Yuuki_Multiprocess()
+        MdsThreadControl = Yuuki_Multiprocess()
 
         # Data
-        if self.threading:
-            self.Data = self.MpDataControl.dataManager.dict()
-        else:
-            self.Data = {}
+        self.Data = {}
 
         self.DataType = {
             "Global":{
@@ -79,6 +83,25 @@ class Yuuki_Data:
                     self.Data[Type] = self.DataType[Type]
                     f.write(json.dumps(self.Data[Type]))
 
+        # Python MDS
+
+        if self.threading:
+            self.mdsHost = "http://localhost:2019/"
+            self.mdsCode = "{}.{}".format(random.random(), time.time())
+            MdsThreadControl.add(msd_listen, (self.mdsCode,))
+
+            # MDS Sync
+
+            time.sleep(1)
+            requests.post(
+                url=self.mdsHost,
+                json={
+                    "code": self.mdsCode,
+                    "do": "SYC",
+                    "path": self.Data
+                }
+            )
+
         # Log
 
         self.LogType = {
@@ -111,6 +134,52 @@ class Yuuki_Data:
         else:
             Function(*args)
 
+    def _mdsShake(self, do, path, data=None):
+        if self.threading:
+            mds = requests.post(
+                url=self.mdsHost,
+                json={
+                    "code": self.mdsCode,
+                    "do": do,
+                    "path": path,
+                    "data": data
+                }
+            )
+            over = mds.json()
+            assert over["status"] == 200, "mds - ERROR\n{} on {}".format(do, path)
+            return over
+        else:
+            status = {"status" : 0}
+            return json.dumps(status)
+
+    def _local_query(self, query_data):
+        if type(query_data) is list:
+            result = self.Data.copy()
+            query_len = len(query_data)
+            source_data = self.Data
+            for count, key in enumerate(query_data):
+                if key in source_data:
+                    if count < (query_len - 1):
+                        if type(source_data.get(key)) is dict:
+                            source_data = source_data.get(key)
+                        else:
+                            result = 1
+                            break
+                    else:
+                        result = source_data.get(key)
+                else:
+                    result = 2
+                    break
+
+            return result
+        return 0
+
+    def _local_update(self, path, data):
+        over = self._local_query(path)
+        if not str(over).isnumeric():
+            over.update(data)
+        return False
+
     def file(self, Type, Mode, Format):
         if Format == "Data":
             return open(self.DataPath + self.DataName.format(Type), Mode)
@@ -118,24 +187,36 @@ class Yuuki_Data:
             return open(self.LogPath + self.LogName.format(Type), Mode)
 
     def syncData(self):
+        if self.threading:
+            sync = self._mdsShake("GET", [])
+            self.Data = sync.get("data")
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
                 f.write(json.dumps(self.Data[Type]))
 
-    def updateData(self, Object, Input, Data):
+    def updateData(self, path, data):
         if self.threading:
-            self.ThreadExec(self._updateData, (Object, Input, Data))
+            self.ThreadExec(self._updateData, (path, data))
         else:
-            self._updateData(Object, Input, Data)
+            self._updateData(path, data)
 
-    def _updateData(self, Object, Input, Data):
-        if type(Object) == list:
-            if Input:
-                Object.append(Data)
-            else:
-                Object.remove(Data)
-        elif type(Object) == dict:
-            Object[Input] = Data
+    def _updateData(self, path, data):
+        if not path:
+            assert "Empty path - updateData"
+        elif len(path) == 1:
+            origin = self.getData([]).copy()
+            origin[path] = data
+            data = origin
+        else:
+            origin = self.getData(path[:-1]).copy()
+            origin[path[-1]] = data
+            path = path[:-1]
+            data = origin
+        assert type(data) == dict, "Error data type - updateData"
+        if self.threading:
+            self._mdsShake("UPT", path, data)
+        else:
+            self._local_update(path, data)
 
     def updateLog(self, Type, Data):
         if self.threading:
@@ -147,40 +228,30 @@ class Yuuki_Data:
         with self.file(Type, "a", "Log") as f:
             f.write(self.LogType[Type] % Data)
 
-    def getTime(self, format="%b %d %Y %H:%M:%S %Z"):
+    @staticmethod
+    def getTime(time_format="%b %d %Y %H:%M:%S %Z"):
         Time = time.localtime(time.time())
-        return time.strftime(format, Time)
+        return time.strftime(time_format, Time)
 
-    def getData(self, Type):
-        return self.Data[Type]
-
-    def getLimit(self, Type):
-        LimitInfo = self.getData("LimitInfo")
-        if Type == "Kick":
-            Limit = {}
-            for Mode in LimitInfo["KickLimit"]:
-                Limit[Mode] = int(LimitInfo["KickLimit"][Mode])
-        elif Type == "Cancel":
-            Limit = {}
-            for Mode in LimitInfo["CancelLimit"]:
-                Limit[Mode] = int(LimitInfo["CancelLimit"][Mode])
+    def getData(self, path):
+        if self.threading:
+            return self._mdsShake("GET", path).get("data")
         else:
-            Limit = None
-        return Limit
+            return self._local_query(path)
 
     def getGroup(self, GroupID):
-        Groups = self.getData("Group")
+        Groups = self.getData(["Group"])
         if len(Groups) > 0:
             GroupIDs = [Group for Group in Groups]
             if GroupID not in GroupIDs:
-                Groups[GroupID] = self.GroupType
+                self.updateData(["Group", GroupID], self.GroupType)
         else:
-            Groups[GroupID] = self.GroupType
-        return Groups[GroupID]
+            self.updateData(["Group", GroupID], self.GroupType)
+        return self.getData(["Group", GroupID])
 
     def getSEGroup(self, GroupID):
         SEMode = self.getGroup(GroupID).get("SEGroup")
-        if SEMode == None:
+        if SEMode is None:
             return None
         SEMode_ = {}
         for Mode in SEMode:

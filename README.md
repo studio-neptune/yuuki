@@ -1,6 +1,6 @@
 Star Yuuki(pYthon) BOT - Yuuki
 ==================
-![Version](https://img.shields.io/badge/v6.5.1-OpenSource-33FF33.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF8800.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg)
+![Version](https://img.shields.io/badge/v6.5.2-OpenSource-FF0033.svg) ![Series](https://img.shields.io/badge/syb_Yuuki-Series-7700FF.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg) ![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)
 
 A Python BOT for LINE Group Protection with LINE Unofficial API.
 ![ICON](logo.png)
