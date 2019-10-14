@@ -9,7 +9,13 @@ import socket, \
 
 from git import Repo
 
-from .core.TalkService import *
+try:
+    from .core.TalkService import *
+except ImportError:
+    print(
+        "It's necessary to install \"core\" for LINE connection,\n"
+        "Please read the \"README.md\" first."
+    )
 
 from .connection import Yuuki_Connect
 from .data import Yuuki_Data
@@ -268,7 +274,7 @@ class Yuuki:
     def limitReset(self):
         for userId in self.AllAccountIds:
             self.data.updateData(["LimitInfo", "KickLimit", userId], self.KickLimit)
-            self.data.updateData(["LimitInfo", "KickLimit", userId], self.CancelLimit)
+            self.data.updateData(["LimitInfo", "CancelLimit", userId], self.CancelLimit)
 
     @staticmethod
     def dictShuffle(dict_object, requirement=None):
@@ -409,7 +415,7 @@ class Yuuki:
 
     def JoinGroup(self, ncMessage):
         """
-            ToDo Type:
+            Event Type:
                 NOTIFIED_INVITE_INTO_GROUP (13)
         """
         GroupInvite = []
@@ -452,7 +458,7 @@ class Yuuki:
 
     def Commands(self, ncMessage):
         """
-            ToDo Type:
+            Event Type:
                 RECEIVE_MESSAGE (26)
         """
         BlockedIgnore = (ncMessage.message.to in self.data.getData(["BlackList"])) or (ncMessage.message.from_ in self.data.getData(["BlackList"]))
@@ -643,8 +649,13 @@ class Yuuki:
 
             elif self.YuukiConfigs["name"] + '/Com' == msgSep[0] and len(msgSep) != 1:
                 if ncMessage.message.from_ in self.Admin:
-                    ComMsg = self.readCommandLine(msgSep[1:len(msgSep)])
-                    self.sendText(self.sendToWho(ncMessage), str(eval(ComMsg)))
+                    try:
+                        ComMsg = self.readCommandLine(msgSep[1:len(msgSep)])
+                        Report = str(eval(ComMsg))
+                    except:
+                        (err1, err2, err3, ErrorInfo) = self.errorReport()
+                        Report = "Star Yuuki BOT - Eval Error:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo)
+                    self.sendText(self.sendToWho(ncMessage), Report)
 
         elif ncMessage.message.contentType == ContentType.CONTACT:
             Catched = ncMessage.message.contentMetadata["mid"]
@@ -661,7 +672,7 @@ class Yuuki:
 
     def Security(self, ncMessage):
         """
-            ToDo Type:
+            Event Type:
                 NOTIFIED_UPDATE_GROUP (11)
                 NOTIFIED_INVITE_INTO_GROUP (13)
                 NOTIFIED_ACCEPT_GROUP_INVITATION (17)

@@ -3,7 +3,7 @@
 """
     Star Inc. multiprocessing data switching
     ===
-        To switch data in multiprocessing tasks.
+        To switch data in multiprocessor tasks.
 
     LICENSE: MPL 2.0
                                (c)2019 Star Inc.
@@ -49,7 +49,7 @@ def query(query_data, null=None):
     global switch_data
     try:
         if type(switch_data) is dict and type(query_data) is list:
-            result = switch_data.copy()
+            result = switch_data
             query_len = len(query_data)
             source_data = switch_data
             for count, key in enumerate(query_data):
@@ -101,7 +101,7 @@ class IndexHandler(RequestHandler):
     def get(self):
         self.write('''
             <b>Python MDS Server</b><br>
-            To switch data in multiprocessing tasks.<hr>
+            To switch data in multiprocessor tasks.<hr>
             (c)2019 <a href="https://starinc.xyz">Star Inc.</a>
         ''')
 

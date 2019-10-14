@@ -155,7 +155,7 @@ class Yuuki_Data:
 
     def _local_query(self, query_data):
         if type(query_data) is list:
-            result = self.Data.copy()
+            result = self.Data
             query_len = len(query_data)
             source_data = self.Data
             for count, key in enumerate(query_data):
@@ -189,8 +189,7 @@ class Yuuki_Data:
 
     def syncData(self):
         if self.threading:
-            sync = self._mdsShake("GET", [])
-            self.Data = sync.get("data")
+            self.Data = self.getData([])
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
                 f.write(json.dumps(self.Data[Type]))
@@ -204,19 +203,22 @@ class Yuuki_Data:
     def _updateData(self, path, data):
         assert path and type(path) is list, "Empty path - updateData"
         if len(path) == 1:
-            origin = self.getData([]).copy()
+            origin_data = self.getData([])
+            assert type(origin_data) is dict, "Error origin data type (1) - updateData"
+            origin = origin_data.copy()
             origin[path[0]] = data
-            data = origin
+            path = []
         else:
-            origin = self.getData(path[:-1]).copy()
+            origin_data = self.getData(path[:-1])
+            assert type(origin_data) is dict, "Error origin data type (2) - updateData"
+            origin = origin_data.copy()
             origin[path[-1]] = data
             path = path[:-1]
-            data = origin
-        assert type(data) == dict, "Error data type - updateData"
+        assert type(origin) is dict, "Error request data type - updateData"
         if self.threading:
-            self._mdsShake("UPT", path, data)
+            self._mdsShake("UPT", path, origin)
         else:
-            self._local_update(path, data)
+            self._local_update(path, origin)
 
     def updateLog(self, Type, Data):
         if self.threading:
