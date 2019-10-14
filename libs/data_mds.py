@@ -3,7 +3,7 @@
 """
     Star Inc. multiprocessing data switching
     ===
-        To switch data in multiprocessor tasks.
+        To switch data in multiprocessing.
 
     LICENSE: MPL 2.0
                                (c)2019 Star Inc.
@@ -101,7 +101,7 @@ class IndexHandler(RequestHandler):
     def get(self):
         self.write('''
             <b>Python MDS Server</b><br>
-            To switch data in multiprocessor tasks.<hr>
+            To switch data in multiprocessing.<hr>
             (c)2019 <a href="https://starinc.xyz">Star Inc.</a>
         ''')
 
