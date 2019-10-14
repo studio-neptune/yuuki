@@ -10,7 +10,7 @@ Yeah! This is the BOT which was the first Chinese LINE Group Security BOT.
 Now, it is OpenSource.
 
 ## License
-The software licensed under Mozilla Public LICENSE 2.0.
+The software licensed under [Mozilla Public License 2.0](LICENSE.md) with [COPYING.md](COPYING.md).
 
 ## Warning
 Some function of old version maybe will make your LINE account be banned.
