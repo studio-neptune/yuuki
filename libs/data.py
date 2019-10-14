@@ -193,6 +193,7 @@ class Yuuki_Data:
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
                 f.write(json.dumps(self.Data[Type]))
+        return self.getData(["Global","Power"])
 
     def updateData(self, path, data):
         if self.threading:

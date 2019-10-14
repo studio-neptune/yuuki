@@ -110,7 +110,6 @@ class Yuuki:
 
         self.data = Yuuki_Data(self.Threading)
 
-        self.data.updateData(["Global","Power"], True)
         self.data.updateData(["Global","GroupJoined"], self.client.getGroupIdsJoined())
         self.data.updateData(["Global","SecurityService"], self.YuukiConfigs["SecurityService"])
 
@@ -802,7 +801,10 @@ class Yuuki:
         if "LastResetLimitTime" not in self.data.getData(["Global"]):
             self.data.updateData(["Global", "LastResetLimitTime"], None)
 
-        while self.data.getData(["Global","Power"]):
+        Power = True
+        self.data.updateData(["Global","Power"], Power)
+
+        while Power:
             try:
                 if time.localtime().tm_hour != self.data.getData(["Global", "LastResetLimitTime"]):
                     self.limitReset()
@@ -828,7 +830,13 @@ class Yuuki:
                     if len(cacheOperations) > 1:
                         self.revision = max(cacheOperations[-1].revision, cacheOperations[-2].revision)
 
-                self.data.syncData()
+                Power = self.data.syncData()
+
+            except requests.exceptions.ConnectionError:
+                Power = False
+
+            except SystemExit:
+                Power = False
 
             except KeyboardInterrupt:
                 self.exit()
