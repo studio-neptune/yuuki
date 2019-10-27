@@ -156,18 +156,14 @@ class Yuuki_Data:
     def _local_query(self, query_data):
         if type(query_data) is list:
             result = self.Data
-            query_len = len(query_data)
-            source_data = self.Data
+            query_len = len(query_data) - 1
             for count, key in enumerate(query_data):
-                if key in source_data:
-                    if count < (query_len - 1):
-                        if type(source_data.get(key)) is dict:
-                            source_data = source_data.get(key)
-                        else:
+                if key in result:
+                    if count < query_len:
+                        if type(result.get(key)) is not dict:
                             result = 1
                             break
-                    else:
-                        result = source_data.get(key)
+                    result = result.get(key)
                 else:
                     result = 2
                     break

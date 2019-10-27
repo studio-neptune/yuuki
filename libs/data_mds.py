@@ -50,18 +50,14 @@ def query(query_data, null=None):
     try:
         if type(switch_data) is dict and type(query_data) is list:
             result = switch_data
-            query_len = len(query_data)
-            source_data = switch_data
+            query_len = len(query_data) - 1
             for count, key in enumerate(query_data):
-                if key in source_data:
-                    if count < (query_len -  1):
-                        if type(source_data.get(key)) is dict:
-                            source_data = source_data.get(key)
-                        else:
+                if key in result:
+                    if count < query_len:
+                        if type(result.get(key)) is not dict:
                             result = 1 #"unknown_type" + type(source_data.get(key))
                             break
-                    else:
-                        result = source_data.get(key)
+                    result = result.get(key)
                 else:
                     result = 2 #"unknown_key"
                     break

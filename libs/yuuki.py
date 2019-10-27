@@ -27,7 +27,7 @@ class Yuuki_Settings:
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.2",
+        "version": "v6.5.2_RC1",
         "version_check": True,
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
