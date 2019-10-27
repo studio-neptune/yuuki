@@ -244,13 +244,10 @@ class Yuuki_Data:
 
     def getGroup(self, GroupID):
         Groups = self.getData(["Group"])
-        if len(Groups) > 0:
-            GroupIDs = [Group for Group in Groups]
-            if GroupID not in GroupIDs:
-                self.updateData(["Group", GroupID], self.GroupType)
-        else:
+        if GroupID not in Groups:
             self.updateData(["Group", GroupID], self.GroupType)
-        return self.getData(["Group", GroupID])
+            return self.GroupType
+        return Groups.get(GroupID)
 
     def getSEGroup(self, GroupID):
         GroupData = self.getGroup(GroupID)
