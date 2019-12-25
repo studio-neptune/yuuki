@@ -13,15 +13,8 @@ import traceback
 import requests
 from git import Repo
 
-try:
-    from .core.TalkService import *
-except ImportError:
-    print(
-        "It's necessary to install \"core\" for LINE connection,\n"
-        "Please read the \"README.md\" first."
-    )
-
 from .connection import Yuuki_Connect
+from .core.TalkService import *
 from .data import Yuuki_Data
 from .i18n import Yuuki_LangSetting
 from .thread_control import Yuuki_Multiprocess
