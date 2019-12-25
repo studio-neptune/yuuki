@@ -26,6 +26,6 @@ Clone the repository and get the library of the programming language you want.
 
 > Start to Create your Applications. >o<
 
-or Compile the ["line.thrift"](origin/line.thrift) for yourself...
+or Compile the ["line.thrift"](https://github.com/star-inc/olsb_cores/blob/master/origin/line.thrift) for yourself...
 
 *(c) 2019 Star Inc.*
