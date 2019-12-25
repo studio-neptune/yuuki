@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import socket, \
-       os, time,  \
-       json, ntpath, \
-       random, requests, \
-       platform, traceback
+import json
+import ntpath
+import os
+import platform
+import random
+import requests
+import socket
+import time
+import traceback
 
 from git import Repo
 
@@ -22,12 +26,13 @@ from .data import Yuuki_Data
 from .i18n import Yuuki_LangSetting
 from .thread_control import Yuuki_Multiprocess
 
+
 class Yuuki_Settings:
     """ Yuuki Custom Settings """
 
     config = {
         "name": "Yuuki",
-        "version": "v6.5.2_RC1",
+        "version": "v6.5.3-alpha",
         "version_check": True,
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
@@ -44,6 +49,7 @@ class Yuuki_Settings:
         "helper_LINE_ACCESS_KEYs": []
     }
 
+
 class Yuuki:
     def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
 
@@ -53,7 +59,7 @@ class Yuuki:
 
         self.Threading = threading
         self.Thread_Control = Yuuki_Multiprocess()
- 
+
         self.Seq = self.YuukiConfigs["Seq"]
         self.Admin = self.YuukiConfigs["Admin"]
 
@@ -88,7 +94,7 @@ class Yuuki:
             "<*> {}\n\n"
             "More Information:\n"
             "{}\n\n\t\t\t\t\t"
-            "{}\n\t{}\n"   .format(
+            "{}\n\t{}\n".format(
                 self.YuukiConfigs["name"],
                 self.YuukiConfigs["version"],
                 git_result,
@@ -110,8 +116,8 @@ class Yuuki:
 
         self.data = Yuuki_Data(self.Threading)
 
-        self.data.updateData(["Global","GroupJoined"], self.client.getGroupIdsJoined())
-        self.data.updateData(["Global","SecurityService"], self.YuukiConfigs["SecurityService"])
+        self.data.updateData(["Global", "GroupJoined"], self.client.getGroupIdsJoined())
+        self.data.updateData(["Global", "SecurityService"], self.YuukiConfigs["SecurityService"])
 
         # Initialize
 
@@ -434,8 +440,10 @@ class Yuuki:
                     NewGroupList = GroupList.copy()
                     NewGroupList.append(GroupID)
                     self.data.updateData(["Global", "GroupJoined"], NewGroupList)
-                    self.sendText(GroupID, _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
-                    self.sendText(GroupID, _("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
+                    self.sendText(GroupID,
+                                  _("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.YuukiConfigs["name"])
+                    self.sendText(GroupID,
+                                  _("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
                                   (self.YuukiConfigs["name"], self.sybGetGroupCreator(GroupInfo).displayName,))
                     self.getGroupTicket(GroupID, self.MyMID, True)
                     # Log
@@ -460,7 +468,8 @@ class Yuuki:
             Event Type:
                 RECEIVE_MESSAGE (26)
         """
-        BlockedIgnore = (ncMessage.message.to in self.data.getData(["BlackList"])) or (ncMessage.message.from_ in self.data.getData(["BlackList"]))
+        BlockedIgnore = (ncMessage.message.to in self.data.getData(["BlackList"])) or (
+                    ncMessage.message.from_ in self.data.getData(["BlackList"]))
         if ('BOT_CHECK' in ncMessage.message.contentMetadata) or BlockedIgnore:
             pass
         elif ncMessage.message.toType == MIDType.ROOM:
@@ -470,7 +479,8 @@ class Yuuki:
             msgSep = ncMessage.message.text.split(" ")
 
             if self.YuukiConfigs["name"] + '/Help' == ncMessage.message.text:
-                self.sendText(self.sendToWho(ncMessage), _("%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s") %
+                self.sendText(self.sendToWho(ncMessage),
+                              _("%s\n\t%s\n\nCommands Info:\n%s\n\nPrivacy:\n%s\n\nMore Information:\n%s\n\n%s") %
                               (self.YuukiConfigs["name"], self.YuukiConfigs["version"],
                                self.YuukiConfigs["man_page"], self.YuukiConfigs["privacy_page"],
                                self.YuukiConfigs["project_url"], self.YuukiConfigs["copyright"]))
@@ -484,7 +494,8 @@ class Yuuki:
             elif self.YuukiConfigs["name"] + '/GetAllHelper' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + \
+                                     self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         for userId in self.Connect.helper_ids:
                             self.sendUser(self.sendToWho(ncMessage), userId)
@@ -504,12 +515,14 @@ class Yuuki:
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Enable(True): 1\nDisable(False): 0"))
                     else:
-                        self.sendText(self.sendToWho(ncMessage), str(bool(self.data.getData(["Global", "SecurityService"]))))
+                        self.sendText(self.sendToWho(ncMessage),
+                                      str(bool(self.data.getData(["Global", "SecurityService"]))))
 
             elif self.YuukiConfigs["name"] + '/Switch' == msgSep[0] and len(msgSep) != 1:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + \
+                                     self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if not self.data.getData(["Global", "SecurityService"]):
                         self.sendText(self.sendToWho(ncMessage),
                                       _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
@@ -530,14 +543,18 @@ class Yuuki:
                         else:
                             self.sendText(self.sendToWho(ncMessage), _("Not Found"))
                         if unknown_msgtext != "":
-                            self.sendText(self.sendToWho(ncMessage), _("Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext))
+                            self.sendText(self.sendToWho(ncMessage),
+                                          _("Notice: Unknown command line argument(s)") + "\n({})".format(
+                                              unknown_msgtext))
 
             elif self.YuukiConfigs["name"] + '/DisableAll' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + \
+                                     self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if not self.data.getData(["Global", "SecurityService"]):
-                        self.sendText(self.sendToWho(ncMessage), _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
+                        self.sendText(self.sendToWho(ncMessage),
+                                      _("SecurityService of %s was disable") % (self.YuukiConfigs["name"],))
                     elif ncMessage.message.from_ in GroupPrivilege:
                         self.configSecurityStatus(ncMessage.message.to, [])
                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
@@ -553,21 +570,23 @@ class Yuuki:
                                     if msgSep[2] in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
                                         self.sendText(self.sendToWho(ncMessage), _("Added"))
                                     elif msgSep[2] not in self.data.getData(["BlackList"]):
-                                        origin = self.data.getData(["Group", GroupInfo.id,"Ext_Admin"])
+                                        origin = self.data.getData(["Group", GroupInfo.id, "Ext_Admin"])
                                         ext_admin_list = origin.copy()
                                         ext_admin_list.append(msgSep[2])
-                                        self.data.updateData(["Group", GroupInfo.id,"Ext_Admin"], ext_admin_list)
+                                        self.data.updateData(["Group", GroupInfo.id, "Ext_Admin"], ext_admin_list)
                                         self.sendText(self.sendToWho(ncMessage), _("Okay"))
                                     else:
-                                        self.sendText(self.sendToWho(ncMessage), _("The User(s) was in our blacklist database."))
+                                        self.sendText(self.sendToWho(ncMessage),
+                                                      _("The User(s) was in our blacklist database."))
                                 else:
-                                    self.sendText(self.sendToWho(ncMessage), _("Wrong UserID or the guy is not in Group"))
+                                    self.sendText(self.sendToWho(ncMessage),
+                                                  _("Wrong UserID or the guy is not in Group"))
                             elif msgSep[1] == "delete":
                                 if msgSep[2] in self.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                                    origin = self.data.getData(["Group", GroupInfo.id,"Ext_Admin"])
+                                    origin = self.data.getData(["Group", GroupInfo.id, "Ext_Admin"])
                                     ext_admin_list = origin.copy()
                                     ext_admin_list.remove(msgSep[2])
-                                    self.data.updateData(["Group", GroupInfo.id,"Ext_Admin"], ext_admin_list)
+                                    self.data.updateData(["Group", GroupInfo.id, "Ext_Admin"], ext_admin_list)
                                     self.sendText(self.sendToWho(ncMessage), _("Okay"))
                                 else:
                                     self.sendText(self.sendToWho(ncMessage), _("Not Found"))
@@ -599,19 +618,21 @@ class Yuuki:
                             self.sybGetGroupCreator(GroupInfo).displayName,
                         )
                     else:
-                        status = _("SecurityService is Listening on\n\nURL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nMain Admin of the Group:\n%s") % (
-                            group_status[OpType.NOTIFIED_UPDATE_GROUP],
-                            group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
-                            group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
-                            group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP],
-                            self.sybGetGroupCreator(GroupInfo).displayName,
-                        )
+                        status = _(
+                            "SecurityService is Listening on\n\nURL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n\nMain Admin of the Group:\n%s") % (
+                                     group_status[OpType.NOTIFIED_UPDATE_GROUP],
+                                     group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
+                                     group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
+                                     group_status[OpType.NOTIFIED_KICKOUT_FROM_GROUP],
+                                     self.sybGetGroupCreator(GroupInfo).displayName,
+                                 )
                     self.sendText(self.sendToWho(ncMessage), status)
 
             elif self.YuukiConfigs["name"] + '/GroupBackup' == ncMessage.message.text:
                 if ncMessage.message.toType == MIDType.GROUP:
                     GroupInfo = self.getClient(self.MyMID).getGroup(ncMessage.message.to)
-                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+                    GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + \
+                                     self.data.getGroup(GroupInfo.id)["Ext_Admin"]
                     if ncMessage.message.from_ in GroupPrivilege:
                         GroupMembers = [User.mid for User in GroupInfo.members]
                         GroupInvites = None
@@ -683,7 +704,8 @@ class Yuuki:
         SEGroup = self.data.getSEGroup(GroupID)
 
         GroupInfo = self.getClient(self.MyMID).getGroup(GroupID)
-        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)["Ext_Admin"]
+        GroupPrivilege = self.Admin + [self.sybGetGroupCreator(GroupInfo).mid] + self.data.getGroup(GroupInfo.id)[
+            "Ext_Admin"]
 
         if Action in GroupPrivilege or Another in GroupPrivilege:
             if ncMessage.type != OpType.NOTIFIED_KICKOUT_FROM_GROUP:
@@ -704,7 +726,8 @@ class Yuuki:
                         self.Thread_Exec(self.sendText, (GroupID, _("DO NOT ENABLE THE GROUP URL STATUS, see you...")))
                         Kicker = self.kickSomeone(GroupInfo, Action)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+                        self.data.updateLog("KickEvent", (
+                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP and Security_Access:
                 Canceler = "None"
                 if "\x1e" in Another:
@@ -715,18 +738,23 @@ class Yuuki:
                             else:
                                 Canceler = self.kickSomeone(GroupInfo, userId)
                                 # Log
-                                self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId, ncMessage.type*10))
+                                self.data.updateLog("KickEvent", (
+                                self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId,
+                                ncMessage.type * 10))
                     # Log
-                    self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
+                    self.data.updateLog("CancelEvent", (
+                    self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.AllAccountIds + GroupPrivilege:
                     if GroupInfo.invitee and Another in [user.mid for user in GroupInfo.invitee]:
                         Canceler = self.cancelSomeone(GroupInfo, Another)
                     else:
                         Canceler = self.kickSomeone(GroupInfo, Another)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another, ncMessage.type*10))
+                        self.data.updateLog("KickEvent", (
+                        self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another, ncMessage.type * 10))
                     # Log
-                    self.data.updateLog("CancelEvent", (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
+                    self.data.updateLog("CancelEvent",
+                                        (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
                 if Canceler != "None":
                     self.sendText(GroupID, _("Do not invite anyone...thanks"))
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION and Security_Access:
@@ -735,17 +763,20 @@ class Yuuki:
                         self.Thread_Exec(self.sendText, (GroupID, _("You are our blacklist. Bye~")))
                         Kicker = self.kickSomeone(GroupInfo, Action)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
+                        self.data.updateLog("KickEvent", (
+                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
                 if Action in self.Connect.helper_ids:
                     # Log
-                    self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Action, Action, Another, ncMessage.type*10+1))
+                    self.data.updateLog("KickEvent", (
+                    self.data.getTime(), GroupInfo.name, GroupID, Action, Action, Another, ncMessage.type * 10 + 1))
                 elif Another in self.AllAccountIds:
                     Kicker = "None"
                     try:
                         Kicker = self.kickSomeone(GroupInfo, Action, Another)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+2))
+                        self.data.updateLog("KickEvent", (
+                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type * 10 + 2))
                         assert Kicker != "None", "No Helper Found"
                         if GroupInfo.preventJoinByTicket:
                             self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, True, Kicker))
@@ -771,7 +802,8 @@ class Yuuki:
                             NewGroupList.remove(GroupID)
                             self.data.updateData(["Global", "GroupJoined"], NewGroupList)
                         # Log
-                        self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type*10+3))
+                        self.data.updateLog("KickEvent", (
+                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type * 10 + 3))
                     BlackList = self.data.getData(["BlackList"])
                     if Action not in BlackList:
                         NewBlackList = BlackList.copy()
@@ -784,7 +816,8 @@ class Yuuki:
                     self.Thread_Exec(self.sendText, (GroupID, _("DO NOT KICK, thank you ^^")))
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
-                    self.data.updateLog("KickEvent", (self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+                    self.data.updateLog("KickEvent", (
+                    self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
                     self.Thread_Exec(self.sendText, (GroupID, _("The one who was been kicked:")))
                     self.Thread_Exec(self.sendUser, (GroupID, Another))
 
@@ -802,7 +835,7 @@ class Yuuki:
             self.data.updateData(["Global", "LastResetLimitTime"], None)
 
         Power = True
-        self.data.updateData(["Global","Power"], Power)
+        self.data.updateData(["Global", "Power"], Power)
 
         while Power:
             try:
@@ -855,7 +888,7 @@ class Yuuki:
                         self.revision = self.client.getLastOpRevision()
                     for Root in self.Admin:
                         self.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
-                                     (err1, err2, err3, ErrorInfo))
+                                      (err1, err2, err3, ErrorInfo))
                 except:
                     print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo))
                     self.exit()
