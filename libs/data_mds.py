@@ -19,9 +19,11 @@ from tornado.web import Application, RequestHandler
 switch_data = {}
 auth_code = 0
 
+
 # Functions
 def mds_exit(null=None, null_=None):
     exit(0)
+
 
 def update(path, data):
     global switch_data
@@ -29,10 +31,11 @@ def update(path, data):
         if type(path) is list:
             over = query(path)
             over.get("data").update(data)
-            return {"status" : 200}
-        return {"status" : 400}
+            return {"status": 200}
+        return {"status": 400}
     except:
         return {"status": 500}
+
 
 def delete(path, data):
     global switch_data
@@ -40,10 +43,11 @@ def delete(path, data):
         if type(path) is list:
             over = query(path)
             over.get("data").pop(data)
-            return {"status" : 200}
-        return {"status" : 400}
+            return {"status": 200}
+        return {"status": 400}
     except:
         return {"status": 500}
+
 
 def query(query_data, null=None):
     global switch_data
@@ -55,33 +59,36 @@ def query(query_data, null=None):
                 if key in result:
                     if count < query_len:
                         if type(result.get(key)) is not dict:
-                            result = 1 #"unknown_type" + type(source_data.get(key))
+                            result = 1  # "unknown_type" + type(source_data.get(key))
                             break
                     result = result.get(key)
                 else:
-                    result = 2 #"unknown_key"
+                    result = 2  # "unknown_key"
                     break
 
-            return {"status" : 200, "data" : result}
-        return {"status" : 400}
+            return {"status": 200, "data": result}
+        return {"status": 400}
     except:
         return {"status": 500}
+
 
 def sync(path, null=None):
     global switch_data
     try:
         switch_data = path
-        return {"status" : 200}
+        return {"status": 200}
     except:
         return {"status": 500}
+
 
 def yuukiLimitDecrease(path, userId):
     global switch_data
     try:
         switch_data["LimitInfo"][path][userId] -= 1
-        return {"status" : 200}
+        return {"status": 200}
     except:
         return {"status": 500}
+
 
 # Works
 _work = {
@@ -92,6 +99,7 @@ _work = {
     "SYC": sync,
     "YLD": yuukiLimitDecrease
 }
+
 
 class IndexHandler(RequestHandler):
     def get(self):
@@ -109,16 +117,17 @@ class IndexHandler(RequestHandler):
         if req_res.get("code") == auth_code:
             result = _work[req_res.get("do")](req_res.get("path"), req_res.get("data"))
         else:
-            result = {"status" : 401}
+            result = {"status": 401}
         if not result:
-            result = {"status" : 500}
+            result = {"status": 500}
         self.write(json.dumps(result))
+
 
 # Main
 def listen(code):
     global auth_code
     auth_code = code
-    app = Application([('/',IndexHandler)])
+    app = Application([('/', IndexHandler)])
     server = HTTPServer(app)
     server.listen(2019)
     IOLoop.current().start()

@@ -1,16 +1,18 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-from .core.TalkService import Client
-
-from thrift.transport import THttpClient
 from thrift.protocol import TCompactProtocol
+from thrift.transport import THttpClient
+
+from .core.TalkService import Client
 
 """         NC HightSpeed Lib          """
 try:
     from thrift.protocol import fastbinary
 except:
     fastbinary = None
+
+
 ##########################################
 
 class Yuuki_Connection:
@@ -27,6 +29,7 @@ class Yuuki_Connection:
         "X-Line-Access": "",
         "User-Agent": ""
     }
+
 
 class Yuuki_Connect:
     def __init__(self, Yuuki_Connection):

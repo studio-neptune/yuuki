@@ -1,18 +1,18 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import \
-    os, \
-    time,\
-    json, \
-    random,\
-    requests
+import json
+import os
+import random
+import time
+
+import requests
+
 from .core.ttypes import OpType
-
 from .data_mds import listen as msd_listen
-
-from .thread_control import Yuuki_Thread
 from .thread_control import Yuuki_Multiprocess
+from .thread_control import Yuuki_Thread
+
 
 class Yuuki_Data:
     def __init__(self, threading):
@@ -24,30 +24,30 @@ class Yuuki_Data:
         self.Data = {}
 
         self.DataType = {
-            "Global":{
-                "LastResetLimitTime":None,
+            "Global": {
+                "LastResetLimitTime": None,
             },
             "Group": {},
-            "LimitInfo":{},
-            "BlackList":[]
+            "LimitInfo": {},
+            "BlackList": []
         }
 
         self.GroupType = {
-            "SEGroup":None,
-            "Ext_Admin":[],
-            "GroupTicket":{}
+            "SEGroup": None,
+            "Ext_Admin": [],
+            "GroupTicket": {}
         }
 
         self.LimitType = {
-            "KickLimit":{},
-            "CancelLimit":{}
+            "KickLimit": {},
+            "CancelLimit": {}
         }
 
         self.SEGrouptype = {
-            OpType.NOTIFIED_UPDATE_GROUP:False,
-            OpType.NOTIFIED_INVITE_INTO_GROUP:False,
-            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:False,
-            OpType.NOTIFIED_KICKOUT_FROM_GROUP:False
+            OpType.NOTIFIED_UPDATE_GROUP: False,
+            OpType.NOTIFIED_INVITE_INTO_GROUP: False,
+            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION: False,
+            OpType.NOTIFIED_KICKOUT_FROM_GROUP: False
         }
 
         self.DataPath = "data/"
@@ -105,10 +105,10 @@ class Yuuki_Data:
         # Log
 
         self.LogType = {
-            "JoinGroup":"<li>%s: %s(%s) -> Inviter: %s</li>",
-            "KickEvent":"<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
-            "CancelEvent":"<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
-            "BlackList":"<li>%s: %s(%s)</li>"
+            "JoinGroup": "<li>%s: %s(%s) -> Inviter: %s</li>",
+            "KickEvent": "<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
+            "CancelEvent": "<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
+            "BlackList": "<li>%s: %s(%s)</li>"
         }
 
         self.LogPath = "logs/"
@@ -150,7 +150,7 @@ class Yuuki_Data:
             assert over["status"] == 200, assert_result
             return over
         else:
-            status = {"status" : 0}
+            status = {"status": 0}
             return json.dumps(status)
 
     def _local_query(self, query_data):
@@ -189,7 +189,7 @@ class Yuuki_Data:
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
                 f.write(json.dumps(self.Data[Type]))
-        return self.getData(["Global","Power"])
+        return self.getData(["Global", "Power"])
 
     def updateData(self, path, data):
         if self.threading:

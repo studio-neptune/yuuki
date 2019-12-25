@@ -6,11 +6,11 @@ import ntpath
 import os
 import platform
 import random
-import requests
 import socket
 import time
 import traceback
 
+import requests
 from git import Repo
 
 try:
@@ -469,7 +469,7 @@ class Yuuki:
                 RECEIVE_MESSAGE (26)
         """
         BlockedIgnore = (ncMessage.message.to in self.data.getData(["BlackList"])) or (
-                    ncMessage.message.from_ in self.data.getData(["BlackList"]))
+                ncMessage.message.from_ in self.data.getData(["BlackList"]))
         if ('BOT_CHECK' in ncMessage.message.contentMetadata) or BlockedIgnore:
             pass
         elif ncMessage.message.toType == MIDType.ROOM:
@@ -727,7 +727,7 @@ class Yuuki:
                         Kicker = self.kickSomeone(GroupInfo, Action)
                         # Log
                         self.data.updateLog("KickEvent", (
-                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+                            self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP and Security_Access:
                 Canceler = "None"
                 if "\x1e" in Another:
@@ -739,11 +739,11 @@ class Yuuki:
                                 Canceler = self.kickSomeone(GroupInfo, userId)
                                 # Log
                                 self.data.updateLog("KickEvent", (
-                                self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId,
-                                ncMessage.type * 10))
+                                    self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId,
+                                    ncMessage.type * 10))
                     # Log
                     self.data.updateLog("CancelEvent", (
-                    self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
+                        self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.AllAccountIds + GroupPrivilege:
                     if GroupInfo.invitee and Another in [user.mid for user in GroupInfo.invitee]:
                         Canceler = self.cancelSomeone(GroupInfo, Another)
@@ -751,7 +751,8 @@ class Yuuki:
                         Canceler = self.kickSomeone(GroupInfo, Another)
                         # Log
                         self.data.updateLog("KickEvent", (
-                        self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another, ncMessage.type * 10))
+                            self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another,
+                            ncMessage.type * 10))
                     # Log
                     self.data.updateLog("CancelEvent",
                                         (self.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another))
@@ -764,19 +765,20 @@ class Yuuki:
                         Kicker = self.kickSomeone(GroupInfo, Action)
                         # Log
                         self.data.updateLog("KickEvent", (
-                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
+                            self.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
                 if Action in self.Connect.helper_ids:
                     # Log
                     self.data.updateLog("KickEvent", (
-                    self.data.getTime(), GroupInfo.name, GroupID, Action, Action, Another, ncMessage.type * 10 + 1))
+                        self.data.getTime(), GroupInfo.name, GroupID, Action, Action, Another, ncMessage.type * 10 + 1))
                 elif Another in self.AllAccountIds:
                     Kicker = "None"
                     try:
                         Kicker = self.kickSomeone(GroupInfo, Action, Another)
                         # Log
                         self.data.updateLog("KickEvent", (
-                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type * 10 + 2))
+                            self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another,
+                            ncMessage.type * 10 + 2))
                         assert Kicker != "None", "No Helper Found"
                         if GroupInfo.preventJoinByTicket:
                             self.Thread_Exec(self.changeGroupUrlStatus, (GroupInfo, True, Kicker))
@@ -803,7 +805,8 @@ class Yuuki:
                             self.data.updateData(["Global", "GroupJoined"], NewGroupList)
                         # Log
                         self.data.updateLog("KickEvent", (
-                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type * 10 + 3))
+                            self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another,
+                            ncMessage.type * 10 + 3))
                     BlackList = self.data.getData(["BlackList"])
                     if Action not in BlackList:
                         NewBlackList = BlackList.copy()
@@ -817,7 +820,7 @@ class Yuuki:
                     Kicker = self.kickSomeone(GroupInfo, Action)
                     # Log
                     self.data.updateLog("KickEvent", (
-                    self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
+                        self.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
                     self.Thread_Exec(self.sendText, (GroupID, _("The one who was been kicked:")))
                     self.Thread_Exec(self.sendUser, (GroupID, Another))
 

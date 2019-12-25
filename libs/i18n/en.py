@@ -13,8 +13,8 @@
     The software licensed under Mozilla Public License Version 2.0
 """
 
-class English:
 
+class English:
     i18nText = {
         "Helllo^^\nMy name is %s ><\nNice to meet you OwO": "Helllo^^\nMy name is %s ><\nNice to meet you OwO",
         "Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s": "Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s",

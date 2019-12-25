@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 # coding=UTF-8
 
-import threading, multiprocessing
+import multiprocessing
+import threading
+
 
 class Yuuki_Thread:
     def __init__(self):
@@ -15,6 +17,7 @@ class Yuuki_Thread:
         print(threading.active_count())
         print(threading.enumerate())
         print("{} add Threading\n".format(threading.current_thread()))
+
 
 class Yuuki_Multiprocess:
     def add(self, Yuuki_Func, args=()):
