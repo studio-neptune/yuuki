@@ -1,4 +1,3 @@
-simplegist==1.0.1
 certifi==2019.11.28
 chardet==3.0.4
 gitdb2==2.0.6

@@ -1,6 +1,6 @@
 Star Yuuki(pYthon) BOT - Yuuki
 ==================
-![Version](https://img.shields.io/badge/v6.5.2-OpenSource-FF0033.svg) ![Series](https://img.shields.io/badge/syb-Series-7700FF.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg) ![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)
+![Version](https://img.shields.io/badge/v6.5.3-OpenSource-FF0033.svg) ![Series](https://img.shields.io/badge/syb-Series-7700FF.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg) ![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)
 
 A Python BOT for LINE Group Protection with LINE Unofficial API.
 ![ICON](logo.png)
@@ -16,16 +16,12 @@ The software licensed under [Mozilla Public License 2.0](LICENSE.md) with [COPYI
 Some function of old version maybe will make your LINE account be banned.
 
 ## Requirement
-Recommand Environment:
+Recommend Environment:
 
     Ubuntu >= 18.04
     python >= 3.7
     pip >= 19.2
     git >= 2.17
-
-You need the "LINE Unofficial API Core for Python". (Ex:[olsb](https://github.com/star-inc/olsb_cores),  [akad](https://pypi.org/project/akad), [curve](https://pypi.org/project/curve) ...)
-
-Please place the core directory in `./libs/`
 
 ## Setup
 + Check your system environment(Operating System, Requirements...)
