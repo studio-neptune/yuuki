@@ -18,6 +18,7 @@ from .core.TalkService import *
 from .data import Yuuki_Data
 from .i18n import Yuuki_LangSetting
 from .thread_control import Yuuki_Multiprocess
+from .webadmin.server import Yuuki_WebAdmin
 
 
 class Yuuki_Settings:
@@ -121,6 +122,16 @@ class Yuuki:
 
         if len(self.data.getData(["LimitInfo"])) != 2:
             self.data.updateData(["LimitInfo"], self.data.LimitType)
+
+        # Setup WebAdmin
+
+        if self.Threading:
+            password = hash(random.random())
+            webAdmin = Yuuki_WebAdmin()
+            self.Thread_Control.add(webAdmin.start, (password,))
+            print("WebAdmin Password: {}".format(password))
+
+        # i18n Short Name
 
         global _
 
