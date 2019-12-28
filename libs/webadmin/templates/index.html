@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css() }}
+
+    <style>
+        body {
+            padding-top: 5rem;
+        }
+
+        .starter-template {
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .damage {
+            color: #ff0000;
+        }
+
+        .password_box {
+            margin: 0;
+            position: absolute;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+
+    <title>Star Yuuki BOT - WebAdmin</title>
+</head>
+
+<body>
+
+    {% from 'bootstrap/nav.html' import render_nav_item %}
+
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">Yuuki - WebAdmin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                {{ render_nav_item('index') }}
+            </ul>
+        </div>
+    </nav>
+
+    <main role="main" class="container">
+
+        <div class="starter-template">
+            <h1>Star Yuuki BOT - WebAdmin</h1>
+            <p class="lead">Version {{ version }}</p>
+            <p>
+                The administrator control center of LINE BOT
+            </p>
+            <div class="status damage"></div>
+        </div>
+
+        <div class="password_box">
+            <form class="form-inline mt-2 mt-md-0 login-box" method="post">
+                <input class="form-control mr-sm-2" type="password" placeholder="Type your admin password"
+                    aria-label="Login" name="code">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+            </form>
+            <div class="datahere"></div>
+        </div>
+    </main>
+
+    <!-- Optional JavaScript -->
+    {{ bootstrap.load_js() }}
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+    <script>
+        $(function () {
+            $('form.login-box').on('submit', function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: "/verify",
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        if (data.status == 200) {
+                            $(".status").text("Welcome");
+                            Cookies.set('yuuki_admin', data.session);
+                            location.reload();
+                        } else {
+                            $(".status").text("Wrong password")
+                        }
+                    }
+                });
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+
+</html>

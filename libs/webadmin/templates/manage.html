@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css() }}
+
+    <style>
+        body {
+            padding-top: 5rem;
+        }
+
+        .starter-template {
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .damage {
+            color: #ff0000;
+        }
+    </style>
+    <title>Star Yuuki BOT - WebAdmin</title>
+</head>
+
+<body>
+
+    {% from 'bootstrap/nav.html' import render_nav_item %}
+
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">Yuuki - WebAdmin</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                {{ render_nav_item('index') }}
+            </ul>
+            <a href="/logout"><button class="btn btn-outline-success my-2 my-sm-0">Logout</button></a>
+        </div>
+    </nav>
+
+    {% block body %}{% endblock%}
+
+    <!-- Optional JavaScript -->
+    {{ bootstrap.load_js() }}
+</body>
+
+</html>
