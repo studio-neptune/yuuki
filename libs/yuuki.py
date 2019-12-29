@@ -126,9 +126,9 @@ class Yuuki:
         # Setup WebAdmin
 
         if self.Threading:
-            password = hash(random.random())
-            webAdmin = Yuuki_WebAdmin()
-            self.Thread_Control.add(webAdmin.start, (password,))
+            password = str(hash(random.random()))
+            self.webAdmin = Yuuki_WebAdmin(self)
+            self.Thread_Control.add(self.webAdmin.start, (password,))
             print("WebAdmin Password: {}".format(password))
 
         # i18n Short Name
