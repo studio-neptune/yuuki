@@ -6,6 +6,8 @@ import time
 from flask import Flask, render_template, Response, request, redirect
 from flask_bootstrap import Bootstrap
 
+from gevent.pywsgi import WSGIServer
+
 wa_app = Flask(__name__)
 Yuuki_Handle = None
 
@@ -85,4 +87,5 @@ class Yuuki_WebAdmin:
 
     def start(self, admin_password):
         self.set_password(admin_password)
-        self.app.run(port=2020, debug=True, use_reloader=False)
+        http_server = WSGIServer(('', 2020), self.app)
+        http_server.serve_forever()

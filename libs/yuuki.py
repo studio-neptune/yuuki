@@ -130,7 +130,7 @@ class Yuuki:
             password = str(hash(random.random()))
             self.webAdmin = Yuuki_WebAdmin(self)
             self.Thread_Control.add(self.webAdmin.start, (password,))
-            print("WebAdmin Password: {}".format(password))
+            print("WebAdmin Password: {}\n".format(password))
 
         # i18n Short Name
 
