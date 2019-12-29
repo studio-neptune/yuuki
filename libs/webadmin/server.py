@@ -7,12 +7,16 @@ from flask import Flask, render_template, Response, request, redirect
 from flask_bootstrap import Bootstrap
 
 wa_app = Flask(__name__)
+Yuuki_Handle = None
 
 passports = []
 password = str(hash(random.random()))
 
 class Yuuki_WebAdmin:
-    def __init__(self):
+    def __init__(self, Yuuki):
+        global Yuuki_Handle
+        Yuuki_Handle = Yuuki
+
         self.app = wa_app
         Bootstrap(self.app)
 
@@ -31,7 +35,11 @@ class Yuuki_WebAdmin:
                 )
                 return response
         else:
-            return render_template('index.html')
+            return render_template(
+                'index.html',
+                name=Yuuki_Handle.YuukiConfigs["name"],
+                version=Yuuki_Handle.YuukiConfigs["version"]
+            )
 
     @staticmethod
     @wa_app.route("/verify", methods=['GET', 'POST'])
@@ -70,4 +78,4 @@ class Yuuki_WebAdmin:
 
     def start(self, admin_password):
         self.set_password(admin_password)
-        self.app.run(port=2020, debug=True)
+        self.app.run(port=2020, debug=True, use_reloader=False)
