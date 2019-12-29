@@ -3,6 +3,8 @@ import json
 import random
 import time
 
+from .reader import Yuuki_WebDataReader
+
 from flask import Flask, render_template, Response, request, redirect
 from flask_bootstrap import Bootstrap
 
@@ -10,14 +12,16 @@ from gevent.pywsgi import WSGIServer
 
 wa_app = Flask(__name__)
 Yuuki_Handle = None
+Yuuki_DataHandle = None
 
 passports = []
 password = str(hash(random.random()))
 
 class Yuuki_WebAdmin:
     def __init__(self, Yuuki):
-        global Yuuki_Handle
+        global Yuuki_Handle, Yuuki_DataHandle
         Yuuki_Handle = Yuuki
+        Yuuki_DataHandle = Yuuki_WebDataReader(Yuuki_Handle.data)
 
         self.app = wa_app
         Bootstrap(self.app)
@@ -79,6 +83,19 @@ class Yuuki_WebAdmin:
                 expires=0
             )
         return response
+
+    @staticmethod
+    @wa_app.route("/api/logs")
+    @wa_app.route("/api/logs/<name>")
+    def logs(name=""):
+        result = {"status": 403}
+        if "yuuki_admin" in request.cookies:
+            if request.cookies.get("yuuki_admin") in passports:
+                if name:
+                    result = Yuuki_DataHandle.get_log(name)
+                else:
+                    result = Yuuki_DataHandle.get_all_logs()
+        return Response(json.dumps(result), mimetype='application/json')
 
     @staticmethod
     def set_password(code):
