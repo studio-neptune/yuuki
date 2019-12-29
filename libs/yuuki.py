@@ -115,7 +115,8 @@ class Yuuki:
 
         # Initialize
 
-        self.MyMID = self.client.getProfile().mid
+        self.profile = self.client.getProfile()
+        self.MyMID = self.profile.mid
         self.revision = self.client.getLastOpRevision()
 
         self.AllAccountIds = [self.MyMID] + self.Connect.helper_ids

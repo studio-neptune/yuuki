@@ -53,7 +53,6 @@
     </nav>
 
     <main role="main" class="container">
-
         <div class="starter-template">
             <h1>Star Yuuki BOT - WebAdmin</h1>
             <p class="lead">Version {{ version }}</p>
@@ -85,7 +84,6 @@
                     data: $(this).serialize(),
                     success: function (data) {
                         if (data.status == 200) {
-                            $(".status").text("Welcome");
                             Cookies.set('yuuki_admin', data.session);
                             location.reload();
                         } else {

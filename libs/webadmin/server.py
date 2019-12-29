@@ -25,7 +25,14 @@ class Yuuki_WebAdmin:
     def index():
         if "yuuki_admin" in request.cookies:
             if request.cookies["yuuki_admin"] in passports:
-                return render_template('manage.html')
+                return render_template(
+                    'manage.html',
+                    name=Yuuki_Handle.YuukiConfigs["name"],
+                    version=Yuuki_Handle.YuukiConfigs["version"],
+                    LINE_Media_server=Yuuki_Handle.LINE_Media_server,
+                    profileName=Yuuki_Handle.profile.displayName,
+                    pictureStatus=Yuuki_Handle.profile.pictureStatus
+                )
             else:
                 response = redirect("/")
                 response.set_cookie(

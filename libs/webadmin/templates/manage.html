@@ -31,7 +31,7 @@
     {% from 'bootstrap/nav.html' import render_nav_item %}
 
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="/">Control Center</a>
+        <a class="navbar-brand" href="/">{{ name }} - WebAdmin</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -44,7 +44,17 @@
         </div>
     </nav>
 
-    {% block body %}{% endblock%}
+    <main role="main" class="container">
+        <div class="starter-template">
+            <img src="{{ LINE_Media_server}}/{{pictureStatus }}">
+            <h1>{{ profileName }}</h1>
+            <p class="lead">Version {{ version }}</p>
+            <p>
+                The administrator control center of LINE BOT
+            </p>
+            <div class="status damage"></div>
+        </div>
+    </main>
 
     <!-- Optional JavaScript -->
     {{ bootstrap.load_js() }}
