@@ -11,12 +11,11 @@ import json
 import random
 import time
 
-from .reader import Yuuki_WebDataReader
-
 from flask import Flask, render_template, Response, request, redirect
 from flask_bootstrap import Bootstrap
-
 from gevent.pywsgi import WSGIServer
+
+from .reader import Yuuki_WebDataReader
 
 wa_app = Flask(__name__)
 Yuuki_Handle = None
@@ -24,6 +23,7 @@ Yuuki_DataHandle = None
 
 passports = []
 password = str(hash(random.random()))
+
 
 class Yuuki_WebAdmin:
     def __init__(self, Yuuki):
@@ -40,8 +40,7 @@ class Yuuki_WebAdmin:
         if "yuuki_admin" in request.cookies:
             if request.cookies["yuuki_admin"] in passports:
                 return render_template(
-                    'manage.html',
-                    name=Yuuki_Handle.YuukiConfigs["name"],
+                    'manage/index.html',
                     version=Yuuki_Handle.YuukiConfigs["version"],
                     LINE_Media_server=Yuuki_Handle.LINE_Media_server,
                     profileName=Yuuki_Handle.profile.displayName,
@@ -63,6 +62,54 @@ class Yuuki_WebAdmin:
             )
 
     @staticmethod
+    @wa_app.route("/groups")
+    def groups():
+        if "yuuki_admin" in request.cookies:
+            if request.cookies["yuuki_admin"] in passports:
+                return render_template(
+                    'manage/groups.html'
+                )
+        response = redirect("/")
+        response.set_cookie(
+            key='yuuki_admin',
+            value='',
+            expires=0
+        )
+        return response
+
+    @staticmethod
+    @wa_app.route("/helpers")
+    def helpers():
+        if "yuuki_admin" in request.cookies:
+            if request.cookies["yuuki_admin"] in passports:
+                return render_template(
+                    'manage/groups.html'
+                )
+        response = redirect("/")
+        response.set_cookie(
+            key='yuuki_admin',
+            value='',
+            expires=0
+        )
+        return response
+
+    @staticmethod
+    @wa_app.route("/settings")
+    def settings():
+        if "yuuki_admin" in request.cookies:
+            if request.cookies["yuuki_admin"] in passports:
+                return render_template(
+                    'manage/groups.html'
+                )
+        response = redirect("/")
+        response.set_cookie(
+            key='yuuki_admin',
+            value='',
+            expires=0
+        )
+        return response
+
+    @staticmethod
     @wa_app.route("/verify", methods=['GET', 'POST'])
     def verify():
         result = {"status": 403}
@@ -76,7 +123,6 @@ class Yuuki_WebAdmin:
             else:
                 result = {"status": 401}
         return Response(json.dumps(result), mimetype='application/json')
-
 
     @staticmethod
     @wa_app.route("/logout")
@@ -104,6 +150,11 @@ class Yuuki_WebAdmin:
                 else:
                     result = Yuuki_DataHandle.get_all_logs()
         return Response(json.dumps(result), mimetype='application/json')
+
+    @staticmethod
+    @wa_app.route("/api/i")
+    def i():
+        return Yuuki_Handle.YuukiConfigs["name"]
 
     @staticmethod
     def set_password(code):
