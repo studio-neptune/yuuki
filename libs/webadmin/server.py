@@ -139,6 +139,22 @@ class Yuuki_WebAdmin:
         return response
 
     @staticmethod
+    @wa_app.route("/events")
+    def events():
+        if "yuuki_admin" in request.cookies:
+            if request.cookies["yuuki_admin"] in passports:
+                return render_template(
+                    'manage/events.html'
+                )
+        response = redirect("/")
+        response.set_cookie(
+            key='yuuki_admin',
+            value='',
+            expires=0
+        )
+        return response
+
+    @staticmethod
     @wa_app.route("/api/logs")
     @wa_app.route("/api/logs/<name>")
     def logs(name=""):

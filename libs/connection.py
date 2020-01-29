@@ -9,7 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from thrift.protocol import TCompactProtocol
 from thrift.transport import THttpClient
 
-from .core.TalkService import Client
+from yuuki_core.TalkService import Client
 
 """         NC HightSpeed Lib          """
 try:

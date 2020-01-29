@@ -17,9 +17,9 @@ import traceback
 
 import requests
 from git import Repo
+from yuuki_core.TalkService import *
 
 from .connection import Yuuki_Connect
-from .core.TalkService import *
 from .data import Yuuki_Data
 from .i18n import Yuuki_LangSetting
 from .thread_control import Yuuki_Multiprocess

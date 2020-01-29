@@ -12,8 +12,8 @@ import random
 import time
 
 import requests
+from yuuki_core.ttypes import OpType
 
-from .core.ttypes import OpType
 from .data_mds import listen as msd_listen
 from .thread_control import Yuuki_Multiprocess
 from .thread_control import Yuuki_Thread
