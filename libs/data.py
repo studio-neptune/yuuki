@@ -20,43 +20,62 @@ from .thread_control import Yuuki_Thread
 
 
 class Yuuki_Data:
+
+    # Data Struct Define
+
+    Data = {}
+
+    DataType = {
+        "Global": {
+            "LastResetLimitTime": None,
+        },
+        "Group": {},
+        "LimitInfo": {},
+        "BlackList": []
+    }
+
+    GroupType = {
+        "SEGroup": None,
+        "Ext_Admin": [],
+        "GroupTicket": {}
+    }
+
+    LimitType = {
+        "KickLimit": {},
+        "CancelLimit": {}
+    }
+
+    SEGrouptype = {
+        OpType.NOTIFIED_UPDATE_GROUP: False,
+        OpType.NOTIFIED_INVITE_INTO_GROUP: False,
+        OpType.NOTIFIED_ACCEPT_GROUP_INVITATION: False,
+        OpType.NOTIFIED_KICKOUT_FROM_GROUP: False
+    }
+
+    DataPath = "data/"
+    DataName = "{}.json"
+
+    # Log Struct Define
+
+    LogType = {
+        "JoinGroup": "<li>%s: %s(%s) -> Inviter: %s</li>",
+        "KickEvent": "<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
+        "CancelEvent": "<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
+        "BlackList": "<li>%s: %s(%s)</li>"
+    }
+
+    LogPath = "logs/"
+    LogName = "{}.html"
+
+    initHeader = "<title>{} - SYB</title>" \
+                 "<meta charset='utf-8' />"
+
     def __init__(self, threading):
         self.threading = threading
         self.ThreadControl = Yuuki_Thread()
         MdsThreadControl = Yuuki_Multiprocess()
 
-        # Data
-        self.Data = {}
-
-        self.DataType = {
-            "Global": {
-                "LastResetLimitTime": None,
-            },
-            "Group": {},
-            "LimitInfo": {},
-            "BlackList": []
-        }
-
-        self.GroupType = {
-            "SEGroup": None,
-            "Ext_Admin": [],
-            "GroupTicket": {}
-        }
-
-        self.LimitType = {
-            "KickLimit": {},
-            "CancelLimit": {}
-        }
-
-        self.SEGrouptype = {
-            OpType.NOTIFIED_UPDATE_GROUP: False,
-            OpType.NOTIFIED_INVITE_INTO_GROUP: False,
-            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION: False,
-            OpType.NOTIFIED_KICKOUT_FROM_GROUP: False
-        }
-
-        self.DataPath = "data/"
-        self.DataName = "{}.json"
+        # Data Initialize
 
         if not os.path.isdir(self.DataPath):
             os.mkdir(self.DataPath)
@@ -75,8 +94,6 @@ class Yuuki_Data:
                     except ValueError:
                         Type = 1
             assert Type == 0, "{}\nJson Test Error".format(name)
-
-        # Data Initialize
 
         for Type in self.DataType:
             name = self.DataPath + self.DataName.format(Type)
@@ -107,20 +124,7 @@ class Yuuki_Data:
                 }
             )
 
-        # Log
-
-        self.LogType = {
-            "JoinGroup": "<li>%s: %s(%s) -> Inviter: %s</li>",
-            "KickEvent": "<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
-            "CancelEvent": "<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
-            "BlackList": "<li>%s: %s(%s)</li>"
-        }
-
-        self.LogPath = "logs/"
-        self.LogName = "{}.html"
-
-        self.initHeader = "<title>{} - SYB</title>" \
-                          "<meta charset='utf-8' />"
+        # Log Initialize
 
         if not os.path.isdir(self.LogPath):
             os.mkdir(self.LogPath)
