@@ -59,7 +59,7 @@ class Yuuki_Config:
     def _server_config(self):
         if "Server" in self.config.get("LINE"):
             for key in self.config["LINE"]["Server"]:
-                if key in self.systemConfig:
+                if key in self.connectInfo:
                     self.connectInfo[key] = self.config["LINE"]["Server"][key]
 
     def _account_config(self):
@@ -67,7 +67,7 @@ class Yuuki_Config:
             for key in self.config["LINE"]["Account"]:
                 if key in ["X-Line-Application", "User-Agent"]:
                     self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t","\t")
-                if key in self.systemConfig:
+                if key in self.connectHeader:
                     self.connectHeader[key] = self.config["LINE"]["Account"][key]
 
         if "helper_LINE_ACCESS_KEYs" in self.config.get("LINE"):
