@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Yuuki_Libs
-(c) 2019 Star Inc.
+(c) 2020 Star Inc.
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -26,35 +26,12 @@ from .thread_control import Yuuki_Multiprocess
 from .webadmin.server import Yuuki_WebAdmin
 
 
-class Yuuki_Settings:
-    """ Yuuki Custom Settings """
-
-    config = {
-        "name": "Yuuki",
-        "version": "v6.5.3-alpha",
-        "version_check": True,
-        "project_url": "https://tinyurl.com/syb-yuuki",
-        "man_page": "https://tinyurl.com/yuuki-manual",
-        "privacy_page": "OpenSource - Licensed under MPL 2.0",
-        "copyright": "(c)2019 Star Inc.",
-
-        "Seq": 0,
-        "Admin": [],
-        "SecurityService": False,
-        "Hour_KickLimit": 10,
-        "Hour_CancelLimit": 10,
-        "Default_Language": "en",
-        "GroupMebers_Demand": 100,
-        "helper_LINE_ACCESS_KEYs": []
-    }
-
-
 class Yuuki:
-    def __init__(self, Yuuki_Settings, Yuuki_Connection, threading=False):
+    def __init__(self, Yuuki_Settings, threading=False):
 
         # Static Variable
 
-        self.YuukiConfigs = Yuuki_Settings.config
+        self.YuukiConfigs = Yuuki_Settings.systemConfig
 
         self.Threading = threading
         self.Thread_Control = Yuuki_Multiprocess()
@@ -69,7 +46,7 @@ class Yuuki:
 
         self.LINE_Media_server = "https://obs.line-apps.com"
 
-        self.Connect = Yuuki_Connect(Yuuki_Connection)
+        self.Connect = Yuuki_Connect(Yuuki_Settings)
 
         # Version Check
         git_result = "Unknown"
@@ -106,10 +83,11 @@ class Yuuki:
         # LINE Login
 
         (self.client, self.listen) = self.Connect.connect()
-        self.connectHeader = Yuuki_Connection.connectHeader
+        self.connectHeader = Yuuki_Settings.connectHeader
 
-        for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
-            self.Connect.helperConnect(access)
+        if self.YuukiConfigs.get("helper_LINE_ACCESS_KEYs"):
+            for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
+                self.Connect.helperConnect(access)
 
         # Dynamic Variable
 

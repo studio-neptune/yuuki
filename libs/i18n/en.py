@@ -9,7 +9,7 @@
     The Language Package Contributor:
         supersonictw <https://github.com/supersonictw>
 
-    Copyright(c) 2019 Star Inc. All Rights Reserved.
+    Copyright(c) 2020 Star Inc. All Rights Reserved.
     The software licensed under Mozilla Public License Version 2.0
 """
 

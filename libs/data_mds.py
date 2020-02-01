@@ -20,7 +20,7 @@ auth_code = 0
 
 
 # Functions
-def mds_exit(null=None, null_=None):
+def mds_exit():
     exit(0)
 
 
@@ -48,7 +48,7 @@ def delete(path, data):
         return {"status": 500}
 
 
-def query(query_data, null=None):
+def query(query_data):
     global switch_data
     try:
         if type(switch_data) is dict and type(query_data) is list:
@@ -71,7 +71,7 @@ def query(query_data, null=None):
         return {"status": 500}
 
 
-def sync(path, null=None):
+def sync(path):
     global switch_data
     try:
         switch_data = path
