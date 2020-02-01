@@ -2,8 +2,8 @@ Yuuki:
   Default_Language: en
   Admin:
     -
-  KickLimit: 10
-  CancelLimit: 10
+  Hour_KickLimit: 10
+  Hour_CancelLimit: 10
   GroupMebers_Demand: 10
 
 LINE:
