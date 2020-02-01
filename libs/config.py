@@ -45,24 +45,30 @@ class Yuuki_Config:
 
     def __init__(self, config_path="config.yaml"):
         with open(config_path, "r") as configfile:
-            config = yaml.load(configfile, Loader=yaml.BaseLoader)
+            self.config = yaml.load(configfile, Loader=yaml.BaseLoader)
+            self.__yuuki_config()
+            self.__server_config()
+            self.__account_config()
 
-        if "Yuuki" in config:
-            for key in config["Yuuki"]:
+    def __yuuki_config(self):
+        if "Yuuki" in self.config:
+            for key in self.config["Yuuki"]:
                 if key in self.systemConfig:
-                    self.systemConfig[key] = config["Yuuki"][key]
+                    self.systemConfig[key] = self.config["Yuuki"][key]
 
-        if "Server" in config.get("LINE"):
-            for key in config["LINE"]["Server"]:
+    def __server_config(self):
+        if "Server" in self.config.get("LINE"):
+            for key in self.config["LINE"]["Server"]:
                 if key in self.systemConfig:
-                    self.connectInfo[key] = config["LINE"]["Server"][key]
+                    self.connectInfo[key] = self.config["LINE"]["Server"][key]
 
-        if "Account" in config.get("LINE"):
-            for key in config["LINE"]["Account"]:
+    def __account_config(self):
+        if "Account" in self.config.get("LINE"):
+            for key in self.config["LINE"]["Account"]:
                 if key in ["X-Line-Application", "User-Agent"]:
-                    config["LINE"]["Account"][key] = config["LINE"]["Account"][key].replace("\\t","\t")
+                    self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t","\t")
                 if key in self.systemConfig:
-                    self.connectHeader[key] = config["LINE"]["Account"][key]
+                    self.connectHeader[key] = self.config["LINE"]["Account"][key]
 
-        if "helper_LINE_ACCESS_KEYs" in config.get("LINE"):
-            self.systemConfig["helper_LINE_ACCESS_KEYs"] = config["LINE"]["helper_LINE_ACCESS_KEYs"]
+        if "helper_LINE_ACCESS_KEYs" in self.config.get("LINE"):
+            self.systemConfig["helper_LINE_ACCESS_KEYs"] = self.config["LINE"]["helper_LINE_ACCESS_KEYs"]
