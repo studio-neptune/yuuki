@@ -160,7 +160,10 @@ class Yuuki_WebAdmin:
         result = {"status": 403}
         if request.method == "POST" and "task" in request.values:
             if request.cookies.get("yuuki_admin") in passports:
-                query_result = Yuuki_APIHandle.init(request.values)
+                query_result = Yuuki_APIHandle.init(
+                    task=request.values.get("task"),
+                    data=request.values.get("data")
+                )
                 result = {"status": 200, "result": query_result}
             else:
                 result = {"status": 401}

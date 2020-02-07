@@ -18,20 +18,16 @@ class Yuuki_WebAdminAPI:
             "get_groups_joined": self.get_groups_joined,
         }
 
-    def init(self, **action):
-        action.setdefault('task', "")
-        action.setdefault('data', None)
-        return self.events[action["task"]](action["data"])
+    def init(self, *, task="", data=None):
+        return self.events[task](data)
 
-    def get_groups_joined(self, **data):
-        data.setdefault('data', None)
+    def get_groups_joined(self, data):
+        if data:
+            pass
         return self.YukkiData.getData(["Global", "GroupJoined"])
 
-    def get_logs(self, **data):
-        data.setdefault('name', None)
-        if data.get("name"):
-            return self.Yuuki_DataHandle.get_log(data["name"])
-        return self.Yuuki_DataHandle.get_all_logs()
+    def get_logs(self, data):
+        return self.Yuuki_DataHandle.get_logs(data)
 
     @staticmethod
     def nothing(data):
