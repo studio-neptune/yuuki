@@ -83,7 +83,7 @@ class Yuuki_WebAdmin:
         if "yuuki_admin" in request.cookies:
             if request.cookies["yuuki_admin"] in passports:
                 return render_template(
-                    'manage/groups.html'
+                    'manage/helpers.html'
                 )
         response = redirect("/")
         response.set_cookie(
