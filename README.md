@@ -4,7 +4,7 @@ Star Yuuki(pYthon) BOT - Yuuki
 
 ![Scrutinizer-CI_Build](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/build.png?b=rolling) ![Scrutinizer-CI_Quality](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/quality-score.png?b=rolling) ![Code-Inspector_Score](https://www.code-inspector.com/project/3632/score/svg) ![Code-Inspector_Score](https://www.code-inspector.com/project/3632/status/svg)
 
-A Python BOT for LINE Group Protection with LINE Unofficial API.
+A Python BOT for LINE Group Protection.
 ![ICON](logo.png)
 
 ## Maybe you had seen it !
@@ -34,7 +34,9 @@ Recommend Environment:
     pip install -Ur requirements.txt
 
 ## Usage
-+ Configure your connection in `main.py`
++ Copy `config.yaml` from `config.sample.yaml`
+
++ Configure your settings and environment in `config.yaml`
 
 + Exec:
 
@@ -46,3 +48,5 @@ Maybe you want the source of history version. Click [it](https://github.com/star
 
 ### Logo Copyright
 Copyright of the Image which was named "logo.png" belongs to "[©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)".
+
+> (c) 2020 Star Inc.

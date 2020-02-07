@@ -5,7 +5,7 @@
         To switch data in multiprocessing.
 
     LICENSE: MPL 2.0
-                               (c)2019 Star Inc.
+                               (c)2020 Star Inc.
 """
 
 # Initializing
@@ -20,36 +20,38 @@ auth_code = 0
 
 
 # Functions
-def mds_exit():
-    exit(0)
+def mds_exit(data):
+    if data:
+        exit(0)
 
 
-def update(path, data):
+def update(data):
     global switch_data
     try:
-        if type(path) is list:
-            over = query(path)
-            over.get("data").update(data)
+        if type(data["path"]) is list:
+            over = query({"path": data["path"]})
+            over.get("data").update(data["data"])
             return {"status": 200}
         return {"status": 400}
     except:
         return {"status": 500}
 
 
-def delete(path, data):
+def delete(data):
     global switch_data
     try:
-        if type(path) is list:
-            over = query(path)
-            over.get("data").pop(data)
+        if type(data["path"]) is list:
+            over = query({"path": data["path"]})
+            over.get("data").pop(data["data"])
             return {"status": 200}
         return {"status": 400}
     except:
         return {"status": 500}
 
 
-def query(query_data):
+def query(data):
     global switch_data
+    query_data = data["path"]
     try:
         if type(switch_data) is dict and type(query_data) is list:
             result = switch_data
@@ -71,19 +73,19 @@ def query(query_data):
         return {"status": 500}
 
 
-def sync(path):
+def sync(data):
     global switch_data
     try:
-        switch_data = path
+        switch_data = data["path"]
         return {"status": 200}
     except:
         return {"status": 500}
 
 
-def yuukiLimitDecrease(path, userId):
+def yuukiLimitDecrease(data):
     global switch_data
     try:
-        switch_data["LimitInfo"][path][userId] -= 1
+        switch_data["LimitInfo"][data["path"]][data["userId"]] -= 1
         return {"status": 200}
     except:
         return {"status": 500}
@@ -114,7 +116,12 @@ class IndexHandler(RequestHandler):
         req_str = req_body.decode('utf8')
         req_res = json.loads(req_str)
         if req_res.get("code") == auth_code:
-            result = _work[req_res.get("do")](req_res.get("path"), req_res.get("data"))
+            result = _work[req_res.get("do")](
+                {
+                    "path":req_res.get("path"),
+                    "data":req_res.get("data")
+                }
+            )
         else:
             result = {"status": 401}
         if not result:
