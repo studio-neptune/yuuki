@@ -13,7 +13,7 @@
         if (window.location.pathname === p_key)
             nav_list += "<a class=\"nav-link active\" href=\"" + p_key + "\">" + page_list[p_key] + "</a>";
         else
-            nav_list += "<a class=\"nav-link js-lookforward\" data-transition-enter=\"slideleft\" href=\"" + p_key + "\">" + page_list[p_key] + "</a>";
+            nav_list += "<a class=\"nav-link\" data-transition-enter=\"slideleft\" href=\"" + p_key + "\">" + page_list[p_key] + "</a>";
     }
     var html_text =
         "<nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">" +

@@ -18,7 +18,7 @@ from libs import Yuuki, Yuuki_Config
 
 config = Yuuki_Config()
 
-Console = Yuuki(config)
+Console = Yuuki(config,1)
 Console.cleanMyGroupInvitations()
 
 ###########################Start!#############################

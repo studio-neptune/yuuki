@@ -15,11 +15,11 @@ from flask import Flask, render_template, Response, request, redirect
 from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
 
-from .reader import Yuuki_WebDataReader
+from .api import Yuuki_WebAdminAPI
 
 wa_app = Flask(__name__)
 Yuuki_Handle = None
-Yuuki_DataHandle = None
+Yuuki_APIHandle = None
 
 passports = []
 password = str(hash(random.random()))
@@ -27,9 +27,9 @@ password = str(hash(random.random()))
 
 class Yuuki_WebAdmin:
     def __init__(self, Yuuki):
-        global Yuuki_Handle, Yuuki_DataHandle
+        global Yuuki_Handle, Yuuki_APIHandle
         Yuuki_Handle = Yuuki
-        Yuuki_DataHandle = Yuuki_WebDataReader(Yuuki_Handle.data)
+        Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle.data)
 
         self.app = wa_app
         Bootstrap(self.app)
@@ -99,7 +99,7 @@ class Yuuki_WebAdmin:
         if "yuuki_admin" in request.cookies:
             if request.cookies["yuuki_admin"] in passports:
                 return render_template(
-                    'manage/groups.html'
+                    'manage/settings.html'
                 )
         response = redirect("/")
         response.set_cookie(
@@ -155,16 +155,15 @@ class Yuuki_WebAdmin:
         return response
 
     @staticmethod
-    @wa_app.route("/api/logs")
-    @wa_app.route("/api/logs/<name>")
-    def logs(name=""):
+    @wa_app.route("/api", methods=['GET', 'POST'])
+    def api():
         result = {"status": 403}
-        if "yuuki_admin" in request.cookies:
+        if request.method == "POST" and "task" in request.values:
             if request.cookies.get("yuuki_admin") in passports:
-                if name:
-                    result = Yuuki_DataHandle.get_log(name)
-                else:
-                    result = Yuuki_DataHandle.get_all_logs()
+                query_result = Yuuki_APIHandle.init(request.values)
+                result = {"status": 200, "result": query_result}
+            else:
+                result = {"status": 401}
         return Response(json.dumps(result), mimetype='application/json')
 
     @staticmethod
