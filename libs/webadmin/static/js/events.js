@@ -33,7 +33,8 @@ function log_query(data) {
             data: data
         },
         error: function () {
-            alert("Something was wrong.");
+            $("#events").html("<p class=\"pt-3\">Something was wrong.</p>");
+            $("#events").fadeIn();
         },
         success: function (response) {
             let show = "<h6 class=\"border-bottom border-gray pb-2 mb-0\">" + data + "</h6>";

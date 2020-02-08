@@ -17,7 +17,8 @@ $(function () {
                     Cookies.set('yuuki_admin', data.session);
                     location.reload();
                 } else {
-                    $(".status").text("Wrong password")
+                    $(".status").text("Wrong password");
+                    $(".status").fadeIn();
                 }
             }
         });

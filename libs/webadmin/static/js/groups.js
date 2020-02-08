@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
 
+/** global: object_server */
 /*
 Yuuki_Libs
 (c) 2020 Star Inc.
@@ -26,7 +27,8 @@ $(function () {
             task: "get_groups_joined"
         },
         error: function () {
-            alert("Something was wrong.");
+            $("#groups").html("<p class=\"pt-3\">Something was wrong.</p>");
+            $("#groups").fadeIn();
         },
         success: function (response) {
             let show = "";

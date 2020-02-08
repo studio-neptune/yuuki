@@ -17,7 +17,7 @@ function init(id, data) {
             data: data
         },
         error: function () {
-            alert("Something was wrong.");
+            $(id).text("Something was wrong.");
         },
         success: function (response) {
             let ajax_result = response.result;
