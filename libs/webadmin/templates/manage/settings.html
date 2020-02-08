@@ -44,10 +44,10 @@
                 </svg>
                 <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
                     <strong class="d-block text-gray-dark">Yuuki Configure</strong>
-                    Yuuki
+                    Settings for the BOT works.
                 </p>
             </a>
-            <a class="media text-muted pt-3" href="#">
+            <a class="media text-muted pt-3" href="#" onclick="shutdown();">
                 <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32">
                     <title>Shutdown</title>
@@ -68,6 +68,7 @@
     <!-- Optional JavaScript -->
     {{ bootstrap.load_js() }}
     <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 </body>
 
 </html>

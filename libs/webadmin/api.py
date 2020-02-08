@@ -18,6 +18,7 @@ class Yuuki_WebAdminAPI:
             "get_logs": self.get_logs,
             "get_helpers": self.get_helpers,
             "get_groups_joined": self.get_groups_joined,
+            "shutdown": self.shutdown,
         }
 
     def init(self, *, task="", data=None):
@@ -35,6 +36,11 @@ class Yuuki_WebAdminAPI:
 
     def get_logs(self, data):
         return self.Yuuki_DataHandle.get_logs(data)
+
+    def shutdown(self, data):
+        if data:
+            pass
+        return self.Yuuki.exit()
 
     @staticmethod
     def nothing(data):
