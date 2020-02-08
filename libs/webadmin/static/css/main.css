@@ -11,6 +11,11 @@ body {
     color: #ff0000;
 }
 
+.mini-logo {
+    max-width:32px;
+    height:32px;
+}
+
 .password_box {
     margin: 0;
     position: absolute;

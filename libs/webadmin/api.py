@@ -26,6 +26,11 @@ class Yuuki_WebAdminAPI:
             pass
         return self.YukkiData.getData(["Global", "GroupJoined"])
 
+    def get_helpers(self, data):
+        if data:
+            pass
+        return self.YukkiData.getData(["Global", "GroupJoined"])
+
     def get_logs(self, data):
         return self.Yuuki_DataHandle.get_logs(data)
 

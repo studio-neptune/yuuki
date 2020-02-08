@@ -11,12 +11,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 var events = [
     "JoinGroup",
     "KickEvent",
-    "CancelEvent",
-    "BlackList"
+    "CancelEvent"
 ];
 
 function format2html(title, context) {
     return "<div class=\"media pt-3\">" +
+        "<img class=\"mini-logo mr-2 rounded\" src=\"" + object_server + "/os/g/" + title + "\">" +
         "<p class=\"media-body pb-3 mb-0 small lh-125 border-bottom border-gray\">" +
         "<strong class=\"d-block text-gray-dark\">" + title + "</strong>" +
         context +
@@ -24,41 +24,31 @@ function format2html(title, context) {
         "</div>";
 }
 
-function log_query(data) {
+$(function () {
+    url = window.location.href;
     $.ajax({
         url: "/api",
         type: "POST",
         data: {
-            task: "get_logs",
-            data: data
+            task: "get_groups_joined"
         },
         error: function () {
             alert("Something was wrong.");
         },
         success: function (response) {
-            let show = "<h6 class=\"border-bottom border-gray pb-2 mb-0\">" + data + "</h6>";
+            let show = "";
             if (response.result.length) {
                 response.result.forEach(element => {
                     show += format2html(
-                        element.substring(0, 24),
-                        element.substring(26, element.length)
+                        element,
+                        element
                     );
                 });
             } else {
                 show += "<p class=\"pt-3\">Nothing</p>";
             }
-            $("#events").html(show);
-            $("#events").fadeIn();
+            $("#groups").html(show);
+            $("#groups").fadeIn();
         }
     });
-}
-
-$(function () {
-    url = window.location.href;
-    data = url.substring(url.lastIndexOf('#') + 1);
-    if (url.includes("#") && events.includes(data)) {
-        log_query(data);
-    } else {
-        window.location.href = "/";
-    }
 });

@@ -67,7 +67,8 @@ class Yuuki_WebAdmin:
         if "yuuki_admin" in request.cookies:
             if request.cookies["yuuki_admin"] in passports:
                 return render_template(
-                    'manage/groups.html'
+                    'manage/groups.html',
+                    LINE_Media_server=Yuuki_Handle.LINE_Media_server
                 )
         response = redirect("/")
         response.set_cookie(
@@ -99,7 +100,9 @@ class Yuuki_WebAdmin:
         if "yuuki_admin" in request.cookies:
             if request.cookies["yuuki_admin"] in passports:
                 return render_template(
-                    'manage/settings.html'
+                    'manage/settings.html',
+                    version=Yuuki_Handle.YuukiConfigs["version"],
+                    project_url=Yuuki_Handle.YuukiConfigs["project_url"]
                 )
         response = redirect("/")
         response.set_cookie(

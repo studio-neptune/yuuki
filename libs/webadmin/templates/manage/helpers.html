@@ -22,7 +22,7 @@
 
     <main role="main" class="container">
         <div class="my-3 p-3 bg-white rounded shadow-sm">
-            <h6 class="border-bottom border-gray pb-2 mb-0">Groups</h6>
+            <h6 class="border-bottom border-gray pb-2 mb-0">Helpers</h6>
             <div id="groups">
                 <p class="pt-3">Loading...</p>
             </div>
@@ -31,9 +31,8 @@
 
     <!-- Optional JavaScript -->
     {{ bootstrap.load_js() }}
-    <script>var object_server="{{ LINE_Media_server }}";</script>
     <script src="{{ url_for('static', filename='js/header.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/groups.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/helpers.js') }}"></script>
 </body>
 
 </html>
