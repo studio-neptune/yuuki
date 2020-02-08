@@ -8,12 +8,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-var events = [
-    "JoinGroup",
-    "KickEvent",
-    "CancelEvent"
-];
-
 function format2html(title, context) {
     return "<div class=\"media pt-3\">" +
         "<img class=\"mini-logo mr-2 rounded\" src=\"" + object_server + "/os/g/" + title + "\">" +
@@ -25,7 +19,6 @@ function format2html(title, context) {
 }
 
 $(function () {
-    url = window.location.href;
     $.ajax({
         url: "/api",
         type: "POST",
