@@ -9,12 +9,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from .reader import Yuuki_WebDataReader
 
 class Yuuki_WebAdminAPI:
-    def __init__(self, YuukiData):
-        self.YukkiData = YuukiData
-        self.Yuuki_DataHandle = Yuuki_WebDataReader(YuukiData)
+    def __init__(self, Yuuki):
+        self.Yuuki = Yuuki
+        self.YuukiData = self.Yuuki.data
+        self.Yuuki_DataHandle = Yuuki_WebDataReader(self.YuukiData)
         self.events = {
             "": self.nothing,
             "get_logs": self.get_logs,
+            "get_helpers": self.get_helpers,
             "get_groups_joined": self.get_groups_joined,
         }
 
@@ -24,12 +26,12 @@ class Yuuki_WebAdminAPI:
     def get_groups_joined(self, data):
         if data:
             pass
-        return self.YukkiData.getData(["Global", "GroupJoined"])
+        return self.YuukiData.getData(["Global", "GroupJoined"])
 
     def get_helpers(self, data):
         if data:
             pass
-        return self.YukkiData.getData(["Global", "GroupJoined"])
+        return self.Yuuki.Connect.helper_ids
 
     def get_logs(self, data):
         return self.Yuuki_DataHandle.get_logs(data)

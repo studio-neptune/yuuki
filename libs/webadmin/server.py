@@ -29,7 +29,7 @@ class Yuuki_WebAdmin:
     def __init__(self, Yuuki):
         global Yuuki_Handle, Yuuki_APIHandle
         Yuuki_Handle = Yuuki
-        Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle.data)
+        Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle)
 
         self.app = wa_app
         Bootstrap(self.app)
