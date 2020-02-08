@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 /*
 Yuuki_Libs
 (c) 2020 Star Inc.
@@ -6,20 +8,26 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+function nav_items(active, path, path_name) {
+    if (active)
+        return "<a class=\"nav-link active\" href=\"" + path + "\">" + path_name + "</a>";
+    return "<a class=\"nav-link\" data-transition-enter=\"slideleft\" href=\"" + path + "\">" + path_name + "</a>";
+}
+
 function header2html(yuuki_name) {
-    var page_list = {
+    let page_list = {
         "/": "Dashboard",
         "/groups": "Groups",
         "/helpers": "Helpers",
         "/settings": "Settings"
     };
-    var nav_list = "";
-    for (var p_key in page_list) {
+    let nav_list = "";
+    Object.keys(page_list).forEach(p_key => {
         if (window.location.pathname === p_key)
-            nav_list += "<a class=\"nav-link active\" href=\"" + p_key + "\">" + page_list[p_key] + "</a>";
+            nav_list += nav_items(true, p_key, page_list[p_key])
         else
-            nav_list += "<a class=\"nav-link\" data-transition-enter=\"slideleft\" href=\"" + p_key + "\">" + page_list[p_key] + "</a>";
-    }
+            nav_list += nav_items(false, p_key, page_list[p_key])
+    });
     return "<nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">" +
         "<a class=\"navbar-brand\" href=\"/\">" + yuuki_name + " - WebAdmin</a>" +
         "<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\"          data-target=\"#navbarCollapse\"aria-controls=\"navbarCollapse\" aria-expanded=\"false\" aria-label=\"Toggle         navigation\">" +
