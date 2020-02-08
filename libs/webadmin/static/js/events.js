@@ -55,8 +55,8 @@ function log_query(data) {
 }
 
 $(function () {
-    url = window.location.href;
-    data = url.substring(url.lastIndexOf('#') + 1);
+    let url = window.location.href;
+    let data = url.substring(url.lastIndexOf('#') + 1);
     if (url.includes("#") && events.includes(data)) {
         log_query(data);
     } else {

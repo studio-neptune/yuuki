@@ -1,3 +1,4 @@
+/** global: Cookies */
 /*
 Yuuki_Libs
 (c) 2020 Star Inc.

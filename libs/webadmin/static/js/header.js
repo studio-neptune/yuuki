@@ -8,7 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 (function () {
     $.get("/api/i", function (data) {
-        name = data;
+        yuuki_name = data;
     });
     var page_list = {
         "/": "Dashboard",
@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     }
     var html_text =
         "<nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">" +
-        "<a class=\"navbar-brand\" href=\"/\">" + name + " - WebAdmin</a>" +
+        "<a class=\"navbar-brand\" href=\"/\">" + yuuki_name + " - WebAdmin</a>" +
         "<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarCollapse\"aria-controls=\"navbarCollapse\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">" +
         "<span class=\"navbar-toggler-icon\"></span>" +
         "</button>" +
