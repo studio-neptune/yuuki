@@ -21,7 +21,7 @@ class Yuuki_WebAdminAPI:
             "shutdown": self.shutdown,
         }
 
-    def init(self, *, task="", data=None):
+    def action(self, *, task="", data=None):
         return self.events[task](data)
 
     def get_groups_joined(self, data):

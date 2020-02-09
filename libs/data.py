@@ -143,7 +143,7 @@ class Yuuki_Data:
         else:
             Function(*args)
 
-    def _mdsShake(self, do, path, data=None):
+    def mdsShake(self, do, path, data=None):
         if self.threading:
             mds = requests.post(
                 url=self.mdsHost,
@@ -222,7 +222,7 @@ class Yuuki_Data:
             path = path[:-1]
         assert type(origin) is dict, "Error request data type - updateData"
         if self.threading:
-            self._mdsShake("UPT", path, origin)
+            self.mdsShake("UPT", path, origin)
         else:
             self._local_update(path, origin)
 
@@ -243,7 +243,7 @@ class Yuuki_Data:
 
     def getData(self, path):
         if self.threading:
-            return self._mdsShake("GET", path).get("data")
+            return self.mdsShake("GET", path).get("data")
         else:
             return self._local_query(path)
 
@@ -266,6 +266,6 @@ class Yuuki_Data:
 
     def limitDecrease(self, limit_type, userId):
         if self.threading:
-            self._mdsShake("YLD", limit_type, userId)
+            self.mdsShake("YLD", limit_type, userId)
         else:
             self.Data["LimitInfo"][limit_type][userId] -= 1

@@ -35,6 +35,7 @@ class Yuuki_Config:
 
         "Seq": 0,
         "Admin": [],
+        "Advanced": False,
         "SecurityService": False,
         "Hour_KickLimit": 10,
         "Hour_CancelLimit": 10,
@@ -47,20 +48,20 @@ class Yuuki_Config:
         with open(config_path, "r") as configfile:
             self.config = yaml.load(configfile, Loader=yaml.BaseLoader)
         self._yuuki_config()
-        self._server_config()
-        self._account_config()
 
     def _yuuki_config(self):
         if "Yuuki" in self.config:
             for key in self.config["Yuuki"]:
                 if key in self.systemConfig:
                     self.systemConfig[key] = self.config["Yuuki"][key]
+        return self._server_config()
 
     def _server_config(self):
         if "Server" in self.config.get("LINE"):
             for key in self.config["LINE"]["Server"]:
                 if key in self.connectInfo:
                     self.connectInfo[key] = self.config["LINE"]["Server"][key]
+        return self._account_config()
 
     def _account_config(self):
         if "Account" in self.config.get("LINE"):

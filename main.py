@@ -14,16 +14,9 @@
 
 from libs import Yuuki, Yuuki_Config
 
-########################Initializing##########################
-
 config = Yuuki_Config()
-
-Console = Yuuki(config,1)
-Console.cleanMyGroupInvitations()
-
-###########################Start!#############################
-
-print("Star Yuuki BOT - Start Successful!")
+Console = Yuuki(config)
 
 if __name__ == "__main__":
-    Console.Main()
+    print("Star Yuuki BOT - Start Successful!")
+    Console.main()
