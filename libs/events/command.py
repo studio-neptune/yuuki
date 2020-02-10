@@ -68,7 +68,8 @@ class Yuuki_Command:
         self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
             ncMessage), self.Yuuki.get_text("Speed:\n %s com/s") % (Time2 - Time1,))
 
-    def _SecurityMode(self, ncMessage, msgSep):
+    def _SecurityMode(self, ncMessage):
+        msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.from_ in self.Yuuki.Admin:
             if len(msgSep) == 2:
                 if msgSep[1].isdigit() and 1 >= int(msgSep[1]) >= 0:
@@ -84,16 +85,18 @@ class Yuuki_Command:
                                                  str(bool(
                                                      self.Yuuki.data.getData(["Global", "SecurityService"]))))
 
-    def _Switch(self, ncMessage, msgSep):
+    def _Switch(self, ncMessage):
+        msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
             GroupPrivilege = self.Yuuki.Admin + [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
                              self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
             if not self.Yuuki.data.getData(["Global", "SecurityService"]):
-                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
-                                                 self.Yuuki.get_text("SecurityService of %s was disable") % (
-                                                     self.Yuuki.YuukiConfigs["name"],))
+                self.Yuuki_DynamicTools.sendText(
+                    self.Yuuki_StaticTools.sendToWho(ncMessage),
+                    self.Yuuki.get_text("SecurityService of %s was disable") % (self.Yuuki.YuukiConfigs["name"],)
+                )
             elif ncMessage.message.from_ in GroupPrivilege:
                 status = []
                 unknown_msg = []
@@ -114,10 +117,11 @@ class Yuuki_Command:
                     self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
                         ncMessage), self.Yuuki.get_text("Not Found"))
                 if unknown_msgtext != "":
-                    self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
-                                                     self.Yuuki.get_text(
-                                                         "Notice: Unknown command line argument(s)") + "\n({})".format(
-                                                         unknown_msgtext))
+                    self.Yuuki_DynamicTools.sendText(
+                        self.Yuuki_StaticTools.sendToWho(ncMessage),
+                        self.Yuuki.get_text(
+                            "Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext)
+                    )
 
     def _DisableAll(self, ncMessage):
         if ncMessage.message.toType == MIDType.GROUP:
@@ -126,76 +130,91 @@ class Yuuki_Command:
             GroupPrivilege = self.Yuuki.Admin + [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
                              self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
             if not self.Yuuki.data.getData(["Global", "SecurityService"]):
-                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
-                                                 self.Yuuki.get_text("SecurityService of %s was disable") % (
-                                                     self.Yuuki.YuukiConfigs["name"],))
+                self.Yuuki_DynamicTools.sendText(
+                    self.Yuuki_StaticTools.sendToWho(ncMessage),
+                    self.Yuuki.get_text("SecurityService of %s was disable") % (self.Yuuki.YuukiConfigs["name"],)
+                )
             elif ncMessage.message.from_ in GroupPrivilege:
                 self.Yuuki_DynamicTools.configSecurityStatus(
                     ncMessage.message.to, [])
                 self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
                     ncMessage), self.Yuuki.get_text("Okay"))
 
-    def _ExtAdmin(self, ncMessage, msgSep):
+    def _ExtAdmin(self, ncMessage):
+        msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
             GroupPrivilege = self.Yuuki.Admin + \
-                             [self.Yuuki_StaticTools.sybGetGroupCreator(
-                                 GroupInfo).mid]
+                             [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid]
             if len(msgSep) == 3:
                 if ncMessage.message.from_ in GroupPrivilege:
                     if msgSep[1] == "add":
-                        if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
-                            if msgSep[2] in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                                    ncMessage), self.Yuuki.get_text("Added"))
-                            elif msgSep[2] not in self.Yuuki.data.getData(["BlackList"]):
-                                origin = self.Yuuki.data.getData(
-                                    ["Group", GroupInfo.id, "Ext_Admin"])
-                                ext_admin_list = origin.copy()
-                                ext_admin_list.append(msgSep[2])
-                                self.Yuuki.data.updateData(
-                                    ["Group", GroupInfo.id, "Ext_Admin"], ext_admin_list)
-                                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                                    ncMessage), self.Yuuki.get_text("Okay"))
-                            else:
-                                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
-                                                                 self.Yuuki.get_text(
-                                                                     "The User(s) was in our blacklist database."))
-                        else:
-                            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
-                                                             self.Yuuki.get_text(
-                                                                 "Wrong UserID or the guy is not in Group"))
+                        self._ExtAdmin_Add(ncMessage, msgSep, GroupInfo)
                     elif msgSep[1] == "delete":
-                        if msgSep[2] in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                            origin = self.Yuuki.data.getData(
-                                ["Group", GroupInfo.id, "Ext_Admin"])
-                            ext_admin_list = origin.copy()
-                            ext_admin_list.remove(msgSep[2])
-                            self.Yuuki.data.updateData(
-                                ["Group", GroupInfo.id, "Ext_Admin"], ext_admin_list)
-                            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                                ncMessage), self.Yuuki.get_text("Okay"))
-                        else:
-                            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                                ncMessage), self.Yuuki.get_text("Not Found"))
+                        self._ExtAdmin_Delete(ncMessage, msgSep, GroupInfo)
             else:
-                if self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                    status = ""
-                    status_added = []
-                    for member in GroupInfo.members:
-                        if member.mid in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                            status += "{}\n".format(member.displayName)
-                            status_added.append(member.mid)
-                    for userId in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
-                        if userId not in status_added:
-                            status += "{}: {}\n".format(
-                                self.Yuuki.get_text("Unknown"), userId)
-                    self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                        ncMessage), status + self.Yuuki.get_text("\nExtend Administrator(s)"))
-                else:
-                    self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                        ncMessage), self.Yuuki.get_text("Not Found"))
+                self._ExtAdmin_Query(ncMessage, GroupInfo)
+
+    def _ExtAdmin_Add(self, ncMessage, msgSep, GroupInfo):
+        if msgSep[2] in [Member.mid for Member in GroupInfo.members]:
+            if msgSep[2] in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+                self.Yuuki_DynamicTools.sendText(
+                    self.Yuuki_StaticTools.sendToWho(ncMessage),
+                    self.Yuuki.get_text("Added")
+                )
+            elif msgSep[2] not in self.Yuuki.data.getData(["BlackList"]):
+                origin = self.Yuuki.data.getData(
+                    ["Group", GroupInfo.id, "Ext_Admin"])
+                ext_admin_list = origin.copy()
+                ext_admin_list.append(msgSep[2])
+                self.Yuuki.data.updateData(
+                    ["Group", GroupInfo.id, "Ext_Admin"], ext_admin_list)
+                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
+                    ncMessage), self.Yuuki.get_text("Okay"))
+            else:
+                self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
+                                                 self.Yuuki.get_text(
+                                                     "The User(s) was in our blacklist database."))
+        else:
+            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(ncMessage),
+                                             self.Yuuki.get_text(
+                                                 "Wrong UserID or the guy is not in Group"))
+
+    def _ExtAdmin_Delete(self, ncMessage, msgSep, GroupInfo):
+        if msgSep[2] in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+            origin = self.Yuuki.data.getData(["Group", GroupInfo.id, "Ext_Admin"])
+            ext_admin_list = origin.copy()
+            ext_admin_list.remove(msgSep[2])
+            self.Yuuki.data.updateData(
+                ["Group", GroupInfo.id, "Ext_Admin"], ext_admin_list)
+            self.Yuuki_DynamicTools.sendText(
+                self.Yuuki_StaticTools.sendToWho(ncMessage),
+                self.Yuuki.get_text("Okay")
+            )
+        else:
+            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
+                ncMessage), self.Yuuki.get_text("Not Found"))
+
+    def _ExtAdmin_Query(self, ncMessage, GroupInfo):
+        if self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+            status = ""
+            status_added = []
+            for member in GroupInfo.members:
+                if member.mid in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+                    status += "{}\n".format(member.displayName)
+                    status_added.append(member.mid)
+            for userId in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
+                if userId not in status_added:
+                    status += "{}: {}\n".format(
+                        self.Yuuki.get_text("Unknown"), userId)
+            self.Yuuki_DynamicTools.sendText(
+                self.Yuuki_StaticTools.sendToWho(ncMessage),
+                status + self.Yuuki.get_text("\nExtend Administrator(s)")
+            )
+        else:
+            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
+                ncMessage), self.Yuuki.get_text("Not Found"))
 
     def _Status(self, ncMessage):
         if ncMessage.message.toType == MIDType.GROUP:
@@ -278,7 +297,8 @@ class Yuuki_Command:
                 ncMessage), self.Yuuki.get_text("Exit."))
             self.Yuuki.exit()
 
-    def _Com(self, ncMessage, msgSep):
+    def _Com(self, ncMessage):
+        msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.from_ in self.Yuuki.Admin:
             try:
                 ComMsg = self.Yuuki_StaticTools.readCommandLine(
@@ -322,50 +342,25 @@ class Yuuki_Command:
             )
 
         elif ncMessage.message.contentType == ContentType.NONE:
-
+            Yuuki_Name = self.Yuuki.YuukiConfigs["name"]
             msgSep = ncMessage.message.text.split(" ")
-
-            if self.Yuuki.YuukiConfigs["name"] + '/Help' == ncMessage.message.text:
-                self._Help(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Version' == ncMessage.message.text:
-                self._Version(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/UserID' == ncMessage.message.text:
-                self._UserID(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/GetAllHelper' == ncMessage.message.text:
-                self._GetAllHelper(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Speed' == ncMessage.message.text:
-                self._Speed(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/SecurityMode' == msgSep[0]:
-                self._SecurityMode(ncMessage, msgSep)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Switch' == msgSep[0] and len(msgSep) != 1:
-                self._Switch(ncMessage, msgSep)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/DisableAll' == ncMessage.message.text:
-                self._DisableAll(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/ExtAdmin' == msgSep[0]:
-                self._ExtAdmin(ncMessage, msgSep)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Status' == ncMessage.message.text:
-                self._Status(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/GroupBackup' == ncMessage.message.text:
-                self._GroupBackup(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Quit' == ncMessage.message.text:
-                self._Quit(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Exit' == ncMessage.message.text:
-                self._Exit(ncMessage)
-
-            elif self.Yuuki.YuukiConfigs["name"] + '/Com' == msgSep[0] and len(msgSep) != 1:
-                self._Com(ncMessage, msgSep)
+            actions = {
+                Yuuki_Name + '/Help': self._Help,
+                Yuuki_Name + '/Version': self._Version,
+                Yuuki_Name + '/UserID': self._UserID,
+                Yuuki_Name + '/GetAllHelper': self._GetAllHelper,
+                Yuuki_Name + '/Speed': self._Speed,
+                Yuuki_Name + '/SecurityMode': self._SecurityMode,
+                Yuuki_Name + '/Switch': self._Switch,
+                Yuuki_Name + '/DisableAll': self._DisableAll,
+                Yuuki_Name + '/ExtAdmin': self._ExtAdmin,
+                Yuuki_Name + '/Status': self._Status,
+                Yuuki_Name + '/GroupBackup': self._GroupBackup,
+                Yuuki_Name + '/Quit': self._Quit,
+                Yuuki_Name + '/Exit': self._Exit,
+                Yuuki_Name + '/Com': self._Com,
+            }
+            actions[msgSep[0]](ncMessage)
 
         elif ncMessage.message.contentType == ContentType.CONTACT:
             self._contact(ncMessage)
