@@ -129,6 +129,7 @@ class Yuuki:
         if self.Threading:
             try:
                 self.data.mdsShake("EXT", "")
+                self.webAdmin.stop()
             except:
                 pass
         if restart:

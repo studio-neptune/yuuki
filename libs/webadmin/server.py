@@ -26,13 +26,13 @@ password = str(hash(random.random()))
 
 
 class Yuuki_WebAdmin:
+    Bootstrap(wa_app)
+    http_server = None
+
     def __init__(self, Yuuki):
         global Yuuki_Handle, Yuuki_APIHandle
         Yuuki_Handle = Yuuki
         Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle)
-
-        self.app = wa_app
-        Bootstrap(self.app)
 
     @staticmethod
     @wa_app.route("/")
@@ -184,5 +184,9 @@ class Yuuki_WebAdmin:
 
     def start(self, admin_password):
         self.set_password(admin_password)
-        http_server = WSGIServer(('', 2020), self.app)
-        http_server.serve_forever()
+        self.http_server = WSGIServer(('', 2020), wa_app)
+        self.http_server.serve_forever()
+
+    def stop(self):
+        self.http_server.close()
+        self.http_server.stop()
