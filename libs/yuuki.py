@@ -146,7 +146,7 @@ class Yuuki:
                 print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
         sys.exit(0)
 
-    def _Thread_Exec(self, Function, args):
+    def threadExec(self, Function, args):
         if self.Threading:
             self.Thread_Control.add(Function, args)
         else:
@@ -155,15 +155,15 @@ class Yuuki:
     def taskDemux(self, catchedNews):
         for ncMessage in catchedNews:
             if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                self._Thread_Exec(self.JoinGroup, (ncMessage,))
+                self.threadExec(self.JoinGroup, (ncMessage,))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-                self._Thread_Exec(self.Security, (ncMessage,))
+                self.threadExec(self.Security, (ncMessage,))
             elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-                self._Thread_Exec(self.Security, (ncMessage,))
+                self.threadExec(self.Security, (ncMessage,))
             elif ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-                self._Thread_Exec(self.Security, (ncMessage,))
+                self.threadExec(self.Security, (ncMessage,))
             elif ncMessage.type == OpType.RECEIVE_MESSAGE:
-                self._Thread_Exec(self.Command, (ncMessage,))
+                self.threadExec(self.Command, (ncMessage,))
 
     def main(self):
         handle = Yuuki_Poll(self)

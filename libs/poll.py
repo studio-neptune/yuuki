@@ -11,11 +11,16 @@ import time
 import socket
 import requests
 
+from .tools import Yuuki_StaticTools, Yuuki_DynamicTools
+
 from yuuki_core.ttypes import Operation
 
 class Yuuki_Poll:
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
+
+        self.Yuuki_StaticTools = Yuuki_StaticTools()
+        self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
         
         self.NoWork = 0
         self.NoWorkLimit = 5
@@ -35,7 +40,7 @@ class Yuuki_Poll:
         while self.Power:
             try:
                 if time.localtime().tm_hour != self.Yuuki.data.getData(["Global", "LastResetLimitTime"]):
-                    self.Yuuki.limitReset()
+                    self.Yuuki_DynamicTools.limitReset()
                     self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], time.localtime().tm_hour)
 
                 if self.NoWork >= self.NoWorkLimit:
@@ -54,7 +59,7 @@ class Yuuki_Poll:
 
                 if self.cacheOperations:
                     self.NoWork = 0
-                    self.Yuuki.Thread_Exec(self.Yuuki.taskDemux, (self.cacheOperations,))
+                    self.Yuuki.threadExec(self.Yuuki.taskDemux, (self.cacheOperations,))
                     if len(self.cacheOperations) > 1:
                         self.Yuuki.revision = max(self.cacheOperations[-1].revision, self.cacheOperations[-2].revision)
 
@@ -73,7 +78,7 @@ class Yuuki_Poll:
                 pass
 
             except:
-                (err1, err2, err3, ErrorInfo) = self.Yuuki.errorReport()
+                (err1, err2, err3, ErrorInfo) = self.Yuuki_StaticTools.errorReport()
                 try:
                     for self.ncMessage in self.cacheOperations:
                         if self.ncMessage.reqSeq != -1 and self.ncMessage.revision > self.Yuuki.revision:

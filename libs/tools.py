@@ -17,6 +17,7 @@ import traceback
 
 from yuuki_core.ttypes import OpType, MIDType, ContentType, Group, Message
 
+
 class Yuuki_StaticTools:
     @staticmethod
     def sybGetGroupCreator(group):
@@ -39,7 +40,8 @@ class Yuuki_StaticTools:
         traceback.print_tb(err3)
         tb_info = traceback.extract_tb(err3)
         filename, line, func, text = tb_info[-1]
-        ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
+        ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(
+            filename, line, text)
         return err1, err2, err3, ErrorInfo
 
     @staticmethod
@@ -79,6 +81,7 @@ class Yuuki_StaticTools:
 class Yuuki_DynamicTools:
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
+        self.Yuuki_StaticTools = Yuuki_StaticTools()
 
     def getClient(self, userId):
         if self.Yuuki.Threading:
@@ -117,9 +120,10 @@ class Yuuki_DynamicTools:
         else:
             result.preventJoinByTicket = True
         if userId is not None:
-            self.Yuuki.getClient(userId).updateGroup(self.Yuuki.Seq, result)
+            self.getClient(userId).updateGroup(self.Yuuki.Seq, result)
         else:
-            self.Yuuki.getClient(self.Yuuki.MyMID).updateGroup(self.Yuuki.Seq, result)
+            self.getClient(self.Yuuki.MyMID).updateGroup(
+                self.Yuuki.Seq, result)
 
     def configSecurityStatus(self, groupId, status):
         group_status = self.Yuuki.data.SEGrouptype
@@ -135,7 +139,7 @@ class Yuuki_DynamicTools:
         self.Yuuki.data.updateData(["Group", groupId, "SEGroup"], group_status)
 
     def cleanMyGroupInvitations(self):
-        for client in [self.Yuuki.getClient(self.Yuuki.MyMID)] + self.Yuuki.Connect.helper:
+        for client in [self.getClient(self.Yuuki.MyMID)] + self.Yuuki.Connect.helper:
             for cleanInvitations in client.getGroupIdsInvited():
                 client.acceptGroupInvitation(self.Yuuki.Seq, cleanInvitations)
                 client.leaveGroup(self.Yuuki.Seq, cleanInvitations)
@@ -143,7 +147,8 @@ class Yuuki_DynamicTools:
     def getContact(self, userId):
         if len(userId) == len(self.Yuuki.MyMID) and userId[0] == "u":
             try:
-                contactInfo = self.Yuuki.getClient(self.Yuuki.MyMID).getContact(userId)
+                contactInfo = self.getClient(
+                    self.Yuuki.MyMID).getContact(userId)
             except:
                 contactInfo = False
         else:
@@ -159,19 +164,24 @@ class Yuuki_DynamicTools:
         else:
             assert "Error JSON data type - GroupTicket"
         if GroupTicket == "" or renew:
-            GroupTicket = self.Yuuki.getClient(userId).reissueGroupTicket(GroupID)
-            self.Yuuki.data.updateData(["Group", GroupID, "GroupTicket", userId], GroupTicket)
+            GroupTicket = self.getClient(userId).reissueGroupTicket(GroupID)
+            self.Yuuki.data.updateData(
+                ["Group", GroupID, "GroupTicket", userId], GroupTicket)
         return GroupTicket
 
     def limitReset(self):
         for userId in self.Yuuki.AllAccountIds:
-            self.Yuuki.data.updateData(["LimitInfo", "KickLimit", userId], self.Yuuki.KickLimit)
-            self.Yuuki.data.updateData(["LimitInfo", "CancelLimit", userId], self.Yuuki.CancelLimit)
+            self.Yuuki.data.updateData(
+                ["LimitInfo", "KickLimit", userId], self.Yuuki.KickLimit)
+            self.Yuuki.data.updateData(
+                ["LimitInfo", "CancelLimit", userId], self.Yuuki.CancelLimit)
 
     def cancelSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Yuuki.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
-            accounts = self.Yuuki.dictShuffle(self.Yuuki.data.getData(["LimitInfo", "CancelLimit"]), members)
+            members = [
+                member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
+            accounts = self.Yuuki_StaticTools.dictShuffle(
+                self.Yuuki.data.getData(["LimitInfo", "CancelLimit"]), members)
             if len(accounts) == 0:
                 return "None"
             if exceptUserId:
@@ -184,16 +194,19 @@ class Yuuki_DynamicTools:
 
         Limit = self.Yuuki.data.getData(["LimitInfo", "CancelLimit", helper])
         if Limit > 0:
-            self.Yuuki.getClient(helper).cancelGroupInvitation(self.Yuuki.Seq, groupInfo.id, [userId])
+            self.getClient(helper).cancelGroupInvitation(
+                self.Yuuki.Seq, groupInfo.id, [userId])
             self.Yuuki.data.limitDecrease("CancelLimit", helper)
         else:
-            self.Yuuki.sendText(groupInfo.id, self.Yuuki.get_text("Cancel Limit."))
+            self.sendText(groupInfo.id, self.Yuuki.get_text("Cancel Limit."))
         return helper
 
     def kickSomeone(self, groupInfo, userId, exceptUserId=None):
         if len(self.Yuuki.Connect.helper) >= 1:
-            members = [member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
-            accounts = self.Yuuki.dictShuffle(self.Yuuki.data.getData(["LimitInfo", "KickLimit"]), members)
+            members = [
+                member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
+            accounts = self.Yuuki_StaticTools.dictShuffle(
+                self.Yuuki.data.getData(["LimitInfo", "KickLimit"]), members)
             if len(accounts) == 0:
                 return "None"
             if exceptUserId:
@@ -206,15 +219,16 @@ class Yuuki_DynamicTools:
 
         Limit = self.Yuuki.data.getData(["LimitInfo", "KickLimit", helper])
         if Limit > 0:
-            self.Yuuki.getClient(helper).kickoutFromGroup(self.Yuuki.Seq, groupInfo.id, [userId])
+            self.getClient(helper).kickoutFromGroup(
+                self.Yuuki.Seq, groupInfo.id, [userId])
             self.Yuuki.data.limitDecrease("KickLimit", helper)
         else:
-            self.Yuuki.sendText(groupInfo.id, self.Yuuki.get_text("Kick Limit."))
+            self.sendText(groupInfo.id, self.Yuuki.get_text("Kick Limit."))
         return helper
 
     def sendText(self, toid, msg):
         message = Message(to=toid, text=msg)
-        self.Yuuki.getClient(self.Yuuki.MyMID).sendMessage(self.Yuuki.Seq, message)
+        self.getClient(self.Yuuki.MyMID).sendMessage(self.Yuuki.Seq, message)
 
     def sendUser(self, toid, userId):
         message = Message(
@@ -226,7 +240,7 @@ class Yuuki_DynamicTools:
             },
             to=toid
         )
-        self.Yuuki.getClient(self.Yuuki.MyMID).sendMessage(self.Yuuki.Seq, message)
+        self.getClient(self.Yuuki.MyMID).sendMessage(self.Yuuki.Seq, message)
 
     def sendMedia(self, send_to, send_type, path):
         if os.path.exists(path):
@@ -243,7 +257,8 @@ class Yuuki_DynamicTools:
                 media_name = file_name
             else:
                 media_name = 'media'
-            message_id = self.Yuuki.getClient(self.Yuuki.MyMID).sendMessage(self.Yuuki.Seq, message).id
+            message_id = self.getClient(self.Yuuki.MyMID).sendMessage(
+                self.Yuuki.Seq, message).id
             files = {
                 'file': open(path, 'rb'),
             }
@@ -258,6 +273,7 @@ class Yuuki_DynamicTools:
                 'params': json.dumps(params)
             }
             url = self.Yuuki.LINE_Media_server + '/talk/m/upload.nhn'
-            r = requests.post(url, headers=self.Yuuki.connectHeader, data=data, files=files)
+            r = requests.post(
+                url, headers=self.Yuuki.connectHeader, data=data, files=files)
             if r.status_code != 201:
-                self.Yuuki.sendText(send_to, "Error!")
+                self.sendText(send_to, "Error!")
