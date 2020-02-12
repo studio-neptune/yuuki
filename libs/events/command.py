@@ -86,7 +86,6 @@ class Yuuki_Command:
                                                      self.Yuuki.data.getData(["Global", "SecurityService"]))))
 
     def _Switch(self, ncMessage):
-        msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
@@ -98,30 +97,34 @@ class Yuuki_Command:
                     self.Yuuki.get_text("SecurityService of %s was disable") % (self.Yuuki.YuukiConfigs["name"],)
                 )
             elif ncMessage.message.from_ in GroupPrivilege:
-                status = []
-                unknown_msg = []
-                unknown_msgtext = ""
-                for count, code in enumerate(msgSep):
-                    if code.isdigit() and 3 >= int(code) >= 0:
-                        status.append(int(code))
-                    elif count != 0:
-                        unknown_msg.append(code.strip())
-                self.Yuuki_DynamicTools.configSecurityStatus(
-                    ncMessage.message.to, status)
-                if unknown_msg:
-                    unknown_msgtext = ", ".join(unknown_msg)
-                if status:
-                    self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                        ncMessage), self.Yuuki.get_text("Okay"))
-                else:
-                    self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                        ncMessage), self.Yuuki.get_text("Not Found"))
-                if unknown_msgtext != "":
-                    self.Yuuki_DynamicTools.sendText(
-                        self.Yuuki_StaticTools.sendToWho(ncMessage),
-                        self.Yuuki.get_text(
-                            "Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext)
-                    )
+                self._Switch_action(ncMessage)
+
+    def _Switch_action(self, ncMessage):
+        msgSep = ncMessage.message.text.split(" ")
+        status = []
+        unknown_msg = []
+        unknown_msgtext = ""
+        for count, code in enumerate(msgSep):
+            if code.isdigit() and 3 >= int(code) >= 0:
+                status.append(int(code))
+            elif count != 0:
+                unknown_msg.append(code.strip())
+        self.Yuuki_DynamicTools.configSecurityStatus(
+            ncMessage.message.to, status)
+        if unknown_msg:
+            unknown_msgtext = ", ".join(unknown_msg)
+        if status:
+            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
+                ncMessage), self.Yuuki.get_text("Okay"))
+        else:
+            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
+                ncMessage), self.Yuuki.get_text("Not Found"))
+        if unknown_msgtext != "":
+            self.Yuuki_DynamicTools.sendText(
+                self.Yuuki_StaticTools.sendToWho(ncMessage),
+                self.Yuuki.get_text(
+                    "Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext)
+            )
 
     def _DisableAll(self, ncMessage):
         if ncMessage.message.toType == MIDType.GROUP:

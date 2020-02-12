@@ -39,9 +39,7 @@ class Yuuki_StaticTools:
         :param msgs: List of strings
         :return: string
         """
-        reply_msg = ""
-        for msg in msgs:
-            reply_msg += " " + msg
+        reply_msg = " ".join(msgs).lstrip()
         return reply_msg
 
     @staticmethod
@@ -54,8 +52,7 @@ class Yuuki_StaticTools:
         traceback.print_tb(err3)
         tb_info = traceback.extract_tb(err3)
         filename, line, func, text = tb_info[-1]
-        ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(
-            filename, line, text)
+        ErrorInfo = "occurred in\n{}\n\non line {}\nin statement {}".format(filename, line, text)
         return err1, err2, err3, ErrorInfo
 
     @staticmethod
