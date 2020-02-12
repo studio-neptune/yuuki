@@ -249,12 +249,39 @@ class Yuuki_DynamicTools:
     def modifyGroupMemberList(self, action, groupInfo, userId, exceptUserId=None):
         """
         Modify LINE Group Member List
-        :param action: 1->kick 2->cancel
+        :param action: integer (1->kick 2->cancel)
         :param groupInfo: LINE Group
         :param userId: string
         :param exceptUserId: List of userId
         :return: string
         """
+        actions = {1: "KickLimit", 2: "CancelLimit"}
+        assert action in actions, "Invalid action code"
+        if len(self.Yuuki.Connect.helper) >= 1:
+            members = [member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
+            accounts = self.Yuuki_StaticTools.dictShuffle(
+                self.Yuuki.data.getData(["LimitInfo", actions[action]]), members)
+            if len(accounts) == 0:
+                return "None"
+            if exceptUserId:
+                accounts[exceptUserId] = -1
+            helper = max(accounts, key=accounts.get)
+        else:
+            if exceptUserId == self.Yuuki.MyMID:
+                return "None"
+            helper = self.Yuuki.MyMID
+
+        actions_func = {
+            1: self.getClient(helper).cancelGroupInvitation,
+            2: self.getClient(helper).cancelGroupInvitation
+        }
+        Limit = self.Yuuki.data.getData(["LimitInfo", actions[action], helper])
+        if Limit > 0:
+            actions_func[action](self.Yuuki.Seq, groupInfo.id, [userId])
+            self.Yuuki.data.limitDecrease(actions[action], helper)
+        else:
+            self.sendText(groupInfo.id, self.Yuuki.get_text("Cancel Limit."))
+        return helper
 
     def sendText(self, send_to, msg):
         """

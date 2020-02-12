@@ -57,8 +57,7 @@ class Yuuki_Security:
                             self.Yuuki_DynamicTools.changeGroupUrlStatus, (GroupInfo, False))
                         self.Yuuki.threadExec(self.Yuuki_DynamicTools.sendText, (GroupID, self.Yuuki.get_text(
                             "DO NOT ENABLE THE GROUP URL STATUS, see you...")))
-                        Kicker = self.Yuuki_DynamicTools.kickSomeone(
-                            GroupInfo, Action)
+                        Kicker = self.Yuuki_DynamicTools.modifyGroupMemberList(1, GroupInfo, Action)
                         # Log
                         self.Yuuki.data.updateLog("KickEvent", (
                             self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
@@ -68,11 +67,9 @@ class Yuuki_Security:
                     for userId in Another.split("\x1e"):
                         if userId not in self.Yuuki.AllAccountIds + GroupPrivilege:
                             if GroupInfo.invitee and userId in [user.mid for user in GroupInfo.invitee]:
-                                Canceler = self.Yuuki_DynamicTools.cancelSomeone(
-                                    GroupInfo, userId)
+                                Canceler = self.Yuuki_DynamicTools.modifyGroupMemberList(2, GroupInfo, userId)
                             else:
-                                Canceler = self.Yuuki_DynamicTools.kickSomeone(
-                                    GroupInfo, userId)
+                                Canceler = self.Yuuki_DynamicTools.modifyGroupMemberList(1, GroupInfo, userId)
                                 # Log
                                 self.Yuuki.data.updateLog("KickEvent", (
                                     self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, userId,
@@ -82,11 +79,9 @@ class Yuuki_Security:
                         self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another.replace("\x1e", ",")))
                 elif Another not in self.Yuuki.AllAccountIds + GroupPrivilege:
                     if GroupInfo.invitee and Another in [user.mid for user in GroupInfo.invitee]:
-                        Canceler = self.Yuuki_DynamicTools.cancelSomeone(
-                            GroupInfo, Another)
+                        Canceler = self.Yuuki_DynamicTools.modifyGroupMemberList(2, GroupInfo, Another)
                     else:
-                        Canceler = self.Yuuki_DynamicTools.kickSomeone(
-                            GroupInfo, Another)
+                        Canceler = self.Yuuki_DynamicTools.modifyGroupMemberList(1, GroupInfo, Another)
                         # Log
                         self.Yuuki.data.updateLog("KickEvent", (
                             self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Canceler, Action, Another,
@@ -102,8 +97,7 @@ class Yuuki_Security:
                     if userId == Action:
                         self.Yuuki.threadExec(self.Yuuki_DynamicTools.sendText, (GroupID, self.Yuuki.get_text(
                             "You are our blacklist. Bye~")))
-                        Kicker = self.Yuuki_DynamicTools.kickSomeone(
-                            GroupInfo, Action)
+                        Kicker = self.Yuuki_DynamicTools.modifyGroupMemberList(1, GroupInfo, Action)
                         # Log
                         self.Yuuki.data.updateLog("KickEvent", (
                             self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Kicker, Kicker, Action, ncMessage.type))
@@ -115,8 +109,7 @@ class Yuuki_Security:
                 elif Another in self.Yuuki.AllAccountIds:
                     Kicker = "None"
                     try:
-                        Kicker = self.Yuuki_DynamicTools.kickSomeone(
-                            GroupInfo, Action, Another)
+                        Kicker = self.Yuuki_DynamicTools.modifyGroupMemberList(1, GroupInfo, Action, Another)
                         # Log
                         self.Yuuki.data.updateLog("KickEvent", (
                             self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another,
@@ -173,8 +166,7 @@ class Yuuki_Security:
                 elif Security_Access:
                     self.Yuuki.threadExec(self.Yuuki_DynamicTools.sendText, (
                         GroupID, self.Yuuki.get_text("DO NOT KICK, thank you ^^")))
-                    Kicker = self.Yuuki_DynamicTools.kickSomeone(
-                        GroupInfo, Action)
+                    Kicker = self.Yuuki_DynamicTools.modifyGroupMemberList(1, GroupInfo, Action)
                     # Log
                     self.Yuuki.data.updateLog("KickEvent", (
                         self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Kicker, Action, Another, ncMessage.type))
