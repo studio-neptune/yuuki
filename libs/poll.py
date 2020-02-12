@@ -23,7 +23,6 @@ class Yuuki_Poll:
 
     fetchNum = 50
     cacheOperations = []
-    ncMessage = Operation()
 
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
@@ -32,17 +31,19 @@ class Yuuki_Poll:
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
     def _action(self):
+        ncMessage = Operation()
+
         if time.localtime().tm_hour != self.Yuuki.data.getData(["Global", "LastResetLimitTime"]):
             self.Yuuki_DynamicTools.limitReset()
             self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], time.localtime().tm_hour)
 
         if self.NoWork >= self.NoWorkLimit:
             self.NoWork = 0
-            for self.ncMessage in self.cacheOperations:
-                if self.ncMessage.reqSeq != -1 and self.ncMessage.revision > self.Yuuki.revision:
-                    self.Yuuki.revision = self.ncMessage.revision
+            for ncMessage in self.cacheOperations:
+                if ncMessage.reqSeq != -1 and ncMessage.revision > self.Yuuki.revision:
+                    self.Yuuki.revision = ncMessage.revision
                     break
-            if self.ncMessage.revision != self.Yuuki.revision:
+            if ncMessage.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
 
         try:
@@ -58,13 +59,16 @@ class Yuuki_Poll:
 
     def _exception(self):
         (err1, err2, err3, ErrorInfo) = self.Yuuki_StaticTools.errorReport()
+
+        ncMessage = Operation()
+
         # noinspection PyBroadException
         try:
-            for self.ncMessage in self.cacheOperations:
-                if self.ncMessage.reqSeq != -1 and self.ncMessage.revision > self.Yuuki.revision:
-                    self.Yuuki.revision = self.ncMessage.revision
+            for ncMessage in self.cacheOperations:
+                if ncMessage.reqSeq != -1 and ncMessage.revision > self.Yuuki.revision:
+                    self.Yuuki.revision = ncMessage.revision
                     break
-            if self.ncMessage.revision != self.Yuuki.revision:
+            if ncMessage.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
             for Root in self.Yuuki.Admin:
                 self.Yuuki.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %

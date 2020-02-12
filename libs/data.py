@@ -73,10 +73,10 @@ class Yuuki_Data:
     def __init__(self, threading):
         self.threading = threading
         self.ThreadControl = Yuuki_Thread()
-        MdsThreadControl = Yuuki_Multiprocess()
+        self.MdsThreadControl = Yuuki_Multiprocess()
+        self._Data_Initialize()
 
-        # Data Initialize
-
+    def _Data_Initialize(self):
         if not os.path.isdir(self.DataPath):
             os.mkdir(self.DataPath)
 
@@ -104,13 +104,13 @@ class Yuuki_Data:
                 else:
                     self.Data[Type] = self.DataType[Type]
                     f.write(json.dumps(self.Data[Type]))
+        return self._MDS_Initialize()
 
-        # Python MDS
-
+    def _MDS_Initialize(self):
         if self.threading:
             self.mdsHost = "http://localhost:2019/"
             self.mdsCode = "{}.{}".format(random.random(), time.time())
-            MdsThreadControl.add(msd_listen, (self.mdsCode,))
+            self.MdsThreadControl.add(msd_listen, (self.mdsCode,))
 
             # MDS Sync
 
@@ -123,9 +123,9 @@ class Yuuki_Data:
                     "path": self.Data
                 }
             )
+        return self._Log_Initialize()
 
-        # Log Initialize
-
+    def _Log_Initialize(self):
         if not os.path.isdir(self.LogPath):
             os.mkdir(self.LogPath)
 
