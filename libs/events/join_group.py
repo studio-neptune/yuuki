@@ -23,8 +23,7 @@ class Yuuki_JoinGroup:
 
     def action(self, ncMessage):
         GroupInvite = []
-        BlockedIgnore = ncMessage.param2 in self.Yuuki.data.getData([
-                                                                    "BlackList"])
+        BlockedIgnore = ncMessage.param2 in self.Yuuki.data.getData(["BlackList"])
         if self.Yuuki_DynamicTools.checkInInvitationList(ncMessage) and not BlockedIgnore:
             GroupID = ncMessage.param1
             Inviter = ncMessage.param2
@@ -45,21 +44,30 @@ class Yuuki_JoinGroup:
                     NewGroupList.append(GroupID)
                     self.Yuuki.data.updateData(
                         ["Global", "GroupJoined"], NewGroupList)
-                    self.Yuuki_DynamicTools.sendText(GroupID,
-                                                     self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % self.Yuuki.YuukiConfigs["name"])
-                    self.Yuuki_DynamicTools.sendText(GroupID,
-                                                     self.Yuuki.get_text("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
-                                                     (self.Yuuki.YuukiConfigs["name"], self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).displayName,))
-                    self.Yuuki_DynamicTools.getGroupTicket(
-                        GroupID, self.Yuuki.MyMID, True)
+                    self.Yuuki_DynamicTools.sendText(
+                        GroupID,
+                        self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO") %
+                        (self.Yuuki.YuukiConfigs["name"],)
+                    )
+                    self.Yuuki_DynamicTools.sendText(
+                        GroupID,
+                        self.Yuuki.get_text("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
+                        (
+                            self.Yuuki.YuukiConfigs["name"],
+                            self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).displayName,
+                        )
+                    )
+                    self.Yuuki_DynamicTools.getGroupTicket(GroupID, self.Yuuki.MyMID, True)
                     # Log
                     self.Yuuki.data.updateLog(
                         "JoinGroup", (self.Yuuki.data.getTime(), GroupInfo.name, GroupID, Inviter))
                 else:
-                    self.Yuuki_DynamicTools.sendText(GroupID, self.Yuuki.get_text("Sorry...\nThe number of members is not satisfied (%s needed)") %
-                                                     (self.Yuuki.YuukiConfigs["GroupMebers_Demand"],))
-                    self.Yuuki_DynamicTools.getClient(
-                        self.Yuuki.MyMID).leaveGroup(self.Yuuki.Seq, GroupID)
+                    self.Yuuki_DynamicTools.sendText(
+                        GroupID,
+                        self.Yuuki.get_text("Sorry...\nThe number of members is not satisfied (%s needed)") %
+                        (self.Yuuki.YuukiConfigs["GroupMebers_Demand"],)
+                    )
+                    self.Yuuki_DynamicTools.getClient(self.Yuuki.MyMID).leaveGroup(self.Yuuki.Seq, GroupID)
                     # Log
                     self.Yuuki.data.updateLog(
                         "JoinGroup", (self.Yuuki.data.getTime(), GroupID, "Not Join", Inviter))
