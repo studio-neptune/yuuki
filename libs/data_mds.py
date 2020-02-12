@@ -27,6 +27,7 @@ def mds_exit(data):
 
 def update(data):
     global switch_data
+    # noinspection PyBroadException
     try:
         if type(data["path"]) is list:
             over = query({"path": data["path"]})
@@ -39,6 +40,7 @@ def update(data):
 
 def delete(data):
     global switch_data
+    # noinspection PyBroadException
     try:
         if type(data["path"]) is list:
             over = query({"path": data["path"]})
@@ -52,6 +54,7 @@ def delete(data):
 def query(data):
     global switch_data
     query_data = data["path"]
+    # noinspection PyBroadException
     try:
         if type(switch_data) is dict and type(query_data) is list:
             result = switch_data
@@ -75,6 +78,7 @@ def query(data):
 
 def sync(data):
     global switch_data
+    # noinspection PyBroadException
     try:
         switch_data = data["path"]
         return {"status": 200}
@@ -84,6 +88,7 @@ def sync(data):
 
 def yuukiLimitDecrease(data):
     global switch_data
+    # noinspection PyBroadException
     try:
         switch_data["LimitInfo"][data["path"]][data["userId"]] -= 1
         return {"status": 200}

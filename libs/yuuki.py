@@ -49,6 +49,7 @@ class Yuuki:
         origin_url = "https://github.com/star-inc/star_yuuki_bot.git"
 
         if self.YuukiConfigs["version_check"]:
+            # noinspection PyBroadException
             try:
                 GitRemote = Repo('.').remote()
                 UpdateStatus = GitRemote.fetch()[0]

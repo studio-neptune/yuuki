@@ -300,17 +300,37 @@ class Yuuki_Command:
     def _Com(self, ncMessage):
         msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.from_ in self.Yuuki.Admin:
+            # noinspection PyBroadException
             try:
-                ComMsg = self.Yuuki_StaticTools.readCommandLine(
-                    msgSep[1:len(msgSep)])
+                ComMsg = self.Yuuki_StaticTools.readCommandLine(msgSep[1:len(msgSep)])
                 Report = str(eval(ComMsg))
             except:
-                (err1, err2, err3,
-                 ErrorInfo) = self.Yuuki_StaticTools.errorReport()
-                Report = "Star Yuuki BOT - Eval Error:\n%s\n%s\n%s\n\n%s" % (
-                    err1, err2, err3, ErrorInfo)
+                (err1, err2, err3, ErrorInfo) = self.Yuuki_StaticTools.errorReport()
+                Report = "Star Yuuki BOT - Eval Error:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo)
             self.Yuuki_DynamicTools.sendText(
                 self.Yuuki_StaticTools.sendToWho(ncMessage), Report)
+
+    def _text(self, ncMessage):
+        Yuuki_Name = self.Yuuki.YuukiConfigs["name"]
+        msgSep = ncMessage.message.text.split(" ")[0].split("/")
+        actions = {
+            'Help': self._Help,
+            'Version': self._Version,
+            'UserID': self._UserID,
+            'GetAllHelper': self._GetAllHelper,
+            'Speed': self._Speed,
+            'SecurityMode': self._SecurityMode,
+            'Switch': self._Switch,
+            'DisableAll': self._DisableAll,
+            'ExtAdmin': self._ExtAdmin,
+            'Status': self._Status,
+            'GroupBackup': self._GroupBackup,
+            'Quit': self._Quit,
+            'Exit': self._Exit,
+            'Com': self._Com,
+        }
+        if Yuuki_Name == msgSep[0] and msgSep[1] in actions:
+            actions[msgSep[1]](ncMessage)
 
     def _contact(self, ncMessage):
         cache = ncMessage.message.contentMetadata["mid"]
@@ -342,25 +362,7 @@ class Yuuki_Command:
             )
 
         elif ncMessage.message.contentType == ContentType.NONE:
-            Yuuki_Name = self.Yuuki.YuukiConfigs["name"]
-            msgSep = ncMessage.message.text.split(" ")
-            actions = {
-                Yuuki_Name + '/Help': self._Help,
-                Yuuki_Name + '/Version': self._Version,
-                Yuuki_Name + '/UserID': self._UserID,
-                Yuuki_Name + '/GetAllHelper': self._GetAllHelper,
-                Yuuki_Name + '/Speed': self._Speed,
-                Yuuki_Name + '/SecurityMode': self._SecurityMode,
-                Yuuki_Name + '/Switch': self._Switch,
-                Yuuki_Name + '/DisableAll': self._DisableAll,
-                Yuuki_Name + '/ExtAdmin': self._ExtAdmin,
-                Yuuki_Name + '/Status': self._Status,
-                Yuuki_Name + '/GroupBackup': self._GroupBackup,
-                Yuuki_Name + '/Quit': self._Quit,
-                Yuuki_Name + '/Exit': self._Exit,
-                Yuuki_Name + '/Com': self._Com,
-            }
-            actions[msgSep[0]](ncMessage)
+            self._text(ncMessage)
 
         elif ncMessage.message.contentType == ContentType.CONTACT:
             self._contact(ncMessage)

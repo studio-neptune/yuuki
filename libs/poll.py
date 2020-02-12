@@ -38,6 +38,7 @@ class Yuuki_Poll:
             self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], None)
 
         while self.Power:
+            # noinspection PyBroadException
             try:
                 if time.localtime().tm_hour != self.Yuuki.data.getData(["Global", "LastResetLimitTime"]):
                     self.Yuuki_DynamicTools.limitReset()
@@ -79,6 +80,7 @@ class Yuuki_Poll:
 
             except:
                 (err1, err2, err3, ErrorInfo) = self.Yuuki_StaticTools.errorReport()
+                # noinspection PyBroadException
                 try:
                     for self.ncMessage in self.cacheOperations:
                         if self.ncMessage.reqSeq != -1 and self.ncMessage.revision > self.Yuuki.revision:

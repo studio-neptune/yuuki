@@ -14,7 +14,7 @@ from yuuki_core.TalkService import Client
 """         NC HightSpeed Lib          """
 try:
     from thrift.protocol import fastbinary
-except:
+except ImportError:
     print("[No fast_binary using]")
 ##########################################
 
@@ -62,6 +62,7 @@ class Yuuki_Connect:
         client = Client(protocol)
         transport.open()
 
+        # noinspection PyBroadException
         try:
             profile = client.getProfile()
 
