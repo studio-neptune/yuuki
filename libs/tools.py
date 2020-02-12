@@ -62,14 +62,15 @@ class Yuuki_StaticTools:
         :param ncMessage: Operation
         :return: tuple
         """
-        if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-            return ncMessage.param1, ncMessage.param2, ncMessage.param3
-        elif ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-            return ncMessage.param1, ncMessage.param2, ncMessage.param3
-        elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-            return ncMessage.param1, ncMessage.param2, ncMessage.param3
-        elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-            return ncMessage.param1, ncMessage.param2, ncMessage.param3
+        if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP or\
+                ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP or\
+                ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION or\
+                ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+            return {
+                "GroupID": ncMessage.param1,
+                "Action": ncMessage.param2,
+                "Another": ncMessage.param3,
+            }
 
     @staticmethod
     def dictShuffle(dict_object, requirement=None):

@@ -35,8 +35,7 @@ class Yuuki_JoinGroup:
                 if GroupInfo.invitee:
                     GroupInvite = [
                         Catched.mid for Catched in GroupInfo.invitee]
-                self.Yuuki_DynamicTools.getClient(
-                    self.Yuuki.MyMID).acceptGroupInvitation(self.Yuuki.Seq, GroupID)
+                self.Yuuki_DynamicTools.getClient(self.Yuuki.MyMID).acceptGroupInvitation(self.Yuuki.Seq, GroupID)
                 if len(GroupMember) >= self.Yuuki.YuukiConfigs["GroupMebers_Demand"]:
                     GroupList = self.Yuuki.data.getData(
                         ["Global", "GroupJoined"])

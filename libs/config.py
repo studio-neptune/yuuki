@@ -46,7 +46,7 @@ class Yuuki_Config:
 
     def __init__(self, config_path="config.yaml"):
         with open(config_path, "r") as configfile:
-            self.config = yaml.load(configfile, Loader=yaml.BaseLoader)
+            self.config = yaml.load(configfile, Loader=yaml.FullLoader)
         self._yuuki_config()
 
     def _yuuki_config(self):

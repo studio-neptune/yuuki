@@ -261,9 +261,8 @@ class Yuuki_Data:
             return None
         SEMode_ = {}
         for Mode in SEMode:
-            if type(Mode) != "int":
-                Mode = int(Mode)
-            SEMode_[Mode] = SEMode[Mode]
+            Num_Mode = int(Mode)
+            SEMode_[Num_Mode] = SEMode[Mode]
         return SEMode_
 
     def limitDecrease(self, limit_type, userId):
