@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+
+    <title>Star Yuuki BOT - WebAdmin</title>
+</head>
+
+<body>
+
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">{{ name }} - WebAdmin</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            {{ render_nav_item('index') }}
+        </ul>
+    </div>
+</nav>
+
+<main role="main" class="container">
+    <div class="starter-template">
+        <h1>Star Yuuki BOT - WebAdmin</h1>
+        <p class="lead">Version {{ version }}</p>
+        <p>
+            The administrator control center of LINE BOT
+        </p>
+        <div class="status damage"></div>
+    </div>
+
+    <div class="password_box">
+        <form class="form-inline mt-2 mt-md-0 login-box" method="post">
+            <input class="form-control mr-sm-2" type="password" placeholder="Type your admin password"
+                   aria-label="Login" name="code">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+        </form>
+        <div class="datahere"></div>
+    </div>
+</main>
+
+<!-- Optional JavaScript -->
+{{ bootstrap.load_js() }}
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+<script src="{{ url_for('static', filename='js/verify.js') }}"></script>
+</body>
+
+</html>

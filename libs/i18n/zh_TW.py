@@ -9,12 +9,12 @@
     The Language Package Contributor:
         supersonictw <https://github.com/supersonictw>
 
-    Copyright(c) 2019 Star Inc. All Rights Reserved.
+    Copyright(c) 2020 Star Inc. All Rights Reserved.
     The software licensed under Mozilla Public License Version 2.0
 """
 
-class Traditional_Chinese:
 
+class Traditional_Chinese:
     i18nText = {
         "Helllo^^\nMy name is %s ><\nNice to meet you OwO": "安安^^\n我是%s呦><\n請多多指教OwO",
         "Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s": "請輸入：\n\t%s/Help\n以獲得更多資訊\n\n本群組主管理員為：\n%s",

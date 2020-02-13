@@ -1,0 +1,21 @@
+Yuuki:
+  Default_Language: en
+  Admin:
+    -
+  Hour_KickLimit: 10
+  Hour_CancelLimit: 10
+  GroupMebers_Demand: 10
+
+LINE:
+  Server:
+    Host:
+    Command_Path:
+    LongPoll_path:
+
+  Account:
+    X-Line-Application:
+    X-Line-Access:
+    User-Agent:
+
+  helper_LINE_ACCESS_KEYs:
+    -

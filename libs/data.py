@@ -1,58 +1,82 @@
-#!/usr/bin/python3
-# coding=UTF-8
+# -*- coding: utf-8 -*-
+"""
+Yuuki_Libs
+(c) 2020 Star Inc.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+"""
+import json
+import os
+import random
+import time
 
-import \
-    os, \
-    time,\
-    json, \
-    random,\
-    requests
-from .core.ttypes import OpType
+import requests
+from yuuki_core.ttypes import OpType
 
 from .data_mds import listen as msd_listen
-
-from .thread_control import Yuuki_Thread
 from .thread_control import Yuuki_Multiprocess
+from .thread_control import Yuuki_Thread
+
 
 class Yuuki_Data:
+
+    # Data Struct Define
+
+    Data = {}
+
+    DataType = {
+        "Global": {
+            "LastResetLimitTime": None,
+        },
+        "Group": {},
+        "LimitInfo": {},
+        "BlackList": []
+    }
+
+    GroupType = {
+        "SEGroup": None,
+        "Ext_Admin": [],
+        "GroupTicket": {}
+    }
+
+    LimitType = {
+        "KickLimit": {},
+        "CancelLimit": {}
+    }
+
+    SEGrouptype = {
+        OpType.NOTIFIED_UPDATE_GROUP: False,
+        OpType.NOTIFIED_INVITE_INTO_GROUP: False,
+        OpType.NOTIFIED_ACCEPT_GROUP_INVITATION: False,
+        OpType.NOTIFIED_KICKOUT_FROM_GROUP: False
+    }
+
+    DataPath = "data/"
+    DataName = "{}.json"
+
+    # Log Struct Define
+
+    LogType = {
+        "JoinGroup": "<li>%s: %s(%s) -> Inviter: %s</li>",
+        "KickEvent": "<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
+        "CancelEvent": "<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
+        "BlackList": "<li>%s: %s(%s)</li>"
+    }
+
+    LogPath = "logs/"
+    LogName = "{}.html"
+
+    initHeader = "<title>{} - SYB</title>" \
+                 "<meta charset='utf-8' />"
+
     def __init__(self, threading):
         self.threading = threading
         self.ThreadControl = Yuuki_Thread()
-        MdsThreadControl = Yuuki_Multiprocess()
+        self.MdsThreadControl = Yuuki_Multiprocess()
+        self._Data_Initialize()
 
-        # Data
-        self.Data = {}
-
-        self.DataType = {
-            "Global":{
-                "LastResetLimitTime":None,
-            },
-            "Group": {},
-            "LimitInfo":{},
-            "BlackList":[]
-        }
-
-        self.GroupType = {
-            "SEGroup":None,
-            "Ext_Admin":[],
-            "GroupTicket":{}
-        }
-
-        self.LimitType = {
-            "KickLimit":{},
-            "CancelLimit":{}
-        }
-
-        self.SEGrouptype = {
-            OpType.NOTIFIED_UPDATE_GROUP:False,
-            OpType.NOTIFIED_INVITE_INTO_GROUP:False,
-            OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:False,
-            OpType.NOTIFIED_KICKOUT_FROM_GROUP:False
-        }
-
-        self.DataPath = "data/"
-        self.DataName = "{}.json"
-
+    def _Data_Initialize(self):
         if not os.path.isdir(self.DataPath):
             os.mkdir(self.DataPath)
 
@@ -71,8 +95,6 @@ class Yuuki_Data:
                         Type = 1
             assert Type == 0, "{}\nJson Test Error".format(name)
 
-        # Data Initialize
-
         for Type in self.DataType:
             name = self.DataPath + self.DataName.format(Type)
             with open(name, "r+") as f:
@@ -82,13 +104,13 @@ class Yuuki_Data:
                 else:
                     self.Data[Type] = self.DataType[Type]
                     f.write(json.dumps(self.Data[Type]))
+        return self._MDS_Initialize()
 
-        # Python MDS
-
+    def _MDS_Initialize(self):
         if self.threading:
             self.mdsHost = "http://localhost:2019/"
             self.mdsCode = "{}.{}".format(random.random(), time.time())
-            MdsThreadControl.add(msd_listen, (self.mdsCode,))
+            self.MdsThreadControl.add(msd_listen, (self.mdsCode,))
 
             # MDS Sync
 
@@ -101,22 +123,9 @@ class Yuuki_Data:
                     "path": self.Data
                 }
             )
+        return self._Log_Initialize()
 
-        # Log
-
-        self.LogType = {
-            "JoinGroup":"<li>%s: %s(%s) -> Inviter: %s</li>",
-            "KickEvent":"<li>%s: %s(%s) -(%s)> Kicker: %s | Kicked: %s | Status: %s</li>",
-            "CancelEvent":"<li>%s: %s(%s) -(%s)> Inviter: %s | Canceled: %s</li>",
-            "BlackList":"<li>%s: %s(%s)</li>"
-        }
-
-        self.LogPath = "logs/"
-        self.LogName = "{}.html"
-
-        self.initHeader = "<title>{} - SYB</title>" \
-                          "<meta charset='utf-8' />"
-
+    def _Log_Initialize(self):
         if not os.path.isdir(self.LogPath):
             os.mkdir(self.LogPath)
 
@@ -134,7 +143,7 @@ class Yuuki_Data:
         else:
             Function(*args)
 
-    def _mdsShake(self, do, path, data=None):
+    def mdsShake(self, do, path, data=None):
         if self.threading:
             mds = requests.post(
                 url=self.mdsHost,
@@ -150,7 +159,7 @@ class Yuuki_Data:
             assert over["status"] == 200, assert_result
             return over
         else:
-            status = {"status" : 0}
+            status = {"status": 0}
             return json.dumps(status)
 
     def _local_query(self, query_data):
@@ -189,7 +198,7 @@ class Yuuki_Data:
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
                 f.write(json.dumps(self.Data[Type]))
-        return self.getData(["Global","Power"])
+        return self.getData(["Global", "Power"])
 
     def updateData(self, path, data):
         if self.threading:
@@ -213,7 +222,7 @@ class Yuuki_Data:
             path = path[:-1]
         assert type(origin) is dict, "Error request data type - updateData"
         if self.threading:
-            self._mdsShake("UPT", path, origin)
+            self.mdsShake("UPT", path, origin)
         else:
             self._local_update(path, origin)
 
@@ -234,7 +243,7 @@ class Yuuki_Data:
 
     def getData(self, path):
         if self.threading:
-            return self._mdsShake("GET", path).get("data")
+            return self.mdsShake("GET", path).get("data")
         else:
             return self._local_query(path)
 
@@ -252,11 +261,12 @@ class Yuuki_Data:
             return None
         SEMode_ = {}
         for Mode in SEMode:
-            SEMode_[int(Mode)] = SEMode[Mode]
+            Num_Mode = int(Mode)
+            SEMode_[Num_Mode] = SEMode[Mode]
         return SEMode_
 
     def limitDecrease(self, limit_type, userId):
         if self.threading:
-            self._mdsShake("YLD", limit_type, userId)
+            self.mdsShake("YLD", limit_type, userId)
         else:
             self.Data["LimitInfo"][limit_type][userId] -= 1

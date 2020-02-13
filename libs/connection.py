@@ -1,41 +1,32 @@
-#!/usr/bin/python3
-# coding=UTF-8
-
-from .core.TalkService import Client
-
-from thrift.transport import THttpClient
+# -*- coding: utf-8 -*-
+"""
+Yuuki_Libs
+(c) 2020 Star Inc.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+"""
 from thrift.protocol import TCompactProtocol
+from thrift.transport import THttpClient
+
+from yuuki_core.TalkService import Client
 
 """         NC HightSpeed Lib          """
 try:
     from thrift.protocol import fastbinary
-except:
-    fastbinary = None
+except ImportError:
+    print("[No fast_binary using]")
 ##########################################
 
-class Yuuki_Connection:
-    """ Connection Dict Type """
-
-    connectInfo = {
-        "Host": "",
-        "Command_Path": "",
-        "LongPoll_path": ""
-    }
-
-    connectHeader = {
-        "X-Line-Application": "",
-        "X-Line-Access": "",
-        "User-Agent": ""
-    }
 
 class Yuuki_Connect:
-    def __init__(self, Yuuki_Connection):
+    def __init__(self, Yuuki_Configs):
 
-        self.host = Yuuki_Connection.connectInfo["Host"]
-        self.com_path = Yuuki_Connection.connectInfo["Command_Path"]
-        self.poll_path = Yuuki_Connection.connectInfo["LongPoll_path"]
+        self.host = Yuuki_Configs.connectInfo["Host"]
+        self.com_path = Yuuki_Configs.connectInfo["Command_Path"]
+        self.poll_path = Yuuki_Configs.connectInfo["LongPoll_path"]
 
-        self.con_header = Yuuki_Connection.connectHeader
+        self.con_header = Yuuki_Configs.connectHeader
 
         self.helper = []
         self.helper_ids = []
@@ -71,6 +62,7 @@ class Yuuki_Connect:
         client = Client(protocol)
         transport.open()
 
+        # noinspection PyBroadException
         try:
             profile = client.getProfile()
 
