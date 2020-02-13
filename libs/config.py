@@ -50,6 +50,7 @@ class Yuuki_Config:
         self._yuuki_config()
 
     def _yuuki_config(self):
+        assert self.config is not None, "Invalid configure file"
         if "Yuuki" in self.config:
             for key in self.config["Yuuki"]:
                 if key in self.systemConfig:
