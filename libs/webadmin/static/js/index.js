@@ -21,10 +21,11 @@ function init(id, data) {
         },
         success: function (response) {
             let ajax_result = response.result;
-            if (ajax_result.length)
+            if (ajax_result.length) {
                 $(id).text(ajax_result[ajax_result.length - 1]);
-            else
+	    } else {
                 $(id).text("Nothing");
+            }
         }
     });
 }
