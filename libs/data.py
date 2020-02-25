@@ -136,6 +136,7 @@ class Yuuki_Data:
             Function(*args)
 
     def mdsShake(self, do, path, data=None):
+        status = 0
         if self.threading:
             http_client = HTTPClient()
             http_request = HTTPRequest(
@@ -150,11 +151,13 @@ class Yuuki_Data:
             )
             response = http_client.fetch(http_request)
             over = json.loads(response.body)
-            assert_result = "mds - ERROR\n{} on {}".format(do, path)
-            assert over["status"] == 200, assert_result
+            if "status" in over:
+                status = over["status"]
+            assert_result = "mds - ERROR {}\n{} on {}".format(status, do, path)
+            assert status == 200, assert_result
             return over
         else:
-            status = {"status": 0}
+            status = {"status": status}
             return json.dumps(status)
 
     def _local_query(self, query_data):
