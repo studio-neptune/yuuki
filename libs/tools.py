@@ -7,14 +7,14 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-import os
-import sys
 import json
 import ntpath
+import os
 import random
-import requests
+import sys
 import traceback
 
+import requests
 from yuuki_core.ttypes import OpType, MIDType, ContentType, Group, Message
 
 
@@ -62,9 +62,9 @@ class Yuuki_StaticTools:
         :param ncMessage: Operation
         :return: tuple
         """
-        if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP or\
-                ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP or\
-                ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION or\
+        if ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP or \
+                ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP or \
+                ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION or \
                 ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
             return {
                 "GroupID": ncMessage.param1,
@@ -347,7 +347,6 @@ class Yuuki_DynamicTools:
                 'params': json.dumps(params)
             }
             url = self.Yuuki.LINE_Media_server + '/talk/m/upload.nhn'
-            r = requests.post(
-                url, headers=self.Yuuki.connectHeader, data=data, files=files)
+            r = requests.post(url, headers=self.Yuuki.connectHeader, data=data, files=files)
             if r.status_code != 201:
                 self.sendText(send_to, "Error!")

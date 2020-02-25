@@ -123,8 +123,8 @@ class IndexHandler(RequestHandler):
         if req_res.get("code") == auth_code:
             result = _work[req_res.get("do")](
                 {
-                    "path":req_res.get("path"),
-                    "data":req_res.get("data")
+                    "path": req_res.get("path"),
+                    "data": req_res.get("data")
                 }
             )
         else:

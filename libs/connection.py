@@ -16,6 +16,8 @@ try:
     from thrift.protocol import fastbinary
 except ImportError:
     print("[No fast_binary using]")
+
+
 ##########################################
 
 

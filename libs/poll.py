@@ -7,13 +7,13 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-import time
 import socket
-import requests
+import time
+
+from yuuki_core.ttypes import Operation
 
 from .tools import Yuuki_StaticTools, Yuuki_DynamicTools
 
-from yuuki_core.ttypes import Operation
 
 class Yuuki_Poll:
     Power = True
@@ -88,9 +88,6 @@ class Yuuki_Poll:
             try:
                 self._action()
                 self.Power = self.Yuuki.data.syncData()
-
-            except requests.exceptions.ConnectionError:
-                self.Power = False
 
             except SystemExit:
                 self.Power = False

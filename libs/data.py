@@ -11,7 +11,7 @@ import os
 import random
 import time
 
-import requests
+from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
 from .data_mds import listen as msd_listen
@@ -20,7 +20,6 @@ from .thread_control import Yuuki_Thread
 
 
 class Yuuki_Data:
-
     # Data Struct Define
 
     Data = {}
@@ -115,14 +114,7 @@ class Yuuki_Data:
             # MDS Sync
 
             time.sleep(1)
-            requests.post(
-                url=self.mdsHost,
-                json={
-                    "code": self.mdsCode,
-                    "do": "SYC",
-                    "path": self.Data
-                }
-            )
+            self.mdsShake("SYC", self.Data)
         return self._Log_Initialize()
 
     def _Log_Initialize(self):
@@ -145,16 +137,19 @@ class Yuuki_Data:
 
     def mdsShake(self, do, path, data=None):
         if self.threading:
-            mds = requests.post(
+            http_client = HTTPClient()
+            http_request = HTTPRequest(
                 url=self.mdsHost,
-                json={
+                method="POST",
+                body=json.dumps({
                     "code": self.mdsCode,
                     "do": do,
                     "path": path,
                     "data": data
-                }
+                })
             )
-            over = mds.json()
+            response = http_client.fetch(http_request)
+            over = json.loads(response.body)
             assert_result = "mds - ERROR\n{} on {}".format(do, path)
             assert over["status"] == 200, assert_result
             return over

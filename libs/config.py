@@ -68,7 +68,7 @@ class Yuuki_Config:
         if "Account" in self.config.get("LINE"):
             for key in self.config["LINE"]["Account"]:
                 if key in ["X-Line-Application", "User-Agent"]:
-                    self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t","\t")
+                    self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t", "\t")
                 if key in self.connectHeader:
                     self.connectHeader[key] = self.config["LINE"]["Account"][key]
 
