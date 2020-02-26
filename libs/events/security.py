@@ -7,9 +7,9 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-from ..tools import Yuuki_StaticTools, Yuuki_DynamicTools
-
 from yuuki_core.ttypes import OpType
+
+from ..tools import Yuuki_StaticTools, Yuuki_DynamicTools
 
 
 class Yuuki_Security:
@@ -268,11 +268,11 @@ class Yuuki_Security:
         SecurityInfo = self.Yuuki_StaticTools.securityForWhere(ncMessage)
 
         GroupInfo = self.Yuuki_DynamicTools.getClient(self.Yuuki.MyMID).getGroup(SecurityInfo["GroupID"])
-        SecurityInfo["GroupPrivilege"] = self.Yuuki.Admin +\
-                         [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] +\
-                         self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+        SecurityInfo["GroupPrivilege"] = self.Yuuki.Admin + \
+                                         [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
+                                         self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
 
-        if SecurityInfo["Action"] in SecurityInfo["GroupPrivilege"] or\
+        if SecurityInfo["Action"] in SecurityInfo["GroupPrivilege"] or \
                 SecurityInfo["Another"] in SecurityInfo["GroupPrivilege"]:
             if ncMessage.type != OpType.NOTIFIED_KICKOUT_FROM_GROUP:
                 return

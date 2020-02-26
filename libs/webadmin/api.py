@@ -8,6 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from .reader import Yuuki_WebDataReader
 
+
 class Yuuki_WebAdminAPI:
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
