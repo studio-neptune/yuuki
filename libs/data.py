@@ -14,7 +14,7 @@ import time
 from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
-from .data_mds import listen as msd_listen
+from .data_mds import listen as mds_listen
 from .thread_control import Yuuki_Multiprocess
 from .thread_control import Yuuki_Thread
 
@@ -109,7 +109,7 @@ class Yuuki_Data:
         if self.threading:
             self.mdsHost = "http://localhost:2019/"
             self.mdsCode = "{}.{}".format(random.random(), time.time())
-            self.MdsThreadControl.add(msd_listen, (self.mdsCode,))
+            self.MdsThreadControl.add(mds_listen, (self.mdsCode,))
 
             # MDS Sync
 
