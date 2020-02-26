@@ -20,11 +20,6 @@ auth_code = 0
 
 
 # Functions
-def mds_exit(data):
-    if data:
-        exit(0)
-
-
 def update(data):
     global switch_data
     # noinspection PyBroadException
@@ -98,7 +93,6 @@ def yuukiLimitDecrease(data):
 
 # Works
 _work = {
-    "EXT": mds_exit,
     "UPT": update,
     "DEL": delete,
     "GET": query,
@@ -135,10 +129,22 @@ class IndexHandler(RequestHandler):
 
 
 # Main
+app = Application([
+    ('/', IndexHandler)
+])
+server = HTTPServer(app)
+async_lock = IOLoop.current()
+
+
 def listen(code):
     global auth_code
     auth_code = code
-    app = Application([('/', IndexHandler)])
-    server = HTTPServer(app)
     server.listen(2019)
-    IOLoop.current().start()
+    async_lock.start()
+
+
+def mds_exit():
+    server.stop()
+    yield server.close_all_connections()
+    async_lock.stop()
+    async_lock.close()

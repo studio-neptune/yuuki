@@ -7,6 +7,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 import os
+
 import yaml
 
 
@@ -46,6 +47,7 @@ class Yuuki_Config:
         "Seq": 0,
         "Admin": [],
         "Advanced": False,
+        "WebAdmin": False,  # Advanced Mode Required
         "SecurityService": False,
         "Hour_KickLimit": 10,
         "Hour_CancelLimit": 10,

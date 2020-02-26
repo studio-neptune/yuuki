@@ -21,6 +21,7 @@ from .i18n import Yuuki_LangSetting
 from .poll import Yuuki_Poll
 from .thread_control import Yuuki_Multiprocess
 from .webadmin.server import Yuuki_WebAdmin
+from .data_mds import mds_exit
 
 
 class Yuuki:
@@ -112,7 +113,7 @@ class Yuuki:
         self._Setup_WebAdmin()
 
     def _Setup_WebAdmin(self):
-        if self.Threading:
+        if self.Threading and self.YuukiConfigs.get("WebAdmin"):
             password = str(hash(random.random()))
             self.webAdmin = Yuuki_WebAdmin(self)
             self.Thread_Control.add(self.webAdmin.start, (password,))
@@ -126,13 +127,12 @@ class Yuuki:
 
     def exit(self, restart=False):
         print("System Exit")
-        self.data.updateData(["Global", "Power"], False)
+        while self.data.getData(["Global", "Power"]):
+            self.data.updateData(["Global", "Power"], False)
         if self.Threading:
-            try:
-                self.data.mdsShake("EXT", "")
+            mds_exit()
+            if self.YuukiConfigs.get("WebAdmin"):
                 self.webAdmin.stop()
-            except:
-                pass
         if restart:
             if platform.system() == "Windows":
                 with open("cache.bat", "w") as c:

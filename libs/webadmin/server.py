@@ -188,5 +188,5 @@ class Yuuki_WebAdmin:
         self.http_server.serve_forever()
 
     def stop(self):
-        self.http_server.close()
         self.http_server.stop()
+        self.http_server.close()

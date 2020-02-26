@@ -78,7 +78,7 @@ class Yuuki_Poll:
             self.Yuuki.exit()
 
     def init(self):
-        self.Yuuki.data.updateData(["Global", "self.Power"], self.Power)
+        self.Yuuki.data.updateData(["Global", "Power"], self.Power)
 
         if "LastResetLimitTime" not in self.Yuuki.data.getData(["Global"]):
             self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], None)
