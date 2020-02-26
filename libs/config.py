@@ -6,11 +6,21 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
+import os
 import yaml
 
 
 class Yuuki_Config:
-    """ Configure Yuuki """
+    """
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !! DO NOT TOUCH DEFAULT SETTINGS !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    Please config the value you want to set though `config.yaml`.
+    It will overwrite these settings.
+
+    """
 
     connectInfo = {
         "Host": "",
@@ -45,6 +55,7 @@ class Yuuki_Config:
     }
 
     def __init__(self, config_path="config.yaml"):
+        assert os.path.isfile(config_path), "The configure file, `config.yaml` was not found."
         with open(config_path, "r") as configfile:
             self.config = yaml.load(configfile, Loader=yaml.FullLoader)
         self._yuuki_config()
