@@ -6,9 +6,9 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
-
 import os
 import platform
+import time
 import random
 
 from git import Repo
@@ -130,6 +130,8 @@ class Yuuki:
             self.data.updateData(["Global", "Power"], False)
         if self.Threading:
             self.data.mdsShake("EXT", None, None)
+            time.sleep(1)
+            self.data.MdsThreadControl.stop("listen")
             if self.YuukiConfigs.get("WebAdmin"):
                 self.webAdmin.stop()
         if restart:
