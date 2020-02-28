@@ -9,11 +9,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import os
 import platform
 import random
+import sys
 import time
 
 import requests
 from git import Repo
-from yuuki_core.TalkService import *
+from yuuki_core.ttypes import OpType
 
 from .connection import Yuuki_Connect
 from .data import Yuuki_Data
@@ -31,7 +32,6 @@ class Yuuki:
         self.YuukiConfigs = Yuuki_Settings.systemConfig
 
         # Static_Variable
-
         self.Thread_Control = Yuuki_Multiprocess()
 
         self.Seq = self.YuukiConfigs["Seq"]
@@ -157,14 +157,14 @@ class Yuuki:
                 print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
         sys.exit(0)
 
-    def threadExec(self, Function, args):
+    def threadExec(self, function, args):
         if self.Threading:
-            self.Thread_Control.add(Function, args)
+            self.Thread_Control.add(function, args)
         else:
-            Function(*args)
+            function(*args)
 
-    def taskDemux(self, catchedNews):
-        for ncMessage in catchedNews:
+    def taskDemux(self, catched_news):
+        for ncMessage in catched_news:
             if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 self.threadExec(self.JoinGroup, (ncMessage,))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
