@@ -129,7 +129,7 @@ class Yuuki:
         while self.data.getData(["Global", "Power"]):
             self.data.updateData(["Global", "Power"], False)
         if self.Threading:
-            # mds_exit()
+            self.data.mdsShake("EXT", None, None)
             if self.YuukiConfigs.get("WebAdmin"):
                 self.webAdmin.stop()
         if restart:

@@ -10,6 +10,7 @@
 
 # Initializing
 import json
+import types
 from abc import ABC
 
 from tornado.httpserver import HTTPServer
@@ -43,8 +44,8 @@ class IndexHandler(RequestHandler, ABC):
             )
         else:
             result = {"status": 401}
-        if not result:
-            result = {"status": 500}
+        if isinstance(result, types.GeneratorType):
+            result = {"status": 200}
         self.write(json.dumps(result))
 
 
@@ -64,7 +65,7 @@ class PythonMDS:
         _work["GET"] = self._query
         _work["SYC"] = self._sync
         _work["YLD"] = self._yuuki_limit_decrease
-        _work["EXT"] = self.mds_exit
+        _work["EXT"] = self._shutdown
 
     def _query(self, data):
         query_data = data["path"]
@@ -107,17 +108,18 @@ class PythonMDS:
         self.switch_data["LimitInfo"][data["path"]][data["userId"]] -= 1
         return {"status": 200}
 
+    def _shutdown(self, data):
+        if data:
+            pass
+        yield self.__mds_exit()
+
+    async def __mds_exit(self):
+        self.server.stop()
+        self.async_lock.stop()
+        self.async_lock.close()
+
     def listen(self, code):
         global auth_code
         auth_code = code
         self.server.listen(2019)
         self.async_lock.start()
-
-    def mds_exit(self, data):
-        if data:
-            pass
-        self.server.stop()
-        yield {"status": 200}
-        self.server.close_all_connections()
-        self.async_lock.stop()
-        self.async_lock.close()
