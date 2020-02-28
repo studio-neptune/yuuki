@@ -89,7 +89,10 @@ class Yuuki_Poll:
             # noinspection PyBroadException
             try:
                 self._action()
-                self.Power = self.Yuuki.data.syncData()
+                try:
+                    self.Power = self.Yuuki.data.syncData()
+                except ConnectionRefusedError:
+                    self.Power = False
 
             except SystemExit:
                 self.Power = False

@@ -18,7 +18,7 @@ from yuuki_core.ttypes import OpType
 
 from .connection import Yuuki_Connect
 from .data import Yuuki_Data
-from .events import Yuuki_Command, Yuuki_JoinGroup, Yuuki_Security
+from .events import Yuuki_Command, Yuuki_JoinGroup, Yuuki_Security, Yuuki_Callback
 from .i18n import Yuuki_LangSetting
 from .poll import Yuuki_Poll
 from .thread_control import Yuuki_Multiprocess
@@ -94,6 +94,7 @@ class Yuuki:
         self.JoinGroup = Yuuki_JoinGroup(self).action
         self.Command = Yuuki_Command(self).action
         self.Security = Yuuki_Security(self).action
+        self.Callback = Yuuki_Callback(self).action
 
         self.data = Yuuki_Data(self.Threading)
 
@@ -130,7 +131,7 @@ class Yuuki:
 
     def exit(self, restart=False):
         print("System Exit")
-        while self.data.getData(["Global", "Power"]):
+        while self.data.syncData():
             self.data.updateData(["Global", "Power"], False)
         if self.Threading:
             self.data.mdsShake("EXT", None, None)
@@ -175,6 +176,8 @@ class Yuuki:
                 self.threadExec(self.Security, (ncMessage,))
             elif ncMessage.type == OpType.RECEIVE_MESSAGE:
                 self.threadExec(self.Command, (ncMessage,))
+            elif ncMessage.type == OpType.SEND_MESSAGE:
+                self.threadExec(self.Callback, (ncMessage,))
 
     def main(self):
         handle = Yuuki_Poll(self)
