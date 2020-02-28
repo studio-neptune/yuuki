@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import os
 import platform
 import time
+import requests
 import random
 
 from git import Repo
@@ -114,8 +115,11 @@ class Yuuki:
     def _Setup_WebAdmin(self):
         if self.Threading and self.YuukiConfigs.get("WebAdmin"):
             password = str(hash(random.random()))
-            web_admin = Yuuki_WebAdmin(self)
-            self.Thread_Control.add(web_admin.wa_listen, (password,))
+            self.shutdown_password = str(hash(random.random()))
+            self.web_admin = Yuuki_WebAdmin(self)
+            self.web_admin.set_password(password)
+            self.web_admin.set_shutdown_password(self.shutdown_password)
+            self.Thread_Control.add(self.web_admin.wa_listen)
             print(
                 "<*> Yuuki WebAdmin - Enable\n"
                 "<*> http://localhost:2020\n"
@@ -133,6 +137,10 @@ class Yuuki:
             time.sleep(1)
             self.data.MdsThreadControl.stop("mds_listen")
             if self.YuukiConfigs.get("WebAdmin"):
+                requests.get(
+                    "http://localhost:2020/api/shutdown/{}".format(self.shutdown_password)
+                )
+                time.sleep(1)
                 self.data.MdsThreadControl.stop("wa_listen")
         if restart:
             if platform.system() == "Windows":

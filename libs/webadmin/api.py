@@ -10,8 +10,9 @@ from .reader import Yuuki_WebDataReader
 
 
 class Yuuki_WebAdminAPI:
-    def __init__(self, Yuuki):
+    def __init__(self, Yuuki, WebAdmin_Handle):
         self.Yuuki = Yuuki
+        self.WebAdmin = WebAdmin_Handle
         self.YuukiData = self.Yuuki.data
         self.Yuuki_DataHandle = Yuuki_WebDataReader(self.YuukiData)
         self.events = {
@@ -41,7 +42,11 @@ class Yuuki_WebAdminAPI:
     def shutdown(self, data):
         if data:
             pass
+        self.WebAdmin.shutdown()
         return self.Yuuki.exit()
+
+    def command_shutdown(self):
+        self.WebAdmin.shutdown()
 
     @staticmethod
     def nothing(data):

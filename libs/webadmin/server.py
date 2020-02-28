@@ -23,6 +23,7 @@ Yuuki_APIHandle = None
 
 passports = []
 password = str(hash(random.random()))
+shutdown_password = str(hash(random.random()))
 
 
 class Yuuki_WebAdmin:
@@ -32,7 +33,7 @@ class Yuuki_WebAdmin:
     def __init__(self, Yuuki):
         global Yuuki_Handle, Yuuki_APIHandle
         Yuuki_Handle = Yuuki
-        Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle)
+        Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle, self)
 
     @staticmethod
     @wa_app.route("/")
@@ -173,16 +174,33 @@ class Yuuki_WebAdmin:
         return Response(json.dumps(result), mimetype='application/json')
 
     @staticmethod
+    @wa_app.route("/api/shutdown")
+    @wa_app.route("/api/shutdown/<code>")
+    def shutdown(code=None):
+        if code == shutdown_password:
+            Yuuki_APIHandle.command_shutdown()
+            return "200"
+        return "401"
+
+    @staticmethod
     @wa_app.route("/api/i")
     def i():
         return Yuuki_Handle.YuukiConfigs["name"]
+
+    @staticmethod
+    def set_shutdown_password(code):
+        global shutdown_password
+        shutdown_password = code
 
     @staticmethod
     def set_password(code):
         global password
         password = code
 
-    def wa_listen(self, admin_password):
-        self.set_password(admin_password)
+    def shutdown(self):
+        self.http_server.stop()
+        self.http_server.close()
+
+    def wa_listen(self):
         self.http_server = WSGIServer(('', 2020), wa_app)
         self.http_server.serve_forever()
