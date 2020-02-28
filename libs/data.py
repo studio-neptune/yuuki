@@ -14,7 +14,7 @@ import time
 from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
-from .data_mds import listen as mds_listen
+from .data_mds import PythonMDS
 from .thread_control import Yuuki_Multiprocess
 from .thread_control import Yuuki_Thread
 
@@ -79,37 +79,37 @@ class Yuuki_Data:
         if not os.path.isdir(self.DataPath):
             os.mkdir(self.DataPath)
 
-        for Type in self.DataType:
-            name = self.DataPath + self.DataName.format(Type)
+        for data_type in self.DataType:
+            name = self.DataPath + self.DataName.format(data_type)
+
+            test_result = 0
             if not os.path.isfile(name):
                 with open(name, "w") as f:
                     f.write("")
-                Type = 0
             else:
                 with open(name, "r") as f:
                     try:
                         json.load(f)
-                        Type = 0
                     except ValueError:
-                        Type = 1
-            assert Type == 0, "{}\nJson Test Error".format(name)
+                        test_result = 1
+            assert test_result == 0, "{}\nJson Test Error".format(name)
 
-        for Type in self.DataType:
-            name = self.DataPath + self.DataName.format(Type)
             with open(name, "r+") as f:
                 text = f.read()
                 if text != "":
-                    self.Data[Type] = json.loads(text)
+                    self.Data[data_type] = json.loads(text)
                 else:
-                    self.Data[Type] = self.DataType[Type]
-                    f.write(json.dumps(self.Data[Type]))
+                    self.Data[data_type] = self.DataType[data_type]
+                    f.write(json.dumps(self.Data[data_type]))
+
         return self._MDS_Initialize()
 
     def _MDS_Initialize(self):
         if self.threading:
+            mds = PythonMDS()
             self.mdsHost = "http://localhost:2019/"
             self.mdsCode = "{}.{}".format(random.random(), time.time())
-            self.MdsThreadControl.add(mds_listen, (self.mdsCode,))
+            self.MdsThreadControl.add(mds.listen, (self.mdsCode,))
 
             # MDS Sync
 

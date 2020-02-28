@@ -10,103 +10,23 @@
 
 # Initializing
 import json
+from abc import ABC
 
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler
 
-switch_data = {}
+# Works
+_work = {}
 auth_code = 0
 
 
-# Functions
-def update(data):
-    global switch_data
-    # noinspection PyBroadException
-    try:
-        if type(data["path"]) is list:
-            over = query({"path": data["path"]})
-            over.get("data").update(data["data"])
-            return {"status": 200}
-        return {"status": 400}
-    except:
-        return {"status": 500}
-
-
-def delete(data):
-    global switch_data
-    # noinspection PyBroadException
-    try:
-        if type(data["path"]) is list:
-            over = query({"path": data["path"]})
-            over.get("data").pop(data["data"])
-            return {"status": 200}
-        return {"status": 400}
-    except:
-        return {"status": 500}
-
-
-def query(data):
-    global switch_data
-    query_data = data["path"]
-    # noinspection PyBroadException
-    try:
-        if type(switch_data) is dict and type(query_data) is list:
-            result = switch_data
-            query_len = len(query_data) - 1
-            for count, key in enumerate(query_data):
-                if key in result:
-                    if count < query_len:
-                        if type(result.get(key)) is not dict:
-                            result = 1  # "unknown_type" + type(source_data.get(key))
-                            break
-                    result = result.get(key)
-                else:
-                    result = 2  # "unknown_key"
-                    break
-
-            return {"status": 200, "data": result}
-        return {"status": 400}
-    except:
-        return {"status": 500}
-
-
-def sync(data):
-    global switch_data
-    # noinspection PyBroadException
-    try:
-        switch_data = data["path"]
-        return {"status": 200}
-    except:
-        return {"status": 500}
-
-
-def yuukiLimitDecrease(data):
-    global switch_data
-    # noinspection PyBroadException
-    try:
-        switch_data["LimitInfo"][data["path"]][data["userId"]] -= 1
-        return {"status": 200}
-    except:
-        return {"status": 500}
-
-
-# Works
-_work = {
-    "UPT": update,
-    "DEL": delete,
-    "GET": query,
-    "SYC": sync,
-    "YLD": yuukiLimitDecrease
-}
-
-
-class IndexHandler(RequestHandler):
+class IndexHandler(RequestHandler, ABC):
     def get(self):
         self.write('''
             <b>Python MDS Server</b><br>
             To switch data in multiprocessing.<hr>
-            (c)2019 <a href="https://starinc.xyz">Star Inc.</a>
+            (c)2020 <a href="https://starinc.xyz">Star Inc.</a>
         ''')
 
     def post(self):
@@ -128,23 +48,76 @@ class IndexHandler(RequestHandler):
         self.write(json.dumps(result))
 
 
-# Main
-app = Application([
-    ('/', IndexHandler)
-])
-server = HTTPServer(app)
-async_lock = IOLoop.current()
+class PythonMDS:
+    switch_data = {}
 
+    # Main
+    app = Application([
+        ('/', IndexHandler)
+    ])
+    server = HTTPServer(app)
+    async_lock = IOLoop.current()
 
-def listen(code):
-    global auth_code
-    auth_code = code
-    server.listen(2019)
-    async_lock.start()
+    def __init__(self):
+        _work["UPT"] = self._update
+        _work["DEL"] = self._delete
+        _work["GET"] = self._query
+        _work["SYC"] = self._sync
+        _work["YLD"] = self._yuuki_limit_decrease
+        _work["EXT"] = self.mds_exit
 
+    def _query(self, data):
+        query_data = data["path"]
+        if type(self.switch_data) is dict and type(query_data) is list:
+            result = self.switch_data
+            query_len = len(query_data) - 1
+            for count, key in enumerate(query_data):
+                if key in result:
+                    if count < query_len:
+                        if type(result.get(key)) is not dict:
+                            result = 1  # "unknown_type" + type(source_data.get(key))
+                            break
+                    result = result.get(key)
+                else:
+                    result = 2  # "unknown_key"
+                    break
 
-def mds_exit():
-    server.stop()
-    yield server.close_all_connections()
-    async_lock.stop()
-    async_lock.close()
+            return {"status": 200, "data": result}
+        return {"status": 400}
+
+    def _update(self, data):
+        if type(data["path"]) is list:
+            over = self._query({"path": data["path"]})
+            over.get("data").update(data["data"])
+            return {"status": 200}
+        return {"status": 400}
+
+    def _delete(self, data):
+        if type(data["path"]) is list:
+            over = self._query({"path": data["path"]})
+            over.get("data").pop(data["data"])
+            return {"status": 200}
+        return {"status": 400}
+
+    def _sync(self, data):
+        self.switch_data = data["path"]
+        return {"status": 200}
+
+    def _yuuki_limit_decrease(self, data):
+        self.switch_data["LimitInfo"][data["path"]][data["userId"]] -= 1
+        return {"status": 200}
+
+    def listen(self, code):
+        global auth_code
+        auth_code = code
+        self.server.listen(2019)
+        self.async_lock.start()
+
+    def mds_exit(self, data):
+        if data:
+            pass
+        self.server.stop()
+        yield {"status": 200}
+        self.server.close_all_connections()
+        self.async_lock.stop()
+        self.async_lock.close()
