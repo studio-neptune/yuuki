@@ -111,10 +111,8 @@ class PythonMDS:
     def _shutdown(self, data):
         if data:
             pass
-        yield self.__mds_exit()
-
-    async def __mds_exit(self):
         self.server.stop()
+        yield True
         self.async_lock.stop()
         self.async_lock.close()
 
