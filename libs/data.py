@@ -109,7 +109,7 @@ class Yuuki_Data:
             mds = PythonMDS()
             self.mdsHost = "http://localhost:2019/"
             self.mdsCode = "{}.{}".format(random.random(), time.time())
-            self.MdsThreadControl.add(mds.listen, (self.mdsCode,))
+            self.MdsThreadControl.add(mds.mds_listen, (self.mdsCode,))
 
             # MDS Sync
 

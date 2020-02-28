@@ -182,11 +182,7 @@ class Yuuki_WebAdmin:
         global password
         password = code
 
-    def start(self, admin_password):
+    def wa_listen(self, admin_password):
         self.set_password(admin_password)
         self.http_server = WSGIServer(('', 2020), wa_app)
         self.http_server.serve_forever()
-
-    def stop(self):
-        self.http_server.stop()
-        self.http_server.close()

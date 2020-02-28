@@ -51,11 +51,11 @@ class Yuuki:
         if self.YuukiConfigs["version_check"]:
             # noinspection PyBroadException
             try:
-                GitRemote = Repo('.').remote()
-                UpdateStatus = GitRemote.fetch()[0]
-                if UpdateStatus.flags == 64:
+                git_remote = Repo('.').remote()
+                update_status = git_remote.fetch()[0]
+                if update_status.flags == 64:
                     git_result = "New version found."
-                elif UpdateStatus.flags == 4:
+                elif update_status.flags == 4:
                     git_result = "This is the latest version."
             except:
                 git_result = "Something was wrong."
@@ -114,8 +114,8 @@ class Yuuki:
     def _Setup_WebAdmin(self):
         if self.Threading and self.YuukiConfigs.get("WebAdmin"):
             password = str(hash(random.random()))
-            self.webAdmin = Yuuki_WebAdmin(self)
-            self.Thread_Control.add(self.webAdmin.start, (password,))
+            web_admin = Yuuki_WebAdmin(self)
+            self.Thread_Control.add(web_admin.wa_listen, (password,))
             print(
                 "<*> Yuuki WebAdmin - Enable\n"
                 "<*> http://localhost:2020\n"
@@ -131,9 +131,9 @@ class Yuuki:
         if self.Threading:
             self.data.mdsShake("EXT", None, None)
             time.sleep(1)
-            self.data.MdsThreadControl.stop("listen")
+            self.data.MdsThreadControl.stop("mds_listen")
             if self.YuukiConfigs.get("WebAdmin"):
-                self.webAdmin.stop()
+                self.data.MdsThreadControl.stop("wa_listen")
         if restart:
             if platform.system() == "Windows":
                 with open("cache.bat", "w") as c:

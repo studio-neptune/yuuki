@@ -116,7 +116,7 @@ class PythonMDS:
         self.async_lock.stop()
         self.async_lock.close()
 
-    def listen(self, code):
+    def mds_listen(self, code):
         global auth_code
         auth_code = code
         self.server.listen(2019)
