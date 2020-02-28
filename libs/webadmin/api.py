@@ -42,11 +42,10 @@ class Yuuki_WebAdminAPI:
     def shutdown(self, data):
         if data:
             pass
-        self.WebAdmin.shutdown()
         return self.Yuuki.exit()
 
     def command_shutdown(self):
-        self.WebAdmin.shutdown()
+        self.WebAdmin.wa_shutdown()
 
     @staticmethod
     def nothing(data):

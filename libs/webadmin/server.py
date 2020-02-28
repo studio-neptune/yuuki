@@ -197,7 +197,7 @@ class Yuuki_WebAdmin:
         global password
         password = code
 
-    def shutdown(self):
+    def wa_shutdown(self):
         self.http_server.stop()
         self.http_server.close()
 

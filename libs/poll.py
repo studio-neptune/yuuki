@@ -70,8 +70,11 @@ class Yuuki_Poll:
             if ncMessage.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
             for Root in self.Yuuki.Admin:
-                self.Yuuki.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
-                                    (err1, err2, err3, ErrorInfo))
+                self.Yuuki_DynamicTools.sendText(
+                    Root,
+                    "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
+                    (err1, err2, err3, ErrorInfo)
+                )
         except:
             print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo))
             self.Yuuki.exit()

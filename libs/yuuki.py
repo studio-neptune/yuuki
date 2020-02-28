@@ -8,10 +8,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 import os
 import platform
-import time
-import requests
 import random
+import time
 
+import requests
 from git import Repo
 from yuuki_core.TalkService import *
 
