@@ -144,19 +144,23 @@ class Yuuki:
                 time.sleep(1)
                 self.data.MdsThreadControl.stop("wa_listen")
         if restart:
-            if platform.system() == "Windows":
-                with open("cache.bat", "w") as c:
-                    c.write(sys.executable + " ./main.py")
-                os.system("cache.bat")
-                os.system("del cache.bat")
-            elif platform.system() == "Linux":
-                with open(".cache.sh", "w") as c:
-                    c.write(sys.executable + " ./main.py")
-                os.system("sh .cache.sh")
-                os.system("rm .cache.sh")
-            else:
-                print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
+            self.__restart()
         sys.exit(0)
+
+    @staticmethod
+    def __restart():
+        if platform.system() == "Windows":
+            with open("cache.bat", "w") as c:
+                c.write(sys.executable + " ./main.py")
+            os.system("cache.bat")
+            os.system("del cache.bat")
+        elif platform.system() == "Linux":
+            with open(".cache.sh", "w") as c:
+                c.write(sys.executable + " ./main.py")
+            os.system("sh .cache.sh")
+            os.system("rm .cache.sh")
+        else:
+            print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
 
     def threadExec(self, function, args):
         if self.Threading:
