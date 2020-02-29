@@ -9,8 +9,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 function nav_items(active, path, path_name) {
-    if (active)
+    if (active) {
         return "<a class=\"nav-link active\" href=\"" + path + "\">" + path_name + "</a>";
+    }
     return "<a class=\"nav-link\" data-transition-enter=\"slideleft\" href=\"" + path + "\">" + path_name + "</a>";
 }
 
@@ -23,10 +24,11 @@ function header2html(yuuki_name) {
     };
     let nav_list = "";
     Object.keys(page_list).forEach(p_key => {
-        if (window.location.pathname === p_key)
+        if (window.location.pathname === p_key) {
             nav_list += nav_items(true, p_key, page_list[p_key])
-        else
+        } else {
             nav_list += nav_items(false, p_key, page_list[p_key])
+        }
     });
     return "<nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">" +
         "<a class=\"navbar-brand\" href=\"/\">" + yuuki_name + " - WebAdmin</a>" +
