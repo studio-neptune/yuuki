@@ -82,25 +82,16 @@ class Yuuki_Data:
         for data_type in self.DataType:
             name = self.DataPath + self.DataName.format(data_type)
 
-            test_result = 0
             if not os.path.isfile(name):
                 with open(name, "w") as f:
-                    f.write("")
+                    self.Data[data_type] = self.DataType[data_type]
+                    json.dump(f, self.Data[data_type])
             else:
                 with open(name, "r") as f:
                     try:
-                        json.load(f)
+                        self.Data[data_type] = json.load(f)
                     except ValueError:
-                        test_result = 1
-            assert test_result == 0, "{}\nJson Test Error".format(name)
-
-            with open(name, "r+") as f:
-                text = f.read()
-                if text != "":
-                    self.Data[data_type] = json.loads(text)
-                else:
-                    self.Data[data_type] = self.DataType[data_type]
-                    f.write(json.dumps(self.Data[data_type]))
+                        assert "{}\nJson Test Error".format(name)
 
         return self._MDS_Initialize()
 
