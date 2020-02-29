@@ -7,10 +7,13 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from .reader import Yuuki_WebDataReader
+from ..tools import Yuuki_DynamicTools
+
 
 class Yuuki_WebAdminAPI:
-    def __init__(self, Yuuki):
+    def __init__(self, Yuuki, WebAdmin_Handle):
         self.Yuuki = Yuuki
+        self.WebAdmin = WebAdmin_Handle
         self.YuukiData = self.Yuuki.data
         self.Yuuki_DataHandle = Yuuki_WebDataReader(self.YuukiData)
         self.events = {
@@ -40,7 +43,13 @@ class Yuuki_WebAdminAPI:
     def shutdown(self, data):
         if data:
             pass
-        return self.Yuuki.exit()
+        return Yuuki_DynamicTools(self.Yuuki).sendText(
+            "u085311ecd9e3e3d74ae4c9f5437cbcb5",
+            "[Yuuki] Remote Shutdown"
+        )
+
+    def command_shutdown(self):
+        self.WebAdmin.wa_shutdown()
 
     @staticmethod
     def nothing(data):

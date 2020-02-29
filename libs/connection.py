@@ -11,12 +11,11 @@ from thrift.transport import THttpClient
 
 from yuuki_core.TalkService import Client
 
-"""         NC HightSpeed Lib          """
+#           NC HighSpeed Library
 try:
     from thrift.protocol import fastbinary
 except ImportError:
     print("[No fast_binary using]")
-##########################################
 
 
 class Yuuki_Connect:

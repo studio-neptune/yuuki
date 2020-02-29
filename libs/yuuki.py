@@ -6,19 +6,21 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
-
 import os
 import platform
 import random
+import sys
+import time
 
+import requests
 from git import Repo
-from yuuki_core.TalkService import *
+from yuuki_core.ttypes import OpType
 
 from .connection import Yuuki_Connect
 from .data import Yuuki_Data
+from .events import Yuuki_Command, Yuuki_JoinGroup, Yuuki_Security, Yuuki_Callback
 from .i18n import Yuuki_LangSetting
 from .poll import Yuuki_Poll
-from .events import Yuuki_Command, Yuuki_JoinGroup, Yuuki_Security
 from .thread_control import Yuuki_Multiprocess
 from .webadmin.server import Yuuki_WebAdmin
 
@@ -30,7 +32,6 @@ class Yuuki:
         self.YuukiConfigs = Yuuki_Settings.systemConfig
 
         # Static_Variable
-
         self.Thread_Control = Yuuki_Multiprocess()
 
         self.Seq = self.YuukiConfigs["Seq"]
@@ -51,11 +52,11 @@ class Yuuki:
         if self.YuukiConfigs["version_check"]:
             # noinspection PyBroadException
             try:
-                GitRemote = Repo('.').remote()
-                UpdateStatus = GitRemote.fetch()[0]
-                if UpdateStatus.flags == 64:
+                git_remote = Repo('.').remote()
+                update_status = git_remote.fetch()[0]
+                if update_status.flags == 64:
                     git_result = "New version found."
-                elif UpdateStatus.flags == 4:
+                elif update_status.flags == 4:
                     git_result = "This is the latest version."
             except:
                 git_result = "Something was wrong."
@@ -93,6 +94,7 @@ class Yuuki:
         self.JoinGroup = Yuuki_JoinGroup(self).action
         self.Command = Yuuki_Command(self).action
         self.Security = Yuuki_Security(self).action
+        self.Callback = Yuuki_Callback(self).action
 
         self.data = Yuuki_Data(self.Threading)
 
@@ -112,10 +114,13 @@ class Yuuki:
         self._Setup_WebAdmin()
 
     def _Setup_WebAdmin(self):
-        if self.Threading:
+        if self.Threading and self.YuukiConfigs.get("WebAdmin"):
             password = str(hash(random.random()))
-            self.webAdmin = Yuuki_WebAdmin(self)
-            self.Thread_Control.add(self.webAdmin.start, (password,))
+            self.shutdown_password = str(hash(random.random()))
+            self.web_admin = Yuuki_WebAdmin(self)
+            self.web_admin.set_password(password)
+            self.web_admin.set_shutdown_password(self.shutdown_password)
+            self.Thread_Control.add(self.web_admin.wa_listen)
             print(
                 "<*> Yuuki WebAdmin - Enable\n"
                 "<*> http://localhost:2020\n"
@@ -126,13 +131,18 @@ class Yuuki:
 
     def exit(self, restart=False):
         print("System Exit")
-        self.data.updateData(["Global", "Power"], False)
+        while self.data.syncData():
+            self.data.updateData(["Global", "Power"], False)
         if self.Threading:
-            try:
-                self.data.mdsShake("EXT", "")
-                self.webAdmin.stop()
-            except:
-                pass
+            self.data.mdsShake("EXT", None, None)
+            time.sleep(1)
+            self.data.MdsThreadControl.stop("mds_listen")
+            if self.YuukiConfigs.get("WebAdmin"):
+                requests.get(
+                    "http://localhost:2020/api/shutdown/{}".format(self.shutdown_password)
+                )
+                time.sleep(1)
+                self.data.MdsThreadControl.stop("wa_listen")
         if restart:
             if platform.system() == "Windows":
                 with open("cache.bat", "w") as c:
@@ -148,14 +158,14 @@ class Yuuki:
                 print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
         sys.exit(0)
 
-    def threadExec(self, Function, args):
+    def threadExec(self, function, args):
         if self.Threading:
-            self.Thread_Control.add(Function, args)
+            self.Thread_Control.add(function, args)
         else:
-            Function(*args)
+            function(*args)
 
-    def taskDemux(self, catchedNews):
-        for ncMessage in catchedNews:
+    def taskDemux(self, catched_news):
+        for ncMessage in catched_news:
             if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
                 self.threadExec(self.JoinGroup, (ncMessage,))
             elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
@@ -166,6 +176,8 @@ class Yuuki:
                 self.threadExec(self.Security, (ncMessage,))
             elif ncMessage.type == OpType.RECEIVE_MESSAGE:
                 self.threadExec(self.Command, (ncMessage,))
+            elif ncMessage.type == OpType.SEND_MESSAGE:
+                self.threadExec(self.Callback, (ncMessage,))
 
     def main(self):
         handle = Yuuki_Poll(self)

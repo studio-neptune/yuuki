@@ -15,8 +15,8 @@ class Yuuki_Thread:
         self.lock = threading.Lock()
 
     @staticmethod
-    def add(Yuuki_Func, args=()):
-        added_thread = threading.Thread(name=Yuuki_Func.__name__, target=Yuuki_Func, args=args)
+    def add(function, args=()):
+        added_thread = threading.Thread(name=function.__name__, target=function, args=args)
         added_thread.start()
 
     @staticmethod
@@ -27,7 +27,13 @@ class Yuuki_Thread:
 
 
 class Yuuki_Multiprocess:
-    @staticmethod
-    def add(Yuuki_Func, args=()):
-        added_multiprocess = multiprocessing.Process(name=Yuuki_Func.__name__, target=Yuuki_Func, args=args)
+    multiprocess_list = {}
+
+    def add(self, function, args=()):
+        added_multiprocess = multiprocessing.Process(name=function.__name__, target=function, args=args)
+        self.multiprocess_list[function.__name__] = added_multiprocess
         added_multiprocess.start()
+
+    def stop(self, function_name):
+        assert function_name in self.multiprocess_list
+        self.multiprocess_list[function_name].terminate()

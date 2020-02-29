@@ -9,29 +9,29 @@
     <!-- Bootstrap CSS -->
     {{ bootstrap.load_css() }}
     <link rel="stylesheet" href="https://unpkg.com/lookforward@0.1.1/css/lookforward.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
 
     <title>Star Yuuki BOT - WebAdmin</title>
 </head>
 
 <body>
 
-    {% from 'bootstrap/nav.html' import render_nav_item %}
+{% from 'bootstrap/nav.html' import render_nav_item %}
 
-    <div id="header"></div>
+<div id="header"></div>
 
-    <main role="main" class="container">
-        <div class="my-3 p-3 bg-white rounded shadow-sm">
-            <div id="events">
-                <p class="pt-3">Loading...</p>
-            </div>
+<main role="main" class="container">
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <div id="events">
+            <p class="pt-3">Loading...</p>
         </div>
-    </main>
+    </div>
+</main>
 
-    <!-- Optional JavaScript -->
-    {{ bootstrap.load_js() }}
-    <script src="{{ url_for('static', filename='js/header.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/events.js') }}"></script>
+<!-- Optional JavaScript -->
+{{ bootstrap.load_js() }}
+<script src="{{ url_for('static', filename='js/header.js') }}"></script>
+<script src="{{ url_for('static', filename='js/events.js') }}"></script>
 </body>
 
 </html>

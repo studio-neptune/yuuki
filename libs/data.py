@@ -11,16 +11,15 @@ import os
 import random
 import time
 
-import requests
+from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
-from .data_mds import listen as msd_listen
+from .data_mds import PythonMDS
 from .thread_control import Yuuki_Multiprocess
 from .thread_control import Yuuki_Thread
 
 
 class Yuuki_Data:
-
     # Data Struct Define
 
     Data = {}
@@ -80,49 +79,42 @@ class Yuuki_Data:
         if not os.path.isdir(self.DataPath):
             os.mkdir(self.DataPath)
 
-        for Type in self.DataType:
-            name = self.DataPath + self.DataName.format(Type)
+        for data_type in self.DataType:
+            name = self.DataPath + self.DataName.format(data_type)
+
+            test_result = 0
             if not os.path.isfile(name):
                 with open(name, "w") as f:
                     f.write("")
-                Type = 0
             else:
                 with open(name, "r") as f:
                     try:
                         json.load(f)
-                        Type = 0
                     except ValueError:
-                        Type = 1
-            assert Type == 0, "{}\nJson Test Error".format(name)
+                        test_result = 1
+            assert test_result == 0, "{}\nJson Test Error".format(name)
 
-        for Type in self.DataType:
-            name = self.DataPath + self.DataName.format(Type)
             with open(name, "r+") as f:
                 text = f.read()
                 if text != "":
-                    self.Data[Type] = json.loads(text)
+                    self.Data[data_type] = json.loads(text)
                 else:
-                    self.Data[Type] = self.DataType[Type]
-                    f.write(json.dumps(self.Data[Type]))
+                    self.Data[data_type] = self.DataType[data_type]
+                    f.write(json.dumps(self.Data[data_type]))
+
         return self._MDS_Initialize()
 
     def _MDS_Initialize(self):
         if self.threading:
+            mds = PythonMDS()
             self.mdsHost = "http://localhost:2019/"
             self.mdsCode = "{}.{}".format(random.random(), time.time())
-            self.MdsThreadControl.add(msd_listen, (self.mdsCode,))
+            self.MdsThreadControl.add(mds.mds_listen, (self.mdsCode,))
 
             # MDS Sync
 
             time.sleep(1)
-            requests.post(
-                url=self.mdsHost,
-                json={
-                    "code": self.mdsCode,
-                    "do": "SYC",
-                    "path": self.Data
-                }
-            )
+            self.mdsShake("SYC", self.Data)
         return self._Log_Initialize()
 
     def _Log_Initialize(self):
@@ -144,22 +136,28 @@ class Yuuki_Data:
             Function(*args)
 
     def mdsShake(self, do, path, data=None):
+        status = 0
         if self.threading:
-            mds = requests.post(
+            http_client = HTTPClient()
+            http_request = HTTPRequest(
                 url=self.mdsHost,
-                json={
+                method="POST",
+                body=json.dumps({
                     "code": self.mdsCode,
                     "do": do,
                     "path": path,
                     "data": data
-                }
+                })
             )
-            over = mds.json()
-            assert_result = "mds - ERROR\n{} on {}".format(do, path)
-            assert over["status"] == 200, assert_result
+            response = http_client.fetch(http_request)
+            over = json.loads(response.body)
+            if "status" in over:
+                status = over["status"]
+            assert_result = "mds - ERROR {}\n{} on {}".format(status, do, path)
+            assert status == 200, assert_result
             return over
         else:
-            status = {"status": 0}
+            status = {"status": status}
             return json.dumps(status)
 
     def _local_query(self, query_data):

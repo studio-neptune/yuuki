@@ -6,14 +6,13 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
-
-import time
 import socket
-import requests
+import time
+
+from yuuki_core.ttypes import Operation
 
 from .tools import Yuuki_StaticTools, Yuuki_DynamicTools
 
-from yuuki_core.ttypes import Operation
 
 class Yuuki_Poll:
     Power = True
@@ -71,14 +70,17 @@ class Yuuki_Poll:
             if ncMessage.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
             for Root in self.Yuuki.Admin:
-                self.Yuuki.sendText(Root, "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
-                                    (err1, err2, err3, ErrorInfo))
+                self.Yuuki_DynamicTools.sendText(
+                    Root,
+                    "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
+                    (err1, err2, err3, ErrorInfo)
+                )
         except:
             print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo))
             self.Yuuki.exit()
 
     def init(self):
-        self.Yuuki.data.updateData(["Global", "self.Power"], self.Power)
+        self.Yuuki.data.updateData(["Global", "Power"], self.Power)
 
         if "LastResetLimitTime" not in self.Yuuki.data.getData(["Global"]):
             self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], None)
@@ -87,10 +89,10 @@ class Yuuki_Poll:
             # noinspection PyBroadException
             try:
                 self._action()
-                self.Power = self.Yuuki.data.syncData()
-
-            except requests.exceptions.ConnectionError:
-                self.Power = False
+                try:
+                    self.Power = self.Yuuki.data.syncData()
+                except ConnectionRefusedError:
+                    self.Power = False
 
             except SystemExit:
                 self.Power = False

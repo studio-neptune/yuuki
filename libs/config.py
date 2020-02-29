@@ -6,11 +6,22 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
+import os
+
 import yaml
 
 
 class Yuuki_Config:
-    """ Configure Yuuki """
+    """
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !! DO NOT TOUCH DEFAULT SETTINGS !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    Please config the value you want to set though `config.yaml`.
+    It will overwrite these settings.
+
+    """
 
     connectInfo = {
         "Host": "",
@@ -26,7 +37,7 @@ class Yuuki_Config:
 
     systemConfig = {
         "name": "Yuuki",
-        "version": "v6.5.3-alpha",
+        "version": "v6.5.3-alpha_RC1",
         "version_check": True,
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
@@ -36,6 +47,7 @@ class Yuuki_Config:
         "Seq": 0,
         "Admin": [],
         "Advanced": False,
+        "WebAdmin": False,  # Advanced Mode Required
         "SecurityService": False,
         "Hour_KickLimit": 10,
         "Hour_CancelLimit": 10,
@@ -45,11 +57,13 @@ class Yuuki_Config:
     }
 
     def __init__(self, config_path="config.yaml"):
+        assert os.path.isfile(config_path), "The configure file, `config.yaml` was not found."
         with open(config_path, "r") as configfile:
             self.config = yaml.load(configfile, Loader=yaml.FullLoader)
         self._yuuki_config()
 
     def _yuuki_config(self):
+        assert self.config is not None, "Invalid configure file"
         if "Yuuki" in self.config:
             for key in self.config["Yuuki"]:
                 if key in self.systemConfig:
@@ -67,7 +81,7 @@ class Yuuki_Config:
         if "Account" in self.config.get("LINE"):
             for key in self.config["LINE"]["Account"]:
                 if key in ["X-Line-Application", "User-Agent"]:
-                    self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t","\t")
+                    self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t", "\t")
                 if key in self.connectHeader:
                     self.connectHeader[key] = self.config["LINE"]["Account"][key]
 

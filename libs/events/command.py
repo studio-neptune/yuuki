@@ -275,9 +275,7 @@ class Yuuki_Command:
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + \
-                             [self.Yuuki_StaticTools.sybGetGroupCreator(
-                                 GroupInfo).mid]
+            GroupPrivilege = self.Yuuki.Admin + [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid]
             if ncMessage.message.from_ in GroupPrivilege:
                 self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
                     ncMessage), self.Yuuki.get_text("Bye Bye"))
@@ -296,11 +294,13 @@ class Yuuki_Command:
 
     def _Exit(self, ncMessage):
         if ncMessage.message.from_ in self.Yuuki.Admin:
-            self.Yuuki_DynamicTools.sendText(self.Yuuki_StaticTools.sendToWho(
-                ncMessage), self.Yuuki.get_text("Exit."))
+            self.Yuuki_DynamicTools.sendText(
+                self.Yuuki_StaticTools.sendToWho(ncMessage),
+                self.Yuuki.get_text("Exit.")
+            )
             self.Yuuki.exit()
 
-    def _Com(self, ncMessage):
+    def _SystemCall(self, ncMessage):
         msgSep = ncMessage.message.text.split(" ")
         if ncMessage.message.from_ in self.Yuuki.Admin:
             # noinspection PyBroadException
@@ -330,7 +330,7 @@ class Yuuki_Command:
             'GroupBackup': self._GroupBackup,
             'Quit': self._Quit,
             'Exit': self._Exit,
-            'Com': self._Com,
+            'SystemCall': self._SystemCall,
         }
         if Yuuki_Name == msgSep[0] and msgSep[1] in actions:
             actions[msgSep[1]](ncMessage)
