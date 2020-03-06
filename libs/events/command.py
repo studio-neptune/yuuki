@@ -210,7 +210,9 @@ class Yuuki_Command:
             for userId in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
                 if userId not in status_added:
                     status += "{}: {}\n".format(
-                        self.Yuuki.get_text("Unknown"), userId)
+                        self.Yuuki.get_text("Unknown"),
+                        userId
+                    )
             self.Yuuki_DynamicTools.sendText(
                 self.Yuuki_StaticTools.sendToWho(ncMessage),
                 status + self.Yuuki.get_text("\nExtend Administrator(s)")

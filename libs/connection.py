@@ -9,7 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from thrift.protocol import TCompactProtocol
 from thrift.transport import THttpClient
 
-from yuuki_core.TalkService import Client
+from yuuki_core.TalkService import Client, TalkException
 
 #           NC HighSpeed Library
 try:
@@ -21,15 +21,13 @@ except ImportError:
 class Yuuki_Connect:
     def __init__(self, Yuuki_Configs):
 
+        self.helper = {}
+
         self.host = Yuuki_Configs.connectInfo["Host"]
         self.com_path = Yuuki_Configs.connectInfo["Command_Path"]
         self.poll_path = Yuuki_Configs.connectInfo["LongPoll_path"]
 
         self.con_header = Yuuki_Configs.connectHeader
-
-        self.helper = []
-        self.helper_ids = []
-        self.helper_authTokens = {}
 
     def connect(self, listen_timeout=600000):
         transport = THttpClient.THttpClient(self.host + self.com_path)
@@ -51,41 +49,20 @@ class Yuuki_Connect:
 
         return client, listen
 
-    def helperConnect(self, LINE_ACCESS_KEY):
-        helper_ConnectHeader = self.con_header.copy()
-        helper_ConnectHeader["X-Line-Access"] = LINE_ACCESS_KEY
+    def helperConnect(self, auth_token):
+        helper_connect_header = self.con_header.copy()
+        helper_connect_header["X-Line-Access"] = auth_token
 
         transport = THttpClient.THttpClient(self.host + self.com_path)
-        transport.setCustomHeaders(helper_ConnectHeader)
+        transport.setCustomHeaders(helper_connect_header)
         protocol = TCompactProtocol.TCompactProtocol(transport)
         client = Client(protocol)
         transport.open()
 
-        # noinspection PyBroadException
         try:
             profile = client.getProfile()
-
-            self.helper.append(client)
-            self.helper_ids.append(profile.mid)
-            self.helper_authTokens[profile.mid] = LINE_ACCESS_KEY
-
+            self.helper[profile.mid] = client
             return True
-        except:
-            print("Error:\n%s\nNot Acceptable\n" % (LINE_ACCESS_KEY,))
 
-    def helperThreadConnect(self, userId):
-        if userId in self.helper_authTokens:
-            LINE_ACCESS_KEY = self.helper_authTokens.get(userId)
-        else:
-            return None
-
-        helper_ConnectHeader = self.con_header.copy()
-        helper_ConnectHeader["X-Line-Access"] = LINE_ACCESS_KEY
-
-        transport = THttpClient.THttpClient(self.host + self.com_path)
-        transport.setCustomHeaders(helper_ConnectHeader)
-        protocol = TCompactProtocol.TCompactProtocol(transport)
-        client = Client(protocol)
-        transport.open()
-
-        return client
+        except TalkException:
+            print("Error:\n%s\nNot Acceptable\n" % (auth_token,))

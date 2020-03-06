@@ -50,16 +50,13 @@ class Yuuki:
         origin_url = "https://github.com/star-inc/star_yuuki_bot.git"
 
         if self.YuukiConfigs["version_check"]:
-            # noinspection PyBroadException
-            try:
-                git_remote = Repo('.').remote()
-                update_status = git_remote.fetch()[0]
-                if update_status.flags == 64:
-                    git_result = "New version found."
-                elif update_status.flags == 4:
-                    git_result = "This is the latest version."
-            except:
-                git_result = "Something was wrong."
+            git_remote = Repo('.').remote()
+            update_status = git_remote.fetch()[0]
+            if update_status.flags == 64:
+                git_result = "New version found."
+            elif update_status.flags == 4:
+                git_result = "This is the latest version."
+            origin_url = "\n".join(git_remote.urls)
 
         return self._Announce_Dog(git_result, origin_url)
 
@@ -68,8 +65,8 @@ class Yuuki:
             "\n{} {}\n"
             "\t===\n\n"
             "<*> {}\n\n"
-            "More Information:\n"
-            "{}\n\n\t\t\t\t\t"
+            "Update Origin:\n"
+            "\t{}\n\n\t\t\t\t\t"
             "{}\n\t{}\n".format(
                 self.YuukiConfigs["name"],
                 self.YuukiConfigs["version"],
@@ -107,7 +104,10 @@ class Yuuki:
         self.MyMID = self.profile.mid
         self.revision = self.client.getLastOpRevision()
 
-        self.AllAccountIds = [self.MyMID] + self.Connect.helper_ids
+        self.AllAccountIds = [self.MyMID]
+
+        for userId in self.Connect.helper:
+            self.AllAccountIds.append(userId)
 
         if len(self.data.getData(["LimitInfo"])) != 2:
             self.data.updateData(["LimitInfo"], self.data.LimitType)
