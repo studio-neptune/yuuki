@@ -116,17 +116,10 @@ class Yuuki_DynamicTools:
         :param userId: string
         :return: TalkServiceClient
         """
-        if self.Yuuki.Threading:
-            if userId == self.Yuuki.MyMID:
-                (client, _) = self.Yuuki.Connect.connect()
-                return client
-            else:
-                return self.Yuuki.Connect.helperThreadConnect(userId)
+        if userId == self.Yuuki.MyMID:
+            return self.Yuuki.client
         else:
-            Accounts = [self.Yuuki.client] + self.Yuuki.Connect.helper
-            for count, AccountUserId in enumerate(self.Yuuki.AllAccountIds):
-                if AccountUserId == userId:
-                    return Accounts[count]
+            return self.Yuuki.Connect.helper[userId]
 
     def checkInInvitationList(self, ncMessage, userId=None):
         """

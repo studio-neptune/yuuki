@@ -1,21 +1,17 @@
+# Sample Config File for star_yuuki_bot
+# Please replace setting options from `libs/config.py`
+
 Yuuki:
+  SecurityService: True
   Default_Language: en
-  Admin:
-    -
-  Hour_KickLimit: 10
-  Hour_CancelLimit: 10
-  GroupMebers_Demand: 10
 
 LINE:
   Server:
-    Host:
-    Command_Path:
-    LongPoll_path:
+    Host: https://example.com
+    Command_Path: /example_path
+    LongPoll_path: /example_path
 
   Account:
-    X-Line-Application:
-    X-Line-Access:
-    User-Agent:
-
-  helper_LINE_ACCESS_KEYs:
-    -
+    X-Line-Application: LINE_Application_Identification
+    X-Line-Access: LINE_Application_AccessKey
+    User-Agent: LINE_Application_User-Agent

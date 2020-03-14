@@ -58,7 +58,7 @@ class Yuuki_JoinGroup:
 
     def _helper_check(self, ncMessage, GroupInvite, BlockedIgnore):
         if ncMessage.param1 in self.Yuuki.data.getData(["Global", "GroupJoined"]) and not BlockedIgnore:
-            for userId in self.Yuuki.Connect.helper_ids:
+            for userId in self.Yuuki.Connect.helper:
                 if self.Yuuki_DynamicTools.checkInInvitationList(ncMessage, userId) or userId in GroupInvite:
                     self.Yuuki_DynamicTools.getClient(userId).acceptGroupInvitation(self.Yuuki.Seq, ncMessage.param1)
                     self.Yuuki_DynamicTools.getGroupTicket(ncMessage.param1, userId, True)

@@ -105,7 +105,7 @@ class PythonMDS:
         return {"status": 200}
 
     def _yuuki_limit_decrease(self, data):
-        self.switch_data["LimitInfo"][data["path"]][data["userId"]] -= 1
+        self.switch_data["LimitInfo"][data["path"]][data["data"]] -= 1
         return {"status": 200}
 
     def _shutdown(self, data):

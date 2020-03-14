@@ -56,7 +56,7 @@ class Yuuki_Command:
             GroupPrivilege = self.Yuuki.Admin + [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
                              self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
             if ncMessage.message.from_ in GroupPrivilege:
-                for userId in self.Yuuki.Connect.helper_ids:
+                for userId in self.Yuuki.Connect.helper:
                     self.Yuuki_DynamicTools.sendUser(
                         self.Yuuki_StaticTools.sendToWho(ncMessage), userId)
 
@@ -210,7 +210,9 @@ class Yuuki_Command:
             for userId in self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]:
                 if userId not in status_added:
                     status += "{}: {}\n".format(
-                        self.Yuuki.get_text("Unknown"), userId)
+                        self.Yuuki.get_text("Unknown"),
+                        userId
+                    )
             self.Yuuki_DynamicTools.sendText(
                 self.Yuuki_StaticTools.sendToWho(ncMessage),
                 status + self.Yuuki.get_text("\nExtend Administrator(s)")
@@ -281,7 +283,7 @@ class Yuuki_Command:
                     ncMessage), self.Yuuki.get_text("Bye Bye"))
                 self.Yuuki_DynamicTools.getClient(
                     self.Yuuki.MyMID).leaveGroup(self.Yuuki.Seq, GroupInfo.id)
-                for userId in self.Yuuki.Connect.helper_ids:
+                for userId in self.Yuuki.Connect.helper:
                     if userId in [member.mid for member in GroupInfo.members]:
                         self.Yuuki_DynamicTools.getClient(
                             userId).leaveGroup(self.Yuuki.Seq, GroupInfo.id)

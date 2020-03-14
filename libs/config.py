@@ -37,7 +37,7 @@ class Yuuki_Config:
 
     systemConfig = {
         "name": "Yuuki",
-        "version": "v6.5.3-alpha_RC1",
+        "version": "v6.5.3-alpha_RC2",
         "version_check": True,
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",
@@ -57,13 +57,13 @@ class Yuuki_Config:
     }
 
     def __init__(self, config_path="config.yaml"):
-        assert os.path.isfile(config_path), "The configure file, `config.yaml` was not found."
+        assert os.path.isfile(config_path), "The config file, `config.yaml` was not found."
         with open(config_path, "r") as configfile:
             self.config = yaml.load(configfile, Loader=yaml.FullLoader)
         self._yuuki_config()
 
     def _yuuki_config(self):
-        assert self.config is not None, "Invalid configure file"
+        assert self.config is not None, "Invalid config file"
         if "Yuuki" in self.config:
             for key in self.config["Yuuki"]:
                 if key in self.systemConfig:
