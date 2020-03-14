@@ -27,6 +27,8 @@ class Yuuki_Security:
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
     def _NOTIFIED_UPDATE_GROUP(self, GroupInfo, SecurityInfo, ncMessage):
+        if not SecurityInfo["Security_Access"]:
+            return
         if SecurityInfo["Another"] == '4':
             if not GroupInfo.preventJoinByTicket and SecurityInfo["Action"] not in self.Yuuki.Connect.helper_ids:
                 self.Yuuki.threadExec(
@@ -50,6 +52,8 @@ class Yuuki_Security:
                 ))
 
     def _NOTIFIED_INVITE_INTO_GROUP(self, GroupInfo, SecurityInfo, ncMessage):
+        if not SecurityInfo["Security_Access"]:
+            return
         Canceler = "None"
         if "\x1e" in SecurityInfo["Another"]:
             Canceler = self._NOTIFIED_INVITE_INTO_GROUP_list(GroupInfo, SecurityInfo, ncMessage, Canceler)
@@ -114,6 +118,8 @@ class Yuuki_Security:
         return Canceler
 
     def _NOTIFIED_ACCEPT_GROUP_INVITATION(self, GroupInfo, SecurityInfo, ncMessage):
+        if not SecurityInfo["Security_Access"]:
+            return
         for userId in self.Yuuki.data.getData(["BlackList"]):
             if userId == SecurityInfo["Action"]:
                 self.Yuuki.threadExec(
@@ -133,7 +139,7 @@ class Yuuki_Security:
                 ))
 
     def _NOTIFIED_KICKOUT_FROM_GROUP(self, GroupInfo, SecurityInfo, ncMessage):
-        if SecurityInfo["Action"] in self.Yuuki.Connect.helper_ids:
+        if SecurityInfo["Action"] in self.Yuuki.Connect.helper:
             # Log
             self.Yuuki.data.updateLog("KickEvent", (
                 self.Yuuki.data.getTime(),

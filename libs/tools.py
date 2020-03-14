@@ -262,7 +262,7 @@ class Yuuki_DynamicTools:
             helper = self.Yuuki.MyMID
 
         actions_func = {
-            1: self.getClient(helper).cancelGroupInvitation,
+            1: self.getClient(helper).kickoutFromGroup,
             2: self.getClient(helper).cancelGroupInvitation
         }
         Limit = self.Yuuki.data.getData(["LimitInfo", actions[action], helper])

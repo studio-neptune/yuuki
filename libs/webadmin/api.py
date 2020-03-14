@@ -35,7 +35,7 @@ class Yuuki_WebAdminAPI:
     def get_helpers(self, data):
         if data:
             pass
-        return self.Yuuki.Connect.helper_ids
+        return self.Yuuki.Connect.helper
 
     def get_logs(self, data):
         return self.Yuuki_DataHandle.get_logs(data)
