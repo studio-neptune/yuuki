@@ -1,12 +1,9 @@
 # Sample Config File for star_yuuki_bot
-# Please replace setting from `libs/config.py` options
+# Please replace setting options from `libs/config.py`
 
 Yuuki:
-  Default_Language: en
-  Hour_KickLimit: 10
-  Hour_CancelLimit: 10
-  GroupMebers_Demand: 10
   SecurityService: True
+  Default_Language: en
 
 LINE:
   Server:
