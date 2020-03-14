@@ -12,6 +12,14 @@ from yuuki_core.ttypes import OpType
 from ..tools import Yuuki_StaticTools, Yuuki_DynamicTools
 
 
+def security_access_checker(function):
+    def wrapper(*args):
+        if not args[2].get("Security_Access"):
+            return
+        return function(*args)
+    return wrapper
+
+
 class Yuuki_Security:
     def __init__(self, Yuuki):
         """
@@ -26,11 +34,10 @@ class Yuuki_Security:
         self.Yuuki_StaticTools = Yuuki_StaticTools()
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
+    @security_access_checker
     def _NOTIFIED_UPDATE_GROUP(self, GroupInfo, SecurityInfo, ncMessage):
-        if not SecurityInfo["Security_Access"]:
-            return
         if SecurityInfo["Another"] == '4':
-            if not GroupInfo.preventJoinByTicket and SecurityInfo["Action"] not in self.Yuuki.Connect.helper_ids:
+            if not GroupInfo.preventJoinByTicket and SecurityInfo["Action"] not in self.Yuuki.Connect.helper:
                 self.Yuuki.threadExec(
                     self.Yuuki_DynamicTools.changeGroupUrlStatus,
                     (GroupInfo, False)
@@ -51,14 +58,13 @@ class Yuuki_Security:
                     ncMessage.type
                 ))
 
+    @security_access_checker
     def _NOTIFIED_INVITE_INTO_GROUP(self, GroupInfo, SecurityInfo, ncMessage):
-        if not SecurityInfo["Security_Access"]:
-            return
         Canceler = "None"
         if "\x1e" in SecurityInfo["Another"]:
             Canceler = self._NOTIFIED_INVITE_INTO_GROUP_list(GroupInfo, SecurityInfo, ncMessage, Canceler)
         elif SecurityInfo["Another"] not in self.Yuuki.AllAccountIds + SecurityInfo["GroupPrivilege"]:
-            Canceler = self._NOTIFIED_INVITE_INTO_GROUP_single(GroupInfo, SecurityInfo, ncMessage, Canceler)
+            Canceler = self._NOTIFIED_INVITE_INTO_GROUP_single(GroupInfo, SecurityInfo, ncMessage)
         if Canceler != "None":
             self.Yuuki_DynamicTools.sendText(
                 SecurityInfo["GroupID"],
@@ -93,7 +99,7 @@ class Yuuki_Security:
         ))
         return Canceler
 
-    def _NOTIFIED_INVITE_INTO_GROUP_single(self, GroupInfo, SecurityInfo, ncMessage, Canceler):
+    def _NOTIFIED_INVITE_INTO_GROUP_single(self, GroupInfo, SecurityInfo, ncMessage):
         if GroupInfo.invitee and SecurityInfo["Another"] in [user.mid for user in GroupInfo.invitee]:
             Canceler = self.Yuuki_DynamicTools.modifyGroupMemberList(2, GroupInfo, SecurityInfo["Another"])
         else:
@@ -117,9 +123,8 @@ class Yuuki_Security:
         ))
         return Canceler
 
+    @security_access_checker
     def _NOTIFIED_ACCEPT_GROUP_INVITATION(self, GroupInfo, SecurityInfo, ncMessage):
-        if not SecurityInfo["Security_Access"]:
-            return
         for userId in self.Yuuki.data.getData(["BlackList"]):
             if userId == SecurityInfo["Action"]:
                 self.Yuuki.threadExec(
