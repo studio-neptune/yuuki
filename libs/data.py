@@ -85,7 +85,7 @@ class Yuuki_Data:
             if not os.path.isfile(name):
                 with open(name, "w") as f:
                     self.Data[data_type] = self.DataType[data_type]
-                    json.dump(f, self.Data[data_type])
+                    json.dump(self.Data[data_type], f)
             else:
                 with open(name, "r") as f:
                     try:
@@ -186,7 +186,7 @@ class Yuuki_Data:
             self.Data = self.getData([])
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
-                f.write(json.dumps(self.Data[Type]))
+                json.dump(self.Data[Type], f)
         return self.getData(["Global", "Power"])
 
     def updateData(self, path, data):
