@@ -25,8 +25,6 @@ class Yuuki_Poll:
 
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
-
-        self.Yuuki_StaticTools = Yuuki_StaticTools()
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
     def _action(self):
@@ -57,7 +55,7 @@ class Yuuki_Poll:
                 self.Yuuki.revision = max(self.cacheOperations[-1].revision, self.cacheOperations[-2].revision)
 
     def _exception(self):
-        (err1, err2, err3, ErrorInfo) = self.Yuuki_StaticTools.errorReport()
+        (err1, err2, err3, ErrorInfo) = Yuuki_StaticTools.errorReport()
 
         ncMessage = Operation()
 

@@ -17,6 +17,7 @@ def security_access_checker(function):
         if not args[2].get("Security_Access"):
             return
         return function(*args)
+
     return wrapper
 
 
@@ -31,7 +32,6 @@ class Yuuki_Security:
         """
         self.Yuuki = Yuuki
 
-        self.Yuuki_StaticTools = Yuuki_StaticTools()
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
     @security_access_checker
@@ -234,7 +234,7 @@ class Yuuki_Security:
             SecurityInfo["GroupID"], SecurityInfo["Another"], True)
 
     def _NOTIFIED_KICKOUT_FROM_GROUP_rescue_failure(self, GroupInfo, SecurityInfo, ncMessage, Kicker):
-        (err1, err2, err3, ErrorInfo) = self.Yuuki_StaticTools.errorReport()
+        (err1, err2, err3, ErrorInfo) = Yuuki_StaticTools.errorReport()
         for Root in self.Yuuki.Admin:
             self.Yuuki_DynamicTools.sendText(
                 Root,
@@ -276,11 +276,11 @@ class Yuuki_Security:
             self.Yuuki_DynamicTools.sendUser, (SecurityInfo["GroupID"], SecurityInfo["Another"]))
 
     def action(self, ncMessage):
-        SecurityInfo = self.Yuuki_StaticTools.securityForWhere(ncMessage)
+        SecurityInfo = Yuuki_StaticTools.securityForWhere(ncMessage)
 
         GroupInfo = self.Yuuki_DynamicTools.getClient(self.Yuuki.MyMID).getGroup(SecurityInfo["GroupID"])
         SecurityInfo["GroupPrivilege"] = self.Yuuki.Admin + \
-                                         [self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
+                                         [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
                                          self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
 
         if SecurityInfo["Action"] in SecurityInfo["GroupPrivilege"] or \

@@ -108,7 +108,6 @@ class Yuuki_StaticTools:
 class Yuuki_DynamicTools:
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
-        self.Yuuki_StaticTools = Yuuki_StaticTools()
 
     def getClient(self, userId):
         """
@@ -249,7 +248,7 @@ class Yuuki_DynamicTools:
         assert action in actions, "Invalid action code"
         if len(self.Yuuki.Connect.helper) >= 1:
             members = [member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
-            accounts = self.Yuuki_StaticTools.dictShuffle(
+            accounts = Yuuki_StaticTools.dictShuffle(
                 self.Yuuki.data.getData(["LimitInfo", actions[action]]), members)
             if len(accounts) == 0:
                 return "None"

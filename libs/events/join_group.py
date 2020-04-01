@@ -17,8 +17,6 @@ class Yuuki_JoinGroup:
                 NOTIFIED_INVITE_INTO_GROUP (13)
         """
         self.Yuuki = Yuuki
-
-        self.Yuuki_StaticTools = Yuuki_StaticTools()
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
     def _accept(self, GroupID, GroupInfo, Inviter):
@@ -37,7 +35,7 @@ class Yuuki_JoinGroup:
             self.Yuuki.get_text("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
             (
                 self.Yuuki.YuukiConfigs["name"],
-                self.Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).displayName,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).displayName,
             )
         )
         self.Yuuki_DynamicTools.getGroupTicket(GroupID, self.Yuuki.MyMID, True)

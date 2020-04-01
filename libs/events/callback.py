@@ -10,7 +10,7 @@ import time
 
 from yuuki_core.ttypes import ContentType
 
-from ..tools import Yuuki_StaticTools, Yuuki_DynamicTools
+from ..tools import Yuuki_DynamicTools
 
 
 class Yuuki_Callback:
@@ -20,8 +20,6 @@ class Yuuki_Callback:
                 SEND_MESSAGE(25)
         """
         self.Yuuki = Yuuki
-
-        self.Yuuki_StaticTools = Yuuki_StaticTools()
         self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
 
     def _shutdown(self, ncMessage):
