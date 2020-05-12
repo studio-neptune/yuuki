@@ -7,11 +7,10 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 import hashlib
-import json
 import random
 import time
 
-from flask import Flask, render_template, Response, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
 
@@ -126,7 +125,7 @@ class Yuuki_WebAdmin:
                 result = {"status": 200, "session": session_key}
             else:
                 result = {"status": 401}
-        return Response(json.dumps(result), mimetype='application/json')
+        return jsonify(result)
 
     @staticmethod
     @wa_app.route("/logout")
@@ -171,7 +170,7 @@ class Yuuki_WebAdmin:
                 result = {"status": 200, "result": query_result}
             else:
                 result = {"status": 401}
-        return Response(json.dumps(result), mimetype='application/json')
+        return jsonify(result)
 
     @staticmethod
     @wa_app.route("/api/shutdown")
