@@ -357,7 +357,14 @@ class Yuuki_Command:
 
     def _text(self, ncMessage):
         Yuuki_Name = self.Yuuki.YuukiConfigs["name"]
-        msgSep = ncMessage.message.text.split(" ")[0].split("/")
+        if Yuuki_Name == ncMessage.message.text:
+            self.Yuuki_DynamicTools.sendText(
+                self.Yuuki_StaticTools.sendToWho(ncMessage),
+                self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % (Yuuki_Name,)
+            )
+        elif not ncMessage.message.text.startswith(Yuuki_Name + "/"):
+            return
+        msgSep = ncMessage.message.text.split()[0].split("/")
         actions = {
             'Help': self._Help,
             'Version': self._Version,
@@ -374,10 +381,8 @@ class Yuuki_Command:
             'Exit': self._Exit,
             'SystemCall': self._SystemCall,
         }
-        if Yuuki_Name == msgSep[0]:
-            if len(msgSep) > 1 and msgSep[1] in actions:
-                return actions[msgSep[1]](ncMessage)
-            return self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % (Yuuki_Name,)
+        if Yuuki_Name == msgSep[0] and msgSep[1] in actions:
+            return actions[msgSep[1]](ncMessage)
 
     def _contact(self, ncMessage):
         cache = ncMessage.message.contentMetadata["mid"]
