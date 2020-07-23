@@ -3,7 +3,6 @@
 ![Version](https://img.shields.io/badge/v6.5.3-OpenSource-FF0033.svg) ![Series](https://img.shields.io/badge/syb-Series-7700FF.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg) ![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)
 
 [![Scrutinizer-CI_Build](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/build.png?b=master) ![Scrutinizer-CI_Quality](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/) 
-[![Code-Inspector_Score](https://www.code-inspector.com/project/3632/score/svg) ![Code-Inspector_Score](https://www.code-inspector.com/project/3632/status/svg)](https://frontend.code-inspector.com/public/project/3632/star_yuuki_bot/dashboard)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fstar-inc%2Fstar_yuuki_bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fstar-inc%2Fstar_yuuki_bot?ref=badge_shield)
 
 A Python BOT for LINE Group Protection.
