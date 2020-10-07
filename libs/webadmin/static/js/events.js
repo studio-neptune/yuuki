@@ -16,12 +16,12 @@ var events = [
 ];
 
 function format2html(title, context) {
-    return "<div class=\"media pt-3\">" +
-        "<p class=\"media-body pb-3 mb-0 small lh-125 border-bottom border-gray\">" +
-        "<strong class=\"d-block text-gray-dark\">" + title + "</strong>" +
-        context +
-        "</p>" +
-        "</div>";
+    return `<div class=\"media pt-3\">
+                <p class=\"media-body pb-3 mb-0 small lh-125 border-bottom border-gray\">
+                    <strong class=\"d-block text-gray-dark\">${title}</strong>
+                    ${context}
+                </p>
+            </div>`;
 }
 
 function log_query(data) {

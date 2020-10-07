@@ -30,19 +30,19 @@ function header2html(yuuki_name) {
             nav_list += nav_items(false, p_key, page_list[p_key])
         }
     });
-    return "<nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">" +
-        "<a class=\"navbar-brand\" href=\"/\">" + yuuki_name + " - WebAdmin</a>" +
-        "<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\"          data-target=\"#navbarCollapse\"aria-controls=\"navbarCollapse\" aria-expanded=\"false\" aria-label=\"Toggle         navigation\">" +
-        "<span class=\"navbar-toggler-icon\"></span>" +
-        "</button>" +
-        "<div class=\"collapse navbar-collapse\" id=\"navbarCollapse\">" +
-        "<ul class=\"navbar-nav mr-auto\"></ul>" +
-        "<a href=\"/logout\"><button class=\"btn btn-outline-success my-2 my-sm-0\">Logout</button></a>" +
-        "</div>" +
-        "</nav>" +
-        "<div class=\"nav-scroller bg-white shadow-sm\">" +
-        "<nav class=\"nav nav-underline\">" + nav_list + "</nav>" +
-        "</div>";
+    return `<nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">
+                <a class=\"navbar-brand\" href=\"/\"> ${yuuki_name} - WebAdmin</a>
+                <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarCollapse\"aria-controls=\"navbarCollapse\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">
+                    <span class=\"navbar-toggler-icon\"></span>
+                </button>
+                <div class=\"collapse navbar-collapse\" id=\"navbarCollapse\">
+                    <ul class=\"navbar-nav mr-auto\"></ul>
+                    <a href=\"/logout\"><button class=\"btn btn-outline-success my-2 my-sm-0\">Logout</button></a>
+                </div>
+            </nav>
+            <div class=\"nav-scroller bg-white shadow-sm\">
+                <nav class=\"nav nav-underline\">${nav_list}</nav>
+            </div>`;
 }
 
 $(function () {

@@ -10,16 +10,16 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 function format2html(title, context) {
-    return "<div class=\"media pt-3\">" +
-        "<img class=\"mini-logo mr-2 rounded\" src=\"" + object_server + "/os/p/" + title + "\">" +
-        "<p class=\"media-body pb-3 mb-0 small lh-125 border-bottom border-gray\">" +
-        "<strong class=\"d-block text-gray-dark\">" + title + "</strong>" +
-        context +
-        "</p>" +
-        "</div>";
+    return `<div class=\"media pt-3\">
+                <img class=\"mini-logo mr-2 rounded\" src=\"${object_server}/os/p/${title}\">
+                <p class=\"media-body pb-3 mb-0 small lh-125 border-bottom border-gray\">
+                    <strong class=\"d-block text-gray-dark\">${title}</strong>
+                    ${context}
+                </p>
+            </div>`;
 }
 
-$(function(){
+$(function () {
     $.ajax({
         url: "/api",
         type: "POST",

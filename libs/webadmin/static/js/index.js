@@ -23,7 +23,7 @@ function init(id, data) {
             let ajax_result = response.result;
             if (ajax_result.length) {
                 $(id).text(ajax_result[ajax_result.length - 1]);
-	    } else {
+            } else {
                 $(id).text("Nothing");
             }
         }
