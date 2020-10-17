@@ -48,13 +48,13 @@ export default {
                     color: "#007bff",
                     icon: "#6f42c1",
                     preview: "Edit LINE profile of the console BOT.",
-                    action: () => {}
+                    action: () => this.$router.push({path: "/profile"})
                 },
                 "Yuuki Configure": {
                     color: "#e83e8c",
                     icon: "#6f42c1",
                     preview: "Settings for the BOT works.",
-                    action: () => {}
+                    action: () => alert("Unavailable")
                 },
                 Shutdown: {
                     color: "#6f42c1",

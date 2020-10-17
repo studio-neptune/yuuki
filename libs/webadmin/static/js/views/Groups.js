@@ -27,16 +27,16 @@ export default {
     methods: {
         async fetchGroupsJoined() {
             return await new Promise((resolve, reject) => fetch("/api/groups", {
-                    credentials: "same-origin"
-                })
+                credentials: "same-origin"
+            })
                 .then((body) => body.json())
                 .catch(reject)
                 .then(resolve));
         },
         async fetchGroupsInfo(groupIds) {
             return await new Promise((resolve, reject) => fetch(`/api/groups/${groupIds.join(',')}`, {
-                    credentials: "same-origin"
-                })
+                credentials: "same-origin"
+            })
                 .then((body) => body.json())
                 .catch(reject)
                 .then(resolve));

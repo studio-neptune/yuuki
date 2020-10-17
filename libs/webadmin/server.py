@@ -26,7 +26,6 @@ Yuuki_APIHandle_Data = None
 
 passports = []
 password = str(hash(random.random()))
-shutdown_password = str(hash(random.random()))
 
 
 def authorized_response(function):
@@ -60,18 +59,9 @@ class Yuuki_WebAdmin:
         global password
         password = code
 
-    @staticmethod
-    def set_shutdown_password(code):
-        global shutdown_password
-        shutdown_password = code
-
     def wa_listen(self):
         self.http_server = WSGIServer(('', 2020), wa_app)
         self.http_server.serve_forever()
-
-    def wa_shutdown(self):
-        self.http_server.stop()
-        self.http_server.close()
 
     # HTML Server
     @staticmethod
@@ -121,14 +111,24 @@ class Yuuki_WebAdmin:
         return jsonify({"status": 403})
 
     @staticmethod
-    @wa_app.route("/api/profile")
+    @wa_app.route("/api/profile", methods=["GET", "PUT"])
     @authorized_response
     def profile():
-        return {
-            "version": Yuuki_Handle.YuukiConfigs["version"],
-            "name": Yuuki_Handle.profile.displayName,
-            "picture": f"{Yuuki_Handle.LINE_Media_server}/{Yuuki_Handle.profile.pictureStatus}"
-        }
+        if request.method == "GET":
+            return {
+                "version": Yuuki_Handle.YuukiConfigs["version"],
+                "name": Yuuki_Handle.profile.displayName,
+                "status": Yuuki_Handle.profile.statusMessage,
+                "picture": f"{Yuuki_Handle.LINE_Media_server}/{Yuuki_Handle.profile.pictureStatus}"
+            }
+        if request.method == "PUT" and "name" in request.values and "status" in request.values:
+            Yuuki_Handle.profile.displayName = request.values["name"]
+            Yuuki_Handle.profile.statusMessage = request.values["status"]
+            Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).updateProfile(
+                Yuuki_Handle.Seq, Yuuki_Handle.profile
+            )
+            return {"status": 200}
+        return {"status": 400}
 
     @staticmethod
     @wa_app.route("/api/groups", methods=["GET", "POST", "DELETE"])
@@ -195,9 +195,9 @@ class Yuuki_WebAdmin:
         return Yuuki_APIHandle_Data.get_logs(doctype)
 
     @staticmethod
-    @wa_app.route("/api/boardcast", methods=["POST"])
+    @wa_app.route("/api/broadcast", methods=["POST"])
     @authorized_response
-    def boardcast():
+    def broadcast():
         if "message" in request.values and "audience" in request.values and request.values["message"]:
             audience_ids = {
                 "groups": lambda: Yuuki_Handle_Data.getData(

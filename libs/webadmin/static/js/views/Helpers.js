@@ -30,8 +30,8 @@ export default {
     },
     created() {
         fetch("/api/helpers", {
-                credentials: "same-origin"
-            })
+            credentials: "same-origin"
+        })
             .then((body) => body.json())
             .then((helper_list) => {
                 this.helperList = helper_list.length ? helper_list : ["(empty)"];

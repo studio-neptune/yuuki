@@ -18,7 +18,7 @@ export default {
 
             <div class="password_box">
                 <form class="form-inline mt-2 mt-md-0 login-box" method="post">
-                    <input v-model="password" class="form-control mr-sm-2" type="password" placeholder="Type your admin password" aria-label="Login" name="code">
+                    <input v-model="password" class="form-control mr-sm-2" type="password" placeholder="Type your admin password" aria-label="Login" name="code" />
                     <button @click.prevent="authorize" class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
                 </form>
             </div>
@@ -34,9 +34,9 @@ export default {
             let body = new FormData();
             body.append("code", this.password);
             fetch("/api/verify", {
-                    method: "POST",
-                    body
-                })
+                method: "POST",
+                body
+            })
                 .then(body => body.json())
                 .then(data => {
                     if (data.status == 200) {

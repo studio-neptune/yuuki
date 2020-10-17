@@ -13,14 +13,15 @@ import Dashboard from "./views/Dashboard.js";
 import Groups from "./views/Groups.js";
 import Helpers from "./views/Helpers.js";
 import Settings from "./views/Settings.js";
+import Profile from "./views/Profile.js";
 import Events from "./views/Events.js";
 import NotFound from "./views/NotFound.js";
 
 const router = new VueRouter({
     routes: [{
-            path: '/',
-            component: Login
-        },
+        path: '/',
+        component: Login
+    },
         {
             path: '/dashboard',
             component: Dashboard
@@ -35,7 +36,11 @@ const router = new VueRouter({
         },
         {
             path: '/settings',
-            component: Settings
+            component: Settings,
+        },
+        {
+            path: '/profile',
+            component: Profile,
         },
         {
             path: '/events/:doctype',
@@ -49,7 +54,7 @@ const router = new VueRouter({
     ]
 })
 
-const app = new Vue({
+new Vue({
     template: `
     <div>
         <div v-if="accessStatus" class="nav-scroller bg-white shadow-sm pt-1 pb-1">
@@ -78,7 +83,7 @@ const app = new Vue({
                 }
                 this.accessStatus = true;
             } else {
-                if (this.$router.currentRoute.path != "/") {
+                if (this.$router.currentRoute.path !== "/") {
                     this.$router.push({
                         path: "/"
                     });

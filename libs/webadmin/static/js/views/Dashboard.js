@@ -18,18 +18,18 @@ export default {
             </div>
 
             <form class="my-3 p-3 bg-white rounded shadow-sm" method="POST">
-                <h6 class="border-bottom border-gray pb-2 mb-0">Boardcast</h6>
-                <textarea v-model="boardcastText" class="form-control" cols="50" rows="5" placeholder="Type any text message for announcing..."></textarea>
+                <h6 class="border-bottom border-gray pb-2 mb-0">Broadcast</h6>
+                <textarea v-model="broadcastText" class="form-control" cols="50" rows="5" placeholder="Type any text message for announcing..." :disabled="broadcastStatus"></textarea>
                 <div class="mt-1">
                     <label for="name">Audience: </label>
                     <label class="checkbox-inline">
-                        <input v-model="boardcastAudience.contacts" type="checkbox" id="inlineCheckbox1" value="option1" disabled> Contacts
+                        <input v-model="broadcastAudience.contacts" type="checkbox" id="inlineCheckbox1" value="option1" disabled> Contacts
                     </label>
                     <label class="checkbox-inline">
-                        <input v-model="boardcastAudience.groups" type="checkbox" id="inlineCheckbox2" value="option2"> Groups
+                        <input v-model="broadcastAudience.groups" type="checkbox" id="inlineCheckbox2" value="option2" :disabled="broadcastStatus" > Groups
                     </label>
                 </div>
-                <input @click.prevent="boardcast" class="form-control text-light bg-primary mt-1" type="submit" value="Send" />
+                <input @click.prevent="broadcast" class="form-control text-light bg-primary mt-1" type="submit" value="Send" :disabled="broadcastStatus" />
             </form>
 
             <div class="my-3 p-3 bg-white rounded shadow-sm">
@@ -41,12 +41,12 @@ export default {
                  :to="event.href">
                     <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg"
                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32">
-                        <title>{{eventKey}}</title>
+                        <title>{{event.title}}</title>
                         <rect width="100%" height="100%" :fill="event.color"/>
                         <text x="50%" y="50%" :fill="event.color" dy=".3em">32x32</text>
                     </svg>
                     <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                        <strong class="d-block text-gray-dark">[{{eventKey}}]</strong>
+                        <strong class="d-block text-gray-dark">[{{event.title}}]</strong>
                         <span>{{getPreview(event)}}</span>
                     </p>
                 </router-link>
@@ -57,20 +57,23 @@ export default {
         getPreview(event) {
             return "preview" in event ? event.preview : "Loading...";
         },
-        boardcast() {
+        async broadcast() {
             let checkpoint = confirm("The message will broadcast, are you sure?");
-            if (!this.boardcastText && checkpoint) return;
+            if (!this.broadcastText && checkpoint) return;
+            this.broadcastStatus = true;
             let body = new FormData();
-            body.set("message", this.boardcastText);
-            for (let target in this.boardcastAudience) {
-                if (this.boardcastAudience[target]) {
+            body.set("message", this.broadcastText);
+            await Promise.all(Object.keys(this.broadcastAudience).map((target) => {
+                if (this.broadcastAudience[target]) {
                     body.set("audience", target);
-                    fetch("/api/boardcast", {
+                    return fetch("/api/broadcast", {
                         method: "POST",
                         body
                     });
                 }
-            }
+            }));
+            this.broadcastText = "";
+            this.broadcastStatus = false;
         },
         async fetchEventPreview(eventKey) {
             const result = await this.getEventInfo(eventKey);
@@ -82,8 +85,8 @@ export default {
         },
         async getEventInfo(eventKey) {
             return await new Promise((resolve, reject) => fetch(`/api/events/${eventKey}`, {
-                    credentials: "same-origin"
-                })
+                credentials: "same-origin"
+            })
                 .then((body) => body.json())
                 .catch(reject)
                 .then(resolve));
@@ -93,26 +96,31 @@ export default {
         return {
             version: "",
             profileName: "",
-            boardcastText: "",
-            boardcastAudience: {
+            profilePicture: "",
+            broadcastStatus: false,
+            broadcastText: "",
+            broadcastAudience: {
                 contacts: false,
                 groups: false,
             },
-            profilePicture: "",
             events: {
-                "Join Event": {
+                JoinGroup: {
+                    title: "Join Event",
                     color: "#6f42c1",
                     href: "/events/JoinGroup"
                 },
-                "Block Event": {
+                BlackList: {
+                    title: "Block Event",
                     color: "#007bff",
                     href: "/events/BlackList"
                 },
-                "Kick Event": {
+                KickEvent: {
+                    title: "Kick Event",
                     color: "#e83e8c",
                     href: "/events/KickEvent"
                 },
-                "Cancel Event": {
+                CancelEvent: {
+                    title: "Cancel Event",
                     color: "#00ff00",
                     href: "/events/CancelEvent"
                 },
@@ -121,8 +129,8 @@ export default {
     },
     async created() {
         fetch("/api/profile", {
-                credentials: "same-origin"
-            })
+            credentials: "same-origin"
+        })
             .then((body) => body.json())
             .then((profile) => {
                 this.version = profile.version;

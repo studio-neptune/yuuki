@@ -116,10 +116,8 @@ class Yuuki:
     def _Setup_WebAdmin(self):
         if self.Threading and self.YuukiConfigs.get("WebAdmin"):
             password = str(hash(random.random()))
-            self.shutdown_password = str(hash(random.random()))
             self.web_admin = Yuuki_WebAdmin(self)
             self.web_admin.set_password(password)
-            self.web_admin.set_shutdown_password(self.shutdown_password)
             self.Thread_Control.add(self.web_admin.wa_listen)
             print(
                 "<*> Yuuki WebAdmin - Enable\n"

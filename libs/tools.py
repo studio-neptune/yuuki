@@ -130,15 +130,11 @@ class Yuuki_DynamicTools:
         if userId is None:
             userId = self.Yuuki.MyMID
         if ncMessage.param3 == userId:
-            inList = True
+            return True
         elif "\x1e" in ncMessage.param3:
             if userId in ncMessage.param3.split("\x1e"):
-                inList = True
-            else:
-                inList = False
-        else:
-            inList = False
-        return inList
+                return True
+        return False
 
     def changeGroupUrlStatus(self, groupInfo, status, userId=None):
         """
@@ -244,12 +240,21 @@ class Yuuki_DynamicTools:
         :param exceptUserId: List of userId
         :return: string
         """
-        actions = {1: "KickLimit", 2: "CancelLimit"}
+        actions = {
+            1: {
+                "command": "KickLimit",
+                "message": "Kick Limit."
+            },
+            2: {
+                "command": "CancelLimit",
+                "message": "Cancel Limit."
+            }
+        }
         assert action in actions, "Invalid action code"
         if len(self.Yuuki.Connect.helper) >= 1:
             members = [member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
             accounts = Yuuki_StaticTools.dictShuffle(
-                self.Yuuki.data.getData(["LimitInfo", actions[action]]), members)
+                self.Yuuki.data.getData(["LimitInfo", actions[action].get("command")]), members)
             if len(accounts) == 0:
                 return "None"
             if exceptUserId:
@@ -264,12 +269,12 @@ class Yuuki_DynamicTools:
             1: self.getClient(helper).kickoutFromGroup,
             2: self.getClient(helper).cancelGroupInvitation
         }
-        Limit = self.Yuuki.data.getData(["LimitInfo", actions[action], helper])
+        Limit = self.Yuuki.data.getData(["LimitInfo", actions[action].get("command"), helper])
         if Limit > 0:
             actions_func[action](self.Yuuki.Seq, groupInfo.id, [userId])
-            self.Yuuki.data.limitDecrease(actions[action], helper)
+            self.Yuuki.data.limitDecrease(actions[action].get("command"), helper)
         else:
-            self.sendText(groupInfo.id, self.Yuuki.get_text("Cancel Limit."))
+            self.sendText(groupInfo.id, self.Yuuki.get_text(actions[action].get("message")))
         return helper
 
     def sendText(self, send_to, msg):

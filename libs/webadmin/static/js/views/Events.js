@@ -11,10 +11,13 @@ export default {
             <div class="my-3 p-3 bg-white rounded shadow-sm">
                 <h6 class="border-bottom border-gray pb-2 mb-0">Event: {{doctype}}</h6>
                 <div id="events">
-                    <div class="media pt-3">
+                    <div
+                     v-for="(event, eventIndex) in data"
+                     :key="eventIndex"
+                     class="media pt-3">
                         <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                            <strong class="d-block text-gray-dark">{{title}}</strong>
-                            {{content}}
+                            <strong class="d-block text-gray-dark">{{event.title}}</strong>
+                            {{event.content}}
                         </p>
                     </div>
                 </div>
@@ -23,20 +26,21 @@ export default {
     props: ["doctype"],
     data() {
         return {
-            data: []
+            data: [{ title: "Loading..." }]
         }
     },
     created() {
         fetch(`/api/events/${this.doctype}`, {
-                credentials: "same-origin"
-            })
+            credentials: "same-origin"
+        })
             .then((body) => body.json())
             .then((events) => {
                 this.data = events.map((event) => {
+                    if(!event) return { title: "(empty)" };
                     return {
                         title: event.substring(0, 24),
-                        content: event.substring(26, element.length)
-                    }
+                        content: event.substring(26, event.length)
+                    };
                 });
             });
     },
