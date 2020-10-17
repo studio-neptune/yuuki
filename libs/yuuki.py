@@ -138,10 +138,6 @@ class Yuuki:
             time.sleep(1)
             self.data.MdsThreadControl.stop("mds_listen")
             if self.YuukiConfigs.get("WebAdmin"):
-                requests.get(
-                    "http://localhost:2020/api/shutdown/{}".format(self.shutdown_password)
-                )
-                time.sleep(1)
                 self.data.MdsThreadControl.stop("wa_listen")
         if restart:
             self.__restart()

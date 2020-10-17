@@ -13,16 +13,36 @@ import time
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
+from functools import wraps
 
-from .api import Yuuki_WebAdminAPI
+from .reader import Yuuki_WebDataReader
+from ..tools import Yuuki_DynamicTools
 
 wa_app = Flask(__name__)
+
 Yuuki_Handle = None
-Yuuki_APIHandle = None
+Yuuki_Handle_Data = None
+Yuuki_APIHandle_Data = None
 
 passports = []
 password = str(hash(random.random()))
 shutdown_password = str(hash(random.random()))
+
+
+def authorized_response(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        if "yuuki_admin" in request.cookies \
+                and request.cookies["yuuki_admin"] in passports:
+            return jsonify(function(*args, **kwargs))
+        response = jsonify({"status": 403})
+        response.set_cookie(
+            key='yuuki_admin',
+            value='',
+            expires=0
+        )
+        return response
+    return wrapper
 
 
 class Yuuki_WebAdmin:
@@ -30,102 +50,42 @@ class Yuuki_WebAdmin:
     http_server = None
 
     def __init__(self, Yuuki):
-        global Yuuki_Handle, Yuuki_APIHandle
+        global Yuuki_Handle, Yuuki_Handle_Data, Yuuki_APIHandle_Data
         Yuuki_Handle = Yuuki
-        Yuuki_APIHandle = Yuuki_WebAdminAPI(Yuuki_Handle, self)
+        Yuuki_Handle_Data = Yuuki.data
+        Yuuki_APIHandle_Data = Yuuki_WebDataReader(Yuuki_Handle_Data)
 
+    @staticmethod
+    def set_password(code):
+        global password
+        password = code
+
+    @staticmethod
+    def set_shutdown_password(code):
+        global shutdown_password
+        shutdown_password = code
+
+    def wa_listen(self):
+        self.http_server = WSGIServer(('', 2020), wa_app)
+        self.http_server.serve_forever()
+
+    def wa_shutdown(self):
+        self.http_server.stop()
+        self.http_server.close()
+
+    # HTML Server
     @staticmethod
     @wa_app.route("/")
     def index():
-        if "yuuki_admin" in request.cookies:
-            if request.cookies["yuuki_admin"] in passports:
-                return render_template(
-                    'manage/index.html',
-                    version=Yuuki_Handle.YuukiConfigs["version"],
-                    LINE_Media_server=Yuuki_Handle.LINE_Media_server,
-                    profileName=Yuuki_Handle.profile.displayName,
-                    pictureStatus=Yuuki_Handle.profile.pictureStatus
-                )
-            else:
-                response = redirect("/")
-                response.set_cookie(
-                    key='yuuki_admin',
-                    value='',
-                    expires=0
-                )
-                return response
-        else:
-            return render_template(
-                'index.html',
-                name=Yuuki_Handle.YuukiConfigs["name"],
-                version=Yuuki_Handle.YuukiConfigs["version"]
-            )
-
-    @staticmethod
-    @wa_app.route("/groups")
-    def groups():
-        if "yuuki_admin" in request.cookies:
-            if request.cookies["yuuki_admin"] in passports:
-                return render_template(
-                    'manage/groups.html',
-                    LINE_Media_server=Yuuki_Handle.LINE_Media_server
-                )
-        response = redirect("/")
-        response.set_cookie(
-            key='yuuki_admin',
-            value='',
-            expires=0
+        status = False
+        if "yuuki_admin" in request.cookies \
+                and request.cookies["yuuki_admin"] in passports:
+            status = True
+        return render_template(
+            '/index.html',
+            name=Yuuki_Handle.YuukiConfigs["name"],
+            authorized=status
         )
-        return response
-
-    @staticmethod
-    @wa_app.route("/helpers")
-    def helpers():
-        if "yuuki_admin" in request.cookies:
-            if request.cookies["yuuki_admin"] in passports:
-                return render_template(
-                    'manage/helpers.html'
-                )
-        response = redirect("/")
-        response.set_cookie(
-            key='yuuki_admin',
-            value='',
-            expires=0
-        )
-        return response
-
-    @staticmethod
-    @wa_app.route("/settings")
-    def settings():
-        if "yuuki_admin" in request.cookies:
-            if request.cookies["yuuki_admin"] in passports:
-                return render_template(
-                    'manage/settings.html',
-                    version=Yuuki_Handle.YuukiConfigs["version"],
-                    project_url=Yuuki_Handle.YuukiConfigs["project_url"]
-                )
-        response = redirect("/")
-        response.set_cookie(
-            key='yuuki_admin',
-            value='',
-            expires=0
-        )
-        return response
-
-    @staticmethod
-    @wa_app.route("/verify", methods=['GET', 'POST'])
-    def verify():
-        result = {"status": 403}
-        if request.method == "POST" and "code" in request.values:
-            if request.values["code"] == password:
-                seed = hash(random.random() + time.time())
-                seed = str(seed).encode('utf-8')
-                session_key = hashlib.sha256(seed).hexdigest()
-                passports.append(session_key)
-                result = {"status": 200, "session": session_key}
-            else:
-                result = {"status": 401}
-        return jsonify(result)
 
     @staticmethod
     @wa_app.route("/logout")
@@ -141,65 +101,127 @@ class Yuuki_WebAdmin:
             )
         return response
 
+    # API Points
     @staticmethod
-    @wa_app.route("/events")
-    def events():
-        if "yuuki_admin" in request.cookies:
-            if request.cookies["yuuki_admin"] in passports:
-                return render_template(
-                    'manage/events.html'
+    @wa_app.route("/api/verify", methods=['POST'])
+    def verify():
+        if "code" in request.values:
+            if request.values["code"] == password:
+                seed = hash(random.random() + time.time())
+                seed = str(seed).encode('utf-8')
+                session_key = hashlib.sha256(seed).hexdigest()
+                passports.append(session_key)
+                result = jsonify({"status": 200, "session": session_key})
+                result.set_cookie(
+                    key='yuuki_admin',
+                    value=session_key
                 )
-        response = redirect("/")
-        response.set_cookie(
-            key='yuuki_admin',
-            value='',
-            expires=0
-        )
-        return response
+                return result
+            return jsonify({"status": 401})
+        return jsonify({"status": 403})
 
     @staticmethod
-    @wa_app.route("/api", methods=['GET', 'POST'])
-    def api():
-        result = {"status": 403}
-        if request.method == "POST" and "task" in request.values:
-            if request.cookies.get("yuuki_admin") in passports:
-                query_result = Yuuki_APIHandle.action(
-                    task=request.values.get("task"),
-                    data=request.values.get("data")
+    @wa_app.route("/api/profile")
+    @authorized_response
+    def profile():
+        return {
+            "version": Yuuki_Handle.YuukiConfigs["version"],
+            "name": Yuuki_Handle.profile.displayName,
+            "picture": f"{Yuuki_Handle.LINE_Media_server}/{Yuuki_Handle.profile.pictureStatus}"
+        }
+
+    @staticmethod
+    @wa_app.route("/api/groups", methods=["GET", "POST", "DELETE"])
+    @authorized_response
+    def groups():
+        if request.method == "GET":
+            return Yuuki_Handle_Data.getData(["Global", "GroupJoined"])
+        if request.method == "POST" and "id" in request.values:
+            return Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).acceptGroupInvitation(
+                Yuuki_Handle.Seq, request.values["id"]
+            )
+        if request.method == "DELETE" and "id" in request.values:
+            return Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).leaveGroup(
+                Yuuki_Handle.Seq, request.values["id"]
+            )
+        return {"status": 400}
+
+    @staticmethod
+    @wa_app.route("/api/group/ticket", methods=["POST"])
+    @authorized_response
+    def group_ticket():
+        if "id" in request.values and "ticket" in request.values:
+            return Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).acceptGroupInvitationByTicket(
+                Yuuki_Handle.Seq, request.values["id"], request.values["ticket"]
+            )
+        return {"status": 400}
+
+    @staticmethod
+    @wa_app.route("/api/groups/<id_list>")
+    @authorized_response
+    def groups_information(id_list=None):
+        read_id_list = id_list.split(",")
+        if isinstance(read_id_list, list) and len(read_id_list) > 0:
+            def type_handle(obj):
+                for key in obj.__dict__:
+                    if key == "pictureStatus" and obj.__dict__[key] is not None:
+                        obj.__dict__[
+                            key] = f"{Yuuki_Handle.LINE_Media_server}/{obj.__dict__[key]}"
+                    if isinstance(obj.__dict__[key], list):
+                        obj.__dict__[key] = list(
+                            map(type_handle, obj.__dict__[key]))
+                    if hasattr(obj.__dict__[key], '__dict__'):
+                        obj.__dict__[key] = obj.__dict__[key].__dict__
+                return obj.__dict__
+            return list(map(type_handle, Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).getGroups(read_id_list)))
+        return {"status": 400}
+
+    @staticmethod
+    @wa_app.route("/api/helpers")
+    @authorized_response
+    def helpers():
+        return Yuuki_Handle.Connect.helper
+
+    @staticmethod
+    @wa_app.route("/api/settings")
+    @authorized_response
+    def settings():
+        return None
+
+    @staticmethod
+    @wa_app.route("/api/events/<doctype>")
+    @authorized_response
+    def get_logs(doctype):
+        return Yuuki_APIHandle_Data.get_logs(doctype)
+
+    @staticmethod
+    @wa_app.route("/api/boardcast", methods=["POST"])
+    @authorized_response
+    def boardcast():
+        if "message" in request.values and "audience" in request.values and request.values["message"]:
+            audience_ids = {
+                "groups": lambda: Yuuki_Handle_Data.getData(
+                    ["Global", "GroupJoined"]
                 )
-                result = {"status": 200, "result": query_result}
-            else:
-                result = {"status": 401}
-        return jsonify(result)
+            }
+            if request.values["audience"] not in audience_ids:
+                return {"status": "404"}
+            return list(map(
+                lambda target_id: Yuuki_DynamicTools(Yuuki_Handle).sendText(
+                    target_id, request.values["message"]
+                ),
+                audience_ids[request.values["audience"]]()
+            ))
+        return {"status": 400}
 
     @staticmethod
     @wa_app.route("/api/shutdown")
-    @wa_app.route("/api/shutdown/<code>")
-    def shutdown(code=None):
-        if code == shutdown_password:
-            Yuuki_APIHandle.command_shutdown()
-            return "200"
-        return "401"
-
-    @staticmethod
-    @wa_app.route("/api/i")
-    def i():
-        return Yuuki_Handle.YuukiConfigs["name"]
-
-    @staticmethod
-    def set_shutdown_password(code):
-        global shutdown_password
-        shutdown_password = code
-
-    @staticmethod
-    def set_password(code):
-        global password
-        password = code
-
-    def wa_shutdown(self):
-        self.http_server.stop()
-        self.http_server.close()
-
-    def wa_listen(self):
-        self.http_server = WSGIServer(('', 2020), wa_app)
-        self.http_server.serve_forever()
+    @authorized_response
+    def shutdown():
+        LINE_ACCOUNT_SECURITY_NOTIFY_ID = "u085311ecd9e3e3d74ae4c9f5437cbcb5"
+        # The ID belongs to an official account, which is controlled by SysOp of LINE.
+        Yuuki_DynamicTools(Yuuki_Handle).sendText(
+            LINE_ACCOUNT_SECURITY_NOTIFY_ID,
+            "[Yuuki] Remote Shutdown"
+        )
+        return {"status": 200}
