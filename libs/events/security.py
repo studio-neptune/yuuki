@@ -279,10 +279,11 @@ class Yuuki_Security:
         SecurityInfo = Yuuki_StaticTools.securityForWhere(ncMessage)
 
         GroupInfo = self.Yuuki_DynamicTools.getClient(self.Yuuki.MyMID).getGroup(SecurityInfo["GroupID"])
-        SecurityInfo["GroupPrivilege"] = self.Yuuki.Admin + \
-                                         [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
-                                         self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
-
+        SecurityInfo["GroupPrivilege"] = [
+            *self.Yuuki.Admin,
+            Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid,
+            *self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+        ]
         if SecurityInfo["Action"] in SecurityInfo["GroupPrivilege"] or \
                 SecurityInfo["Another"] in SecurityInfo["GroupPrivilege"]:
             if ncMessage.type != OpType.NOTIFIED_KICKOUT_FROM_GROUP:

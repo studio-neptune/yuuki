@@ -12,12 +12,14 @@ export default {
                 <h6 class="border-bottom border-gray pb-2 mb-0">Helper</h6>
                 <div id="helpers">
                     <div
-                     v-for="(helperId, helperIndex) in helperList"
+                     v-for="(helper, helperIndex) in helperList"
                      :key="helperIndex"
+                     :title="helper.id"
                      class="media pt-3">
-                        <img class="mini-logo mr-2 rounded" src="">
+                        <img class="mini-logo mr-2 rounded" :src="helper.picture">
                         <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                            <strong class="d-block text-gray-dark">{{helperId}}</strong>{{helperId}}
+                            <strong class="d-block text-gray-dark">{{helper.name}}</strong>
+                            {{helper.status}}
                         </p>
                     </div>
                 </div>

@@ -51,12 +51,16 @@ class Yuuki_Command:
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
-                             self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            GroupPrivilege = [
+                *self.Yuuki.Admin,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid,
+                *self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            ]
             if ncMessage.message.from_ in GroupPrivilege:
                 for userId in self.Yuuki.Connect.helper:
                     self.Yuuki_DynamicTools.sendUser(
-                        Yuuki_StaticTools.sendToWho(ncMessage), userId)
+                        Yuuki_StaticTools.sendToWho(ncMessage),
+                        userId)
 
     def _Speed(self, ncMessage):
         Time1 = time.time()
@@ -87,8 +91,11 @@ class Yuuki_Command:
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
-                             self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            GroupPrivilege = [
+                *self.Yuuki.Admin,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid,
+                *self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            ]
             if not self.Yuuki.data.getData(["Global", "SecurityService"]):
                 self.Yuuki_DynamicTools.sendText(
                     Yuuki_StaticTools.sendToWho(ncMessage),
@@ -128,8 +135,11 @@ class Yuuki_Command:
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
-                             self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            GroupPrivilege = [
+                *self.Yuuki.Admin,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid,
+                *self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            ]
             if not self.Yuuki.data.getData(["Global", "SecurityService"]):
                 self.Yuuki_DynamicTools.sendText(
                     Yuuki_StaticTools.sendToWho(ncMessage),
@@ -146,8 +156,10 @@ class Yuuki_Command:
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + \
-                             [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid]
+            GroupPrivilege = [
+                *self.Yuuki.Admin,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid
+            ]
             if len(msgSep) == 3:
                 if ncMessage.message.from_ in GroupPrivilege:
                     if msgSep[1] == "add":
@@ -253,8 +265,11 @@ class Yuuki_Command:
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
                 self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid] + \
-                             self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            GroupPrivilege = [
+                *self.Yuuki.Admin,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid,
+                *self.Yuuki.data.getGroup(GroupInfo.id)["Ext_Admin"]
+            ]
             if ncMessage.message.from_ in GroupPrivilege:
                 GroupMembers = [User.mid for User in GroupInfo.members]
                 GroupInvites = None
@@ -276,24 +291,14 @@ class Yuuki_Command:
     def _Quit(self, ncMessage):
         if ncMessage.message.toType == MIDType.GROUP:
             GroupInfo = self.Yuuki_DynamicTools.getClient(
-                self.Yuuki.MyMID).getGroup(ncMessage.message.to)
-            GroupPrivilege = self.Yuuki.Admin + [Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid]
+                self.Yuuki.MyMID
+            ).getGroup(ncMessage.message.to)
+            GroupPrivilege = [
+                *self.Yuuki.Admin,
+                Yuuki_StaticTools.sybGetGroupCreator(GroupInfo).mid
+            ]
             if ncMessage.message.from_ in GroupPrivilege:
-                self.Yuuki_DynamicTools.sendText(Yuuki_StaticTools.sendToWho(
-                    ncMessage), self.Yuuki.get_text("Bye Bye"))
-                self.Yuuki_DynamicTools.getClient(
-                    self.Yuuki.MyMID).leaveGroup(self.Yuuki.Seq, GroupInfo.id)
-                for userId in self.Yuuki.Connect.helper:
-                    if userId in [member.mid for member in GroupInfo.members]:
-                        self.Yuuki_DynamicTools.getClient(userId).leaveGroup(
-                            self.Yuuki.Seq, GroupInfo.id
-                        )
-            GroupList = self.Yuuki.data.getData(
-                ["Global", "GroupJoined"])
-            NewGroupList = GroupList.copy()
-            NewGroupList.remove(GroupInfo.id)
-            self.Yuuki.data.updateData(
-                ["Global", "GroupJoined"], NewGroupList)
+                self.Yuuki_DynamicTools.leaveGroup(GroupInfo)
 
     def _Exit(self, ncMessage):
         if ncMessage.message.from_ in self.Yuuki.Admin:
@@ -339,7 +344,6 @@ class Yuuki_Command:
             if len(msgSep) > 1 and msgSep[1] in actions:
                 return actions[msgSep[1]](ncMessage)
             return self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO")
-
 
     def _contact(self, ncMessage):
         cache = ncMessage.message.contentMetadata["mid"]

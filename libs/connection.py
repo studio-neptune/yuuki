@@ -61,7 +61,10 @@ class Yuuki_Connect:
 
         try:
             profile = client.getProfile()
-            self.helper[profile.mid] = client
+            self.helper[profile.mid] = {
+                "client": client,
+                "profile": profile
+            }
             return True
 
         except TalkException:

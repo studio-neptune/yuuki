@@ -26,7 +26,7 @@ export default {
     props: ["doctype"],
     data() {
         return {
-            data: [{ title: "Loading..." }]
+            data: [{title: "Loading..."}]
         }
     },
     created() {
@@ -36,7 +36,7 @@ export default {
             .then((body) => body.json())
             .then((events) => {
                 this.data = events.map((event) => {
-                    if(!event) return { title: "(empty)" };
+                    if (!event) return {title: "(empty)"};
                     return {
                         title: event.substring(0, 24),
                         content: event.substring(26, event.length)

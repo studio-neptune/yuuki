@@ -28,9 +28,9 @@ export default {
                 </div>
             </div>
             `,
-    methods:{
-        switchButton(){
-            if(this.modify){
+    methods: {
+        switchButton() {
+            if (this.modify) {
                 let body = new FormData();
                 body.append("name", this.profileName);
                 body.append("status", this.profileStatus);
@@ -43,21 +43,21 @@ export default {
         },
         escapeHtml(text) {
             let map = {
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#039;",
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;",
             };
-            return text.replace(/[&<>"']/g, function(m) {
-              return map[m];
+            return text.replace(/[&<>"']/g, function (m) {
+                return map[m];
             });
         },
     },
     computed: {
-      statusMessage() {
-        return this.escapeHtml(this.profileStatus).replace(/\n/g, "<br />");
-      },
+        statusMessage() {
+            return this.escapeHtml(this.profileStatus).replace(/\n/g, "<br />");
+        },
     },
     data() {
         return {

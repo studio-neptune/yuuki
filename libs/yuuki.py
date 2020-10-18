@@ -12,7 +12,6 @@ import random
 import sys
 import time
 
-import requests
 from git import Repo
 from yuuki_core.ttypes import OpType
 

@@ -9,7 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 export default {
     template: `
         <div>
-            <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
+            <div :title="profileId" class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
                 <img class="mr-3" :src="profilePicture" alt="" width="48" height="48">
                 <div class="lh-100">
                     <h6 class="mb-0 text-white lh-100">{{ profileName }}</h6>
@@ -58,8 +58,9 @@ export default {
             return "preview" in event ? event.preview : "Loading...";
         },
         async broadcast() {
-            let checkpoint = confirm("The message will broadcast, are you sure?");
-            if (!this.broadcastText && checkpoint) return;
+            if (!this.broadcastText) return alert("Empty message");
+            const checkpoint = confirm("The message will be broadcast, are you sure?");
+            if (!checkpoint) return;
             this.broadcastStatus = true;
             let body = new FormData();
             body.set("message", this.broadcastText);
@@ -95,6 +96,7 @@ export default {
     data() {
         return {
             version: "",
+            profileId: "",
             profileName: "",
             profilePicture: "",
             broadcastStatus: false,
@@ -127,12 +129,13 @@ export default {
             },
         }
     },
-    async created() {
+    created() {
         fetch("/api/profile", {
             credentials: "same-origin"
         })
             .then((body) => body.json())
             .then((profile) => {
+                this.profileId = profile.id;
                 this.version = profile.version;
                 this.profileName = profile.name;
                 this.profilePicture = profile.picture;

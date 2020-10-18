@@ -6,14 +6,16 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
+import base64
 import hashlib
+import os
 import random
 import time
+from functools import wraps
 
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
-from functools import wraps
 
 from .reader import Yuuki_WebDataReader
 from ..tools import Yuuki_DynamicTools
@@ -41,6 +43,7 @@ def authorized_response(function):
             expires=0
         )
         return response
+
     return wrapper
 
 
@@ -91,6 +94,16 @@ class Yuuki_WebAdmin:
             )
         return response
 
+    @staticmethod
+    @wa_app.route("/logo")
+    def logo():
+        default_logo_path = os.path.abspath(os.path.join(__file__, "../../../logo.png"))
+        online_logo_path = "https://raw.githubusercontent.com/star-inc/star_yuuki_bot/master/logo.png"
+        if os.path.isfile(default_logo_path):
+            with open(default_logo_path, "rb") as f:
+                return f"data:image/png;base64, {base64.b64encode(f.read()).decode('utf-8')}"
+        return online_logo_path
+
     # API Points
     @staticmethod
     @wa_app.route("/api/verify", methods=['POST'])
@@ -116,6 +129,7 @@ class Yuuki_WebAdmin:
     def profile():
         if request.method == "GET":
             return {
+                "id": Yuuki_Handle.profile.mid,
                 "version": Yuuki_Handle.YuukiConfigs["version"],
                 "name": Yuuki_Handle.profile.displayName,
                 "status": Yuuki_Handle.profile.statusMessage,
@@ -141,9 +155,10 @@ class Yuuki_WebAdmin:
                 Yuuki_Handle.Seq, request.values["id"]
             )
         if request.method == "DELETE" and "id" in request.values:
-            return Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).leaveGroup(
-                Yuuki_Handle.Seq, request.values["id"]
-            )
+            group_information = Yuuki_DynamicTools(Yuuki_Handle).getClient(
+                Yuuki_Handle.MyMID
+            ).getGroup(request.values["id"])
+            return Yuuki_DynamicTools(Yuuki_Handle).leaveGroup(group_information)
         return {"status": 400}
 
     @staticmethod
@@ -173,14 +188,29 @@ class Yuuki_WebAdmin:
                     if hasattr(obj.__dict__[key], '__dict__'):
                         obj.__dict__[key] = obj.__dict__[key].__dict__
                 return obj.__dict__
-            return list(map(type_handle, Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).getGroups(read_id_list)))
+
+            return [
+                type_handle(obj)
+                for obj in Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).getGroups(read_id_list)
+            ]
         return {"status": 400}
 
     @staticmethod
     @wa_app.route("/api/helpers")
     @authorized_response
     def helpers():
-        return Yuuki_Handle.Connect.helper
+        def info_handle(profile):
+            return {
+                "id": profile.mid,
+                "name": profile.displayName,
+                "status": profile.statusMessage,
+                "picture": f"{Yuuki_Handle.LINE_Media_server}/{profile.pictureStatus}",
+            }
+
+        return [
+            info_handle(Yuuki_Handle.Connect.helper[userId].get("profile"))
+            for userId in Yuuki_Handle.Connect.helper
+        ]
 
     @staticmethod
     @wa_app.route("/api/settings")
@@ -206,12 +236,10 @@ class Yuuki_WebAdmin:
             }
             if request.values["audience"] not in audience_ids:
                 return {"status": "404"}
-            return list(map(
-                lambda target_id: Yuuki_DynamicTools(Yuuki_Handle).sendText(
-                    target_id, request.values["message"]
-                ),
-                audience_ids[request.values["audience"]]()
-            ))
+            return [
+                Yuuki_DynamicTools(Yuuki_Handle).sendText(target_id, request.values["message"])
+                for target_id in audience_ids[request.values["audience"]]()
+            ]
         return {"status": 400}
 
     @staticmethod
