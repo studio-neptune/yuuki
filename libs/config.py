@@ -37,7 +37,7 @@ class Yuuki_Config:
 
     systemConfig = {
         "name": "Yuuki",
-        "version": "v6.5.3-alpha_RC2",
+        "version": "v6.5.3-beta_RC0",
         "version_check": True,
         "project_url": "https://tinyurl.com/syb-yuuki",
         "man_page": "https://tinyurl.com/yuuki-manual",

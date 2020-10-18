@@ -117,8 +117,7 @@ class Yuuki_DynamicTools:
         """
         if userId == self.Yuuki.MyMID:
             return self.Yuuki.client
-        else:
-            return self.Yuuki.Connect.helper[userId]
+        return self.Yuuki.Connect.helper[userId].get("client")
 
     def checkInInvitationList(self, ncMessage, userId=None):
         """
@@ -130,22 +129,18 @@ class Yuuki_DynamicTools:
         if userId is None:
             userId = self.Yuuki.MyMID
         if ncMessage.param3 == userId:
-            inList = True
+            return True
         elif "\x1e" in ncMessage.param3:
             if userId in ncMessage.param3.split("\x1e"):
-                inList = True
-            else:
-                inList = False
-        else:
-            inList = False
-        return inList
+                return True
+        return False
 
-    def changeGroupUrlStatus(self, groupInfo, status, userId=None):
+    def changeGroupUrlStatus(self, groupInfo, status, handlerId=None):
         """
         Change LINE Group URL Status
         :param groupInfo: Line Group
         :param status: boolean
-        :param userId: string
+        :param handlerId: string
         :return: None
         """
         result = Group()
@@ -153,10 +148,8 @@ class Yuuki_DynamicTools:
             if key != "members" or key != "invitee":
                 result.__dict__[key] = groupInfo.__dict__[key]
         result.preventJoinByTicket = not status
-        if userId is not None:
-            self.getClient(userId).updateGroup(self.Yuuki.Seq, result)
-        else:
-            self.getClient(self.Yuuki.MyMID).updateGroup(self.Yuuki.Seq, result)
+        handler = self.Yuuki.MyMID if handlerId is None else handlerId
+        self.getClient(handler).updateGroup(self.Yuuki.Seq, result)
 
     def configSecurityStatus(self, groupId, status):
         """
@@ -182,10 +175,26 @@ class Yuuki_DynamicTools:
         Clean personal group invitations for LINE account
         :return: None
         """
-        for client in [self.getClient(self.Yuuki.MyMID)] + self.Yuuki.Connect.helper:
+        for client in [self.getClient(userId) for userId in self.Yuuki.MyMID + self.Yuuki.Connect.helper.keys()]:
             for cleanInvitations in client.getGroupIdsInvited():
                 client.acceptGroupInvitation(self.Yuuki.Seq, cleanInvitations)
                 client.leaveGroup(self.Yuuki.Seq, cleanInvitations)
+
+    def leaveGroup(self, groupInfo):
+        """
+        Leave a group by its group information object
+        :param groupInfo: Line Group
+        :return: None
+        """
+        self.sendText(groupInfo.id, self.Yuuki.get_text("Bye Bye"))
+        self.getClient(self.Yuuki.MyMID).leaveGroup(self.Yuuki.Seq, groupInfo.id)
+        for userId in self.Yuuki.Connect.helper:
+            if userId in [member.mid for member in groupInfo.members]:
+                self.getClient(userId).leaveGroup(self.Yuuki.Seq, groupInfo.id)
+        GroupList = self.Yuuki.data.getData(["Global", "GroupJoined"])
+        NewGroupList = GroupList.copy()
+        NewGroupList.remove(groupInfo.id)
+        self.Yuuki.data.updateData(["Global", "GroupJoined"], NewGroupList)
 
     def getContact(self, userId):
         """
@@ -244,12 +253,23 @@ class Yuuki_DynamicTools:
         :param exceptUserId: List of userId
         :return: string
         """
-        actions = {1: "KickLimit", 2: "CancelLimit"}
+        actions = {
+            1: {
+                "command": "KickLimit",
+                "message": "Kick Limit.",
+                "function": lambda handlerId: self.getClient(handlerId).kickoutFromGroup
+            },
+            2: {
+                "command": "CancelLimit",
+                "message": "Cancel Limit.",
+                "function": lambda handlerId: self.getClient(handlerId).cancelGroupInvitation
+            }
+        }
         assert action in actions, "Invalid action code"
         if len(self.Yuuki.Connect.helper) >= 1:
             members = [member.mid for member in groupInfo.members if member.mid in self.Yuuki.AllAccountIds]
             accounts = Yuuki_StaticTools.dictShuffle(
-                self.Yuuki.data.getData(["LimitInfo", actions[action]]), members)
+                self.Yuuki.data.getData(["LimitInfo", actions[action].get("command")]), members)
             if len(accounts) == 0:
                 return "None"
             if exceptUserId:
@@ -259,28 +279,25 @@ class Yuuki_DynamicTools:
             if exceptUserId == self.Yuuki.MyMID:
                 return "None"
             helper = self.Yuuki.MyMID
-
-        actions_func = {
-            1: self.getClient(helper).kickoutFromGroup,
-            2: self.getClient(helper).cancelGroupInvitation
-        }
-        Limit = self.Yuuki.data.getData(["LimitInfo", actions[action], helper])
+        Limit = self.Yuuki.data.getData(["LimitInfo", actions[action].get("command"), helper])
         if Limit > 0:
-            actions_func[action](self.Yuuki.Seq, groupInfo.id, [userId])
-            self.Yuuki.data.limitDecrease(actions[action], helper)
+            actions[action].get("function")(helper)(self.Yuuki.Seq, groupInfo.id, [userId])
+            self.Yuuki.data.limitDecrease(actions[action].get("command"), helper)
         else:
-            self.sendText(groupInfo.id, self.Yuuki.get_text("Cancel Limit."))
+            self.sendText(groupInfo.id, self.Yuuki.get_text(actions[action].get("message")), helper)
         return helper
 
-    def sendText(self, send_to, msg):
+    def sendText(self, send_to, msg, senderId=None):
         """
         Send text to LINE Chat
-        :param send_to: string
-        :param msg: string
+        :param send_to: The target to received
+        :param msg: The message hope to send
+        :param senderId: The client specified to send the message
         :return: None
         """
         message = Message(to=send_to, text=msg)
-        self.getClient(self.Yuuki.MyMID).sendMessage(self.Yuuki.Seq, message)
+        sender = self.Yuuki.MyMID if senderId is None else senderId
+        self.getClient(sender).sendMessage(self.Yuuki.Seq, message)
 
     def sendUser(self, send_to, userId):
         """

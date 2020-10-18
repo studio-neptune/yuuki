@@ -12,8 +12,8 @@ body {
 }
 
 .mini-logo {
-    max-width:32px;
-    height:32px;
+    max-width: 32px;
+    height: 32px;
 }
 
 .password_box {
@@ -22,6 +22,11 @@ body {
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%);
+}
+
+.router-link-exact-active {
+    font-weight: 500;
+    color: #343a40;
 }
 
 .bd-placeholder-img {

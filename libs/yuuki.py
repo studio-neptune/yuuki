@@ -12,7 +12,6 @@ import random
 import sys
 import time
 
-import requests
 from git import Repo
 from yuuki_core.ttypes import OpType
 
@@ -116,10 +115,8 @@ class Yuuki:
     def _Setup_WebAdmin(self):
         if self.Threading and self.YuukiConfigs.get("WebAdmin"):
             password = str(hash(random.random()))
-            self.shutdown_password = str(hash(random.random()))
             self.web_admin = Yuuki_WebAdmin(self)
             self.web_admin.set_password(password)
-            self.web_admin.set_shutdown_password(self.shutdown_password)
             self.Thread_Control.add(self.web_admin.wa_listen)
             print(
                 "<*> Yuuki WebAdmin - Enable\n"
@@ -138,10 +135,6 @@ class Yuuki:
             time.sleep(1)
             self.data.MdsThreadControl.stop("mds_listen")
             if self.YuukiConfigs.get("WebAdmin"):
-                requests.get(
-                    "http://localhost:2020/api/shutdown/{}".format(self.shutdown_password)
-                )
-                time.sleep(1)
                 self.data.MdsThreadControl.stop("wa_listen")
         if restart:
             self.__restart()

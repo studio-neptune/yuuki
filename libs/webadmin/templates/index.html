@@ -27,33 +27,21 @@
         <ul class="navbar-nav mr-auto">
             {{ render_nav_item('index') }}
         </ul>
+        {% if authorized %}
+        <a class="navbar-brand" href="/logout">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+        </a>
+        {% endif %}
     </div>
 </nav>
 
-<main role="main" class="container">
-    <div class="starter-template">
-        <h1>Star Yuuki BOT - WebAdmin</h1>
-        <p class="lead">Version {{ version }}</p>
-        <p>
-            The administrator control center of LINE BOT
-        </p>
-        <div class="status damage"></div>
-    </div>
-
-    <div class="password_box">
-        <form class="form-inline mt-2 mt-md-0 login-box" method="post">
-            <input class="form-control mr-sm-2" type="password" placeholder="Type your admin password"
-                   aria-label="Login" name="code">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
-        </form>
-        <div class="datahere"></div>
-    </div>
-</main>
+<main id="app"></main>
 
 <!-- Optional JavaScript -->
 {{ bootstrap.load_js() }}
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
-<script src="{{ url_for('static', filename='js/verify.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-router/dist/vue-router.js"></script>
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>
