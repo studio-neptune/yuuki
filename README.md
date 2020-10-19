@@ -67,15 +67,6 @@ This is a magic feature since `v6.5.3` that you can control your BOT with GUI.
 
 ![WebAdmin](WebAdmin.png)
 
-## Requirement
-
-Recommend Environment:
-
-    Ubuntu >= 18.04
-    python >= 3.7
-    pip >= 19.2
-    git >= 2.17
-
 ## Documents
 
 Are you finding how to setup, use, or extend its features? 
@@ -84,6 +75,6 @@ The documentation is preparing, will be available on [GitHub Wiki](https://githu
 
 ## Logo Copyright
 
-The copyright of `logo.png` belongs to "[©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)" and its artists.
+Copyright of `logo.png` belongs to "[©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)" and its artists.
 
 > (c) 2020 Star Inc.
