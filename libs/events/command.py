@@ -344,7 +344,7 @@ class Yuuki_Command:
                 return actions[msgSep[1]](ncMessage)
             return self.Yuuki_DynamicTools.sendText(
                 Yuuki_StaticTools.sendToWho(ncMessage),
-                self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO"
+                self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO") % (Yuuki_Name,)
             )
 
     def _contact(self, ncMessage):
