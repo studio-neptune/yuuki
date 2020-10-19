@@ -12,7 +12,7 @@ The perfectest LINE Group Protective BOT.
 
 This is the BOT which was the first Chinese LINE Group Security BOT.
 
-Since 2018, it turns to an opensource software.
+Since 2018, it turns to be an opensource software.
 
 ## Introduction
 
@@ -22,7 +22,7 @@ As know as the group feature of LINE has a major issue, everyone own the permiss
 
 It's a good idea to be fair, but causes a communicate risk if one of member kick everyone maliciously.
 
-So a protective solution is necessary, especially for commerce, corporation, even Youtuber.
+So a protective solution is necessary, especially for corporation, organization, or education.
 
 Since 2015, we start to design and provide several solutions to the market and public, Star Yuuki BOT is one of the success cases.
 
