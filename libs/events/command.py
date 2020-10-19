@@ -318,8 +318,7 @@ class Yuuki_Command:
             except:
                 (err1, err2, err3, ErrorInfo) = Yuuki_StaticTools.errorReport()
                 Report = "Star Yuuki BOT - Eval Error:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo)
-            self.Yuuki_DynamicTools.sendText(
-                Yuuki_StaticTools.sendToWho(ncMessage), Report)
+            self.Yuuki_DynamicTools.sendText(Yuuki_StaticTools.sendToWho(ncMessage), Report)
 
     def _text(self, ncMessage):
         Yuuki_Name = self.Yuuki.YuukiConfigs["name"]
@@ -343,7 +342,10 @@ class Yuuki_Command:
         if Yuuki_Name == msgSep[0]:
             if len(msgSep) > 1 and msgSep[1] in actions:
                 return actions[msgSep[1]](ncMessage)
-            return self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO")
+            return self.Yuuki_DynamicTools.sendText(
+                Yuuki_StaticTools.sendToWho(ncMessage),
+                self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO"
+            )
 
     def _contact(self, ncMessage):
         cache = ncMessage.message.contentMetadata["mid"]
@@ -357,8 +359,7 @@ class Yuuki_Command:
             msg = self.Yuuki.get_text("Name:%s\nPicture URL:%s/%s\nStatusMessage:\n%s\nLINE System UserID:%s") % \
                   (contactInfo.displayName, self.Yuuki.LINE_Media_server, contactInfo.pictureStatus,
                    contactInfo.statusMessage, contactInfo.mid)
-        self.Yuuki_DynamicTools.sendText(
-            Yuuki_StaticTools.sendToWho(ncMessage), msg)
+        self.Yuuki_DynamicTools.sendText(Yuuki_StaticTools.sendToWho(ncMessage), msg)
 
     def action(self, ncMessage):
         BlockedIgnore = (ncMessage.message.to in self.Yuuki.data.getData(["BlackList"])) or \
