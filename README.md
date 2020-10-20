@@ -28,7 +28,7 @@ Since 2015, we start to design and provide several solutions to the market and p
 
 To protect Internet Security is our duty, and open source is romantic, that is why we are here.
 
-> This is design to be a complete BOT, don't use the software as a "Self BOT", it might damage your account.
+> Star Yuuki BOT is designed to be a completed BOT, don't use the software as a "Self BOT", it might damage your account.
 
 ## License
 
@@ -38,7 +38,7 @@ The software is licensed under [Mozilla Public License 2.0](LICENSE.md) with [CO
 
 ## Features
 
-It's a powerful software, not only a BOT, even to be you secretary.
+It's a powerful software, not only a BOT, even to be your secretary.
 
 | Feature | Status |  Note |
 |---|---|---|
