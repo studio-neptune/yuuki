@@ -16,7 +16,10 @@ export default {
                      :key="helperIndex"
                      :title="helper.id"
                      class="media pt-3">
-                        <img class="mini-logo mr-2 rounded" :src="helper.picture">
+                        <img v-if="helper.picture" class="mini-logo mr-2 rounded" :src="helper.picture">
+                        <svg v-else viewBox="0 0 16 16" class="mini-logo mr-2 rounded" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        </svg>
                         <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
                             <strong class="d-block text-gray-dark">{{helper.name}}</strong>
                             {{helper.status}}

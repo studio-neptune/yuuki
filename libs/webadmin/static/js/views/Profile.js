@@ -10,7 +10,10 @@ export default {
     template: `
             <div class="text-center my-3 card">
                     <div class="mx-auto w-100 p-5 card-header" >
-                        <img class="rounded" :src="profilePicture" alt="Profile Picture" width="128" height="128">
+                        <img v-if="profilePicture" width="128" height="128" class="mr-2 rounded" :src="profilePicture">
+                        <svg v-else width="128" height="128" viewBox="0 0 16 16" class="mr-2 rounded" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        </svg>
                     </div>
                 <div v-if="!modify">
                     <div class="mx-auto mt-3 card-body">
