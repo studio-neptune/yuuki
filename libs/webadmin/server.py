@@ -134,6 +134,7 @@ class Yuuki_WebAdmin:
                 "name": Yuuki_Handle.profile.displayName,
                 "status": Yuuki_Handle.profile.statusMessage,
                 "picture": f"{Yuuki_Handle.LINE_Media_server}/{Yuuki_Handle.profile.pictureStatus}"
+                if Yuuki_Handle.profile.pictureStatus is not None else None,
             }
         if request.method == "PUT" and "name" in request.values and "status" in request.values:
             Yuuki_Handle.profile.displayName = request.values["name"]
@@ -204,7 +205,8 @@ class Yuuki_WebAdmin:
                 "id": profile.mid,
                 "name": profile.displayName,
                 "status": profile.statusMessage,
-                "picture": f"{Yuuki_Handle.LINE_Media_server}/{profile.pictureStatus}",
+                "picture": f"{Yuuki_Handle.LINE_Media_server}/{profile.pictureStatus}"
+                if profile.pictureStatus is not None else None,
             }
 
         return [
