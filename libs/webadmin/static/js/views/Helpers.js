@@ -27,7 +27,7 @@ export default {
             `,
     data() {
         return {
-            helperList: ["Loading..."]
+            helperList: [{name: "Loading..."}]
         }
     },
     created() {
@@ -36,7 +36,7 @@ export default {
         })
             .then((body) => body.json())
             .then((helper_list) => {
-                this.helperList = helper_list.length ? helper_list : ["(empty)"];
+                this.helperList = helper_list.length ? helper_list : [{name: "(empty)"}];
             });
     }
 };
