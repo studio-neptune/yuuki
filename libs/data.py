@@ -69,8 +69,9 @@ class Yuuki_Data:
     initHeader = "<title>{} - SYB</title>" \
                  "<meta charset='utf-8' />"
 
-    def __init__(self, threading):
+    def __init__(self, threading, mds_port):
         self.threading = threading
+        self.mds_port = mds_port
         self.ThreadControl = Yuuki_Thread()
         self.MdsThreadControl = Yuuki_Multiprocess()
         self._Data_Initialize()
@@ -97,8 +98,8 @@ class Yuuki_Data:
 
     def _MDS_Initialize(self):
         if self.threading:
-            mds = PythonMDS()
-            self.mdsHost = "http://localhost:2019/"
+            mds = PythonMDS(self.mds_port)
+            self.mdsHost = "http://localhost:{}/".format(self.mds_port)
             self.mdsCode = "{}.{}".format(random.random(), time.time())
             self.MdsThreadControl.add(mds.mds_listen, (self.mdsCode,))
 

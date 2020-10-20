@@ -59,13 +59,14 @@ class PythonMDS:
     server = HTTPServer(app)
     async_lock = IOLoop.current()
 
-    def __init__(self):
+    def __init__(self, port):
         _work["UPT"] = self._update
         _work["DEL"] = self._delete
         _work["GET"] = self._query
         _work["SYC"] = self._sync
         _work["YLD"] = self._yuuki_limit_decrease
         _work["EXT"] = self._shutdown
+        self.port = port
 
     def _query(self, data):
         query_data = data["path"]
@@ -119,5 +120,5 @@ class PythonMDS:
     def mds_listen(self, code):
         global auth_code
         auth_code = code
-        self.server.listen(2019)
+        self.server.listen(self.port)
         self.async_lock.start()

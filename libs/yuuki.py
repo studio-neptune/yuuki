@@ -92,7 +92,8 @@ class Yuuki:
         self.Security = Yuuki_Security(self).action
         self.Callback = Yuuki_Callback(self).action
 
-        self.data = Yuuki_Data(self.Threading)
+        mds_port = self.YuukiConfigs["MDS_Port"]
+        self.data = Yuuki_Data(self.Threading, mds_port)
 
         self.data.updateData(["Global", "GroupJoined"], self.client.getGroupIdsJoined())
         self.data.updateData(["Global", "SecurityService"], self.YuukiConfigs["SecurityService"])
@@ -114,14 +115,15 @@ class Yuuki:
 
     def _Setup_WebAdmin(self):
         if self.Threading and self.YuukiConfigs.get("WebAdmin"):
+            wa_port = self.YuukiConfigs["WebAdmin_Port"]
             password = str(hash(random.random()))
-            self.web_admin = Yuuki_WebAdmin(self)
+            self.web_admin = Yuuki_WebAdmin(self, wa_port)
             self.web_admin.set_password(password)
             self.Thread_Control.add(self.web_admin.wa_listen)
             print(
                 "<*> Yuuki WebAdmin - Enable\n"
-                "<*> http://localhost:2020\n"
-                "<*> Password: {}\n".format(password)
+                "<*> http://localhost:{}\n"
+                "<*> Password: {}\n".format(wa_port, password)
             )
         else:
             print("<*> Yuuki WebAdmin - Disable\n")

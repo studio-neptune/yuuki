@@ -51,11 +51,12 @@ class Yuuki_WebAdmin:
     Bootstrap(wa_app)
     http_server = None
 
-    def __init__(self, Yuuki):
+    def __init__(self, Yuuki, port):
         global Yuuki_Handle, Yuuki_Handle_Data, Yuuki_APIHandle_Data
         Yuuki_Handle = Yuuki
         Yuuki_Handle_Data = Yuuki.data
         Yuuki_APIHandle_Data = Yuuki_WebDataReader(Yuuki_Handle_Data)
+        self.port = port
 
     @staticmethod
     def set_password(code):
@@ -63,7 +64,7 @@ class Yuuki_WebAdmin:
         password = code
 
     def wa_listen(self):
-        self.http_server = WSGIServer(('', 2020), wa_app)
+        self.http_server = WSGIServer(('', self.port), wa_app)
         self.http_server.serve_forever()
 
     # HTML Server

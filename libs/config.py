@@ -48,6 +48,8 @@ class Yuuki_Config:
         "Admin": [],
         "Advanced": False,
         "WebAdmin": False,  # Advanced Mode Required
+        "MDS_Port": 2019,
+        "WebAdmin_Port": 2020,
         "SecurityService": False,
         "Hour_KickLimit": 10,
         "Hour_CancelLimit": 10,
