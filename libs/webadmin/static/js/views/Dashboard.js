@@ -24,7 +24,7 @@ export default {
                 <h6 class="border-bottom border-gray pb-2 mb-0">Broadcast</h6>
                 <textarea v-model="broadcastText" class="form-control" cols="50" rows="5" placeholder="Type any text message for announcing..." :disabled="broadcastStatus"></textarea>
                 <div class="mt-1">
-                    <label for="name">Audience: </label>
+                    <label>Audience: </label>
                     <label class="checkbox-inline">
                         <input v-model="broadcastAudience.contacts" type="checkbox" id="inlineCheckbox1" value="option1" disabled> Contacts
                     </label>
