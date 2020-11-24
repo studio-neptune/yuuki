@@ -69,9 +69,11 @@ This is a magic feature since `v6.5.3` that you can control your BOT with GUI.
 
 ## Documents
 
-Are you finding how to setup, use, or extend its features? 
+Are you finding how to setup, configure, and use it, or extend its features? 
 
-The documentation is preparing, will be available on [GitHub Wiki](https://github.com/star-inc/star_yuuki_bot/wiki) as soon as possible.
+The documentation for developers is available on [GitHub Wiki](https://github.com/star-inc/star_yuuki_bot/wiki).
+
+Welcome to help us for improving and making `Yuuki` better!
 
 ## Logo Copyright
 
