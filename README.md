@@ -49,7 +49,7 @@ It's a powerful software, not only a BOT, even to be your secretary.
 | Advanced Group Protection | O |
 | [WebAdmin](#WebAdmin) | O |
 | General [Manual](https://line.starinc.xyz/yuuki_manual/) for Users | O |
-| [Documentation](#Documents) for Developers | X | Preparing |
+| [Documentation](#Documents) for Developers | X |
 | 100% [OpenSource](https://github.com/star-inc/star_yuuki_bot) and Free | O | [Licensed](#License) |
 
 ## WebAdmin
