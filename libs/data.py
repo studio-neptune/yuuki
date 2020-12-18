@@ -15,11 +15,11 @@ from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
 from .data_mds import PythonMDS
-from .thread_control import Yuuki_Multiprocess
-from .thread_control import Yuuki_Thread
+from .thread_control import YuukiMultiprocess
+from .thread_control import YuukiThread
 
 
-class Yuuki_Data:
+class YuukiData:
     # Data Struct Define
 
     Data = {}
@@ -72,11 +72,11 @@ class Yuuki_Data:
     def __init__(self, threading, mds_port):
         self.threading = threading
         self.mds_port = mds_port
-        self.ThreadControl = Yuuki_Thread()
-        self.MdsThreadControl = Yuuki_Multiprocess()
-        self._Data_Initialize()
+        self.ThreadControl = YuukiThread()
+        self.MdsThreadControl = YuukiMultiprocess()
+        self._data_initialize()
 
-    def _Data_Initialize(self):
+    def _data_initialize(self):
         if not os.path.isdir(self.DataPath):
             os.mkdir(self.DataPath)
 
@@ -94,9 +94,9 @@ class Yuuki_Data:
                     except ValueError:
                         assert "{}\nJson Test Error".format(name)
 
-        return self._MDS_Initialize()
+        return self._mds_initialize()
 
-    def _MDS_Initialize(self):
+    def _mds_initialize(self):
         if self.threading:
             mds = PythonMDS(self.mds_port)
             self.mdsHost = "http://localhost:{}/".format(self.mds_port)
@@ -106,10 +106,10 @@ class Yuuki_Data:
             # MDS Sync
 
             time.sleep(1)
-            self.mdsShake("SYC", self.Data)
-        return self._Log_Initialize()
+            self.mds_shake("SYC", self.Data)
+        return self._log_initialize()
 
-    def _Log_Initialize(self):
+    def _log_initialize(self):
         if not os.path.isdir(self.LogPath):
             os.mkdir(self.LogPath)
 
@@ -119,15 +119,15 @@ class Yuuki_Data:
                 with open(name, "w") as f:
                     f.write(self.initHeader.format(Type))
 
-    def ThreadExec(self, Function, args):
+    def thread_append(self, function_, args):
         if self.threading:
             self.ThreadControl.lock.acquire()
-            self.ThreadControl.add(Function, args)
+            self.ThreadControl.add(function_, args)
             self.ThreadControl.lock.release()
         else:
-            Function(*args)
+            function_(*args)
 
-    def mdsShake(self, do, path, data=None):
+    def mds_shake(self, do, path, data=None):
         status = 0
         if self.threading:
             http_client = HTTPClient()
@@ -182,81 +182,81 @@ class Yuuki_Data:
         elif Format == "Log":
             return open(self.LogPath + self.LogName.format(Type), Mode)
 
-    def syncData(self):
+    def sync_data(self):
         if self.threading:
-            self.Data = self.getData([])
+            self.Data = self.get_data([])
         for Type in self.DataType:
             with self.file(Type, "w", "Data") as f:
                 json.dump(self.Data[Type], f)
-        return self.getData(["Global", "Power"])
+        return self.get_data(["Global", "Power"])
 
-    def updateData(self, path, data):
+    def update_data(self, path, data):
         if self.threading:
-            self.ThreadExec(self._updateData, (path, data))
+            self.thread_append(self._update_data, (path, data))
         else:
-            self._updateData(path, data)
+            self._update_data(path, data)
 
-    def _updateData(self, path, data):
-        assert path and type(path) is list, "Empty path - updateData"
+    def _update_data(self, path, data):
+        assert path and type(path) is list, "Empty path - update_data"
         if len(path) == 1:
-            origin_data = self.getData([])
-            assert type(origin_data) is dict, "Error origin data type (1) - updateData"
+            origin_data = self.get_data([])
+            assert type(origin_data) is dict, "Error origin data type (1) - update_data"
             origin = origin_data.copy()
             origin[path[0]] = data
             path = []
         else:
-            origin_data = self.getData(path[:-1])
-            assert type(origin_data) is dict, "Error origin data type (2) - updateData"
+            origin_data = self.get_data(path[:-1])
+            assert type(origin_data) is dict, "Error origin data type (2) - update_data"
             origin = origin_data.copy()
             origin[path[-1]] = data
             path = path[:-1]
-        assert type(origin) is dict, "Error request data type - updateData"
+        assert type(origin) is dict, "Error request data type - update_data"
         if self.threading:
-            self.mdsShake("UPT", path, origin)
+            self.mds_shake("UPT", path, origin)
         else:
             self._local_update(path, origin)
 
-    def updateLog(self, Type, Data):
+    def update_log(self, type_, data):
         if self.threading:
-            self.ThreadExec(self._updateLog, (Type, Data))
+            self.thread_append(self._update_log, (type_, data))
         else:
-            self._updateLog(Type, Data)
+            self._update_log(type_, data)
 
-    def _updateLog(self, Type, Data):
-        with self.file(Type, "a", "Log") as f:
-            f.write(self.LogType[Type] % Data)
+    def _update_log(self, type_, data):
+        with self.file(type_, "a", "Log") as f:
+            f.write(self.LogType[type_] % data)
 
     @staticmethod
-    def getTime(time_format="%b %d %Y %H:%M:%S %Z"):
-        Time = time.localtime(time.time())
-        return time.strftime(time_format, Time)
+    def get_time(time_format="%b %d %Y %H:%M:%S %Z"):
+        time_ = time.localtime(time.time())
+        return time.strftime(time_format, time_)
 
-    def getData(self, path):
+    def get_data(self, path):
         if self.threading:
-            return self.mdsShake("GET", path).get("data")
+            return self.mds_shake("GET", path).get("data")
         else:
             return self._local_query(path)
 
-    def getGroup(self, GroupID):
-        Groups = self.getData(["Group"])
-        if GroupID not in Groups:
-            self.updateData(["Group", GroupID], self.GroupType)
+    def get_group(self, group_id):
+        group_ids = self.get_data(["Group"])
+        if group_id not in group_ids:
+            self.update_data(["Group", group_ids], self.GroupType)
             return self.GroupType
-        return Groups.get(GroupID)
+        return group_ids.get(group_ids)
 
-    def getSEGroup(self, GroupID):
-        GroupData = self.getGroup(GroupID)
-        SEMode = GroupData.get("SEGroup")
-        if SEMode is None:
+    def get_se_group(self, group_id):
+        group = self.get_group(group_id)
+        mode = group.get("SEGroup")
+        if mode is None:
             return None
-        SEMode_ = {}
-        for Mode in SEMode:
-            Num_Mode = int(Mode)
-            SEMode_[Num_Mode] = SEMode[Mode]
-        return SEMode_
+        mode_ = {}
+        for mode__ in mode:
+            mode_num = int(mode__)
+            mode_[mode_num] = mode[mode__]
+        return mode_
 
-    def limitDecrease(self, limit_type, userId):
+    def trigger_limit(self, limit_type, user_id):
         if self.threading:
-            self.mdsShake("YLD", limit_type, userId)
+            self.mds_shake("YLD", limit_type, user_id)
         else:
-            self.Data["LimitInfo"][limit_type][userId] -= 1
+            self.Data["LimitInfo"][limit_type][user_id] -= 1

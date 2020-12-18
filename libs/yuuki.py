@@ -15,40 +15,40 @@ import time
 from git import Repo
 from yuuki_core.ttypes import OpType
 
-from .connection import Yuuki_Connect
-from .data import Yuuki_Data
-from .events import Yuuki_Command, Yuuki_JoinGroup, Yuuki_Security, Yuuki_Callback
+from .connection import YuukiConnect
+from .data import YuukiData
+from .events import YuukiCommand, YuukiJoinGroup, YuukiSecurity, YuukiCallback
 from .i18n import Yuuki_LangSetting
-from .poll import Yuuki_Poll
-from .thread_control import Yuuki_Multiprocess
-from .webadmin.server import Yuuki_WebAdmin
+from .poll import YuukiPoll
+from .thread_control import YuukiMultiprocess
+from .webadmin.server import YuukiWebAdmin
 
 
 class Yuuki:
-    def __init__(self, Yuuki_Settings):
+    def __init__(self, yuuki_config):
 
-        self.Connect = Yuuki_Connect(Yuuki_Settings)
-        self.YuukiConfigs = Yuuki_Settings.systemConfig
+        self.Connect = YuukiConnect(yuuki_config)
+        self.configs = yuuki_config.systemConfig
 
         # Static_Variable
-        self.Thread_Control = Yuuki_Multiprocess()
+        self.Thread_Control = YuukiMultiprocess()
 
-        self.Seq = self.YuukiConfigs["Seq"]
-        self.Admin = self.YuukiConfigs["Admin"]
-        self.Threading = self.YuukiConfigs["Advanced"]
-        self.KickLimit = self.YuukiConfigs["Hour_KickLimit"]
-        self.CancelLimit = self.YuukiConfigs["Hour_CancelLimit"]
-        self.i18n = Yuuki_LangSetting(self.YuukiConfigs["Default_Language"])
+        self.Seq = self.configs["Seq"]
+        self.Admin = self.configs["Admin"]
+        self.Threading = self.configs["Advanced"]
+        self.KickLimit = self.configs["Hour_KickLimit"]
+        self.CancelLimit = self.configs["Hour_CancelLimit"]
+        self.i18n = Yuuki_LangSetting(self.configs["Default_Language"])
 
         self.LINE_Media_server = "https://obs.line-apps.com"
 
-        self._Version_Check()
+        self._version_check()
 
-    def _Version_Check(self):
+    def _version_check(self):
         git_result = "Unknown"
         origin_url = "https://github.com/star-inc/star_yuuki_bot.git"
 
-        if self.YuukiConfigs["version_check"]:
+        if self.configs["version_check"]:
             git_remote = Repo('.').remote()
             update_status = git_remote.fetch()[0]
             if update_status.flags == 64:
@@ -57,9 +57,9 @@ class Yuuki:
                 git_result = "This is the latest version."
             origin_url = "\n".join(git_remote.urls)
 
-        return self._Announce_Dog(git_result, origin_url)
+        return self._announce_dog(git_result, origin_url)
 
-    def _Announce_Dog(self, git_result, origin_url):
+    def _announce_dog(self, git_result, origin_url):
         print(
             "\n{} {}\n"
             "\t===\n\n"
@@ -67,57 +67,57 @@ class Yuuki:
             "Update Origin:\n"
             "\t{}\n\n\t\t\t\t\t"
             "{}\n\t{}\n".format(
-                self.YuukiConfigs["name"],
-                self.YuukiConfigs["version"],
+                self.configs["name"],
+                self.configs["version"],
                 git_result,
                 origin_url,
-                self.YuukiConfigs["copyright"],
+                self.configs["copyright"],
                 "\t==" * 5
             )
         )
-        self._LINE_Login()
+        self._login_line()
 
-    def _LINE_Login(self):
+    def _login_line(self):
         (self.client, self.listen) = self.Connect.connect()
 
-        if self.YuukiConfigs.get("helper_LINE_ACCESS_KEYs"):
-            for access in self.YuukiConfigs["helper_LINE_ACCESS_KEYs"]:
+        if self.configs.get("helper_LINE_ACCESS_KEYs"):
+            for access in self.configs["helper_LINE_ACCESS_KEYs"]:
                 self.Connect.helperConnect(access)
 
         # Dynamic Variable
         self.get_text = self.i18n.gettext
 
-        self.JoinGroup = Yuuki_JoinGroup(self).action
-        self.Command = Yuuki_Command(self).action
-        self.Security = Yuuki_Security(self).action
-        self.Callback = Yuuki_Callback(self).action
+        self.JoinGroup = YuukiJoinGroup(self).action
+        self.Command = YuukiCommand(self).action
+        self.Security = YuukiSecurity(self).action
+        self.Callback = YuukiCallback(self).action
 
-        mds_port = self.YuukiConfigs["MDS_Port"]
-        self.data = Yuuki_Data(self.Threading, mds_port)
+        mds_port = self.configs["MDS_Port"]
+        self.data = YuukiData(self.Threading, mds_port)
 
-        self.data.updateData(["Global", "GroupJoined"], self.client.getGroupIdsJoined())
-        self.data.updateData(["Global", "SecurityService"], self.YuukiConfigs["SecurityService"])
-        self._Initialize()
+        self.data.update_data(["Global", "GroupJoined"], self.client.getGroupIdsJoined())
+        self.data.update_data(["Global", "SecurityService"], self.configs["SecurityService"])
+        self._initialize()
 
-    def _Initialize(self):
+    def _initialize(self):
         self.profile = self.client.getProfile()
         self.MyMID = self.profile.mid
         self.revision = self.client.getLastOpRevision()
 
         self.AllAccountIds = [self.MyMID]
 
-        for userId in self.Connect.helper:
-            self.AllAccountIds.append(userId)
+        for user_id in self.Connect.helper:
+            self.AllAccountIds.append(user_id)
 
-        if len(self.data.getData(["LimitInfo"])) != 2:
-            self.data.updateData(["LimitInfo"], self.data.LimitType)
-        self._Setup_WebAdmin()
+        if len(self.data.get_data(["LimitInfo"])) != 2:
+            self.data.update_data(["LimitInfo"], self.data.LimitType)
+        self._setup_web_admin()
 
-    def _Setup_WebAdmin(self):
-        if self.Threading and self.YuukiConfigs.get("WebAdmin"):
-            wa_port = self.YuukiConfigs["WebAdmin_Port"]
+    def _setup_web_admin(self):
+        if self.Threading and self.configs.get("WebAdmin"):
+            wa_port = self.configs["WebAdmin_Port"]
             password = str(hash(random.random()))
-            self.web_admin = Yuuki_WebAdmin(self, wa_port)
+            self.web_admin = YuukiWebAdmin(self, wa_port)
             self.web_admin.set_password(password)
             self.Thread_Control.add(self.web_admin.wa_listen)
             print(
@@ -130,13 +130,13 @@ class Yuuki:
 
     def exit(self, restart=False):
         print("System Exit")
-        while self.data.syncData():
-            self.data.updateData(["Global", "Power"], False)
+        while self.data.sync_data():
+            self.data.update_data(["Global", "Power"], False)
         if self.Threading:
-            self.data.mdsShake("EXT", None, None)
+            self.data.mds_shake("EXT", None, None)
             time.sleep(1)
             self.data.MdsThreadControl.stop("mds_listen")
-            if self.YuukiConfigs.get("WebAdmin"):
+            if self.configs.get("WebAdmin"):
                 self.data.MdsThreadControl.stop("wa_listen")
         if restart:
             self.__restart()
@@ -157,27 +157,27 @@ class Yuuki:
         else:
             print("Star Yuuki BOT - Restart Error\n\nUnknown Platform")
 
-    def threadExec(self, function, args):
+    def thread_append(self, function, args):
         if self.Threading:
             self.Thread_Control.add(function, args)
         else:
             function(*args)
 
-    def taskDemux(self, catched_news):
-        for ncMessage in catched_news:
-            if ncMessage.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
-                self.threadExec(self.JoinGroup, (ncMessage,))
-            elif ncMessage.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
-                self.threadExec(self.Security, (ncMessage,))
-            elif ncMessage.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
-                self.threadExec(self.Security, (ncMessage,))
-            elif ncMessage.type == OpType.NOTIFIED_UPDATE_GROUP:
-                self.threadExec(self.Security, (ncMessage,))
-            elif ncMessage.type == OpType.RECEIVE_MESSAGE:
-                self.threadExec(self.Command, (ncMessage,))
-            elif ncMessage.type == OpType.SEND_MESSAGE:
-                self.threadExec(self.Callback, (ncMessage,))
+    def task_executor(self, operations):
+        for operation in operations:
+            if operation.type == OpType.NOTIFIED_INVITE_INTO_GROUP:
+                self.thread_append(self.JoinGroup, (operation,))
+            elif operation.type == OpType.NOTIFIED_KICKOUT_FROM_GROUP:
+                self.thread_append(self.Security, (operation,))
+            elif operation.type == OpType.NOTIFIED_ACCEPT_GROUP_INVITATION:
+                self.thread_append(self.Security, (operation,))
+            elif operation.type == OpType.NOTIFIED_UPDATE_GROUP:
+                self.thread_append(self.Security, (operation,))
+            elif operation.type == OpType.RECEIVE_MESSAGE:
+                self.thread_append(self.Command, (operation,))
+            elif operation.type == OpType.SEND_MESSAGE:
+                self.thread_append(self.Callback, (operation,))
 
     def main(self):
-        handle = Yuuki_Poll(self)
+        handle = YuukiPoll(self)
         handle.init()

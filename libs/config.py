@@ -11,7 +11,7 @@ import os
 import yaml
 
 
-class Yuuki_Config:
+class YuukiConfig:
     """
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -23,19 +23,19 @@ class Yuuki_Config:
 
     """
 
-    connectInfo = {
+    connect_info = {
         "Host": "",
         "Command_Path": "",
         "LongPoll_path": "",
     }
 
-    connectHeader = {
+    connect_header = {
         "X-Line-Application": "",
         "X-Line-Access": "",
         "User-Agent": ""
     }
 
-    systemConfig = {
+    system_config = {
         "name": "Yuuki",
         "version": "v6.5.3-beta_RC0",
         "version_check": True,
@@ -54,7 +54,7 @@ class Yuuki_Config:
         "Hour_KickLimit": 10,
         "Hour_CancelLimit": 10,
         "Default_Language": "en",
-        "GroupMebers_Demand": 100,
+        "GroupMembers_Demand": 100,
         "helper_LINE_ACCESS_KEYs": [],
     }
 
@@ -62,30 +62,30 @@ class Yuuki_Config:
         assert os.path.isfile(config_path), "The config file, `config.yaml` was not found."
         with open(config_path, "r") as configfile:
             self.config = yaml.load(configfile, Loader=yaml.FullLoader)
-        self._yuuki_config()
+        self._config_yuuki()
 
-    def _yuuki_config(self):
+    def _config_yuuki(self):
         assert self.config is not None, "Invalid config file"
         if "Yuuki" in self.config:
             for key in self.config["Yuuki"]:
-                if key in self.systemConfig:
-                    self.systemConfig[key] = self.config["Yuuki"][key]
-        return self._server_config()
+                if key in self.system_config:
+                    self.system_config[key] = self.config["Yuuki"][key]
+        return self._config_server()
 
-    def _server_config(self):
+    def _config_server(self):
         if "Server" in self.config.get("LINE"):
             for key in self.config["LINE"]["Server"]:
-                if key in self.connectInfo:
-                    self.connectInfo[key] = self.config["LINE"]["Server"][key]
-        return self._account_config()
+                if key in self.connect_info:
+                    self.connect_info[key] = self.config["LINE"]["Server"][key]
+        return self._config_account()
 
-    def _account_config(self):
+    def _config_account(self):
         if "Account" in self.config.get("LINE"):
             for key in self.config["LINE"]["Account"]:
                 if key in ["X-Line-Application", "User-Agent"]:
                     self.config["LINE"]["Account"][key] = self.config["LINE"]["Account"][key].replace("\\t", "\t")
-                if key in self.connectHeader:
-                    self.connectHeader[key] = self.config["LINE"]["Account"][key]
+                if key in self.connect_header:
+                    self.connect_header[key] = self.config["LINE"]["Account"][key]
 
         if "helper_LINE_ACCESS_KEYs" in self.config.get("LINE"):
-            self.systemConfig["helper_LINE_ACCESS_KEYs"] = self.config["LINE"]["helper_LINE_ACCESS_KEYs"]
+            self.system_config["helper_LINE_ACCESS_KEYs"] = self.config["LINE"]["helper_LINE_ACCESS_KEYs"]

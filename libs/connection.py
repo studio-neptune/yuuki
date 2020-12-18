@@ -18,16 +18,16 @@ except ImportError:
     print("[No fast_binary using]")
 
 
-class Yuuki_Connect:
-    def __init__(self, Yuuki_Configs):
+class YuukiConnect:
+    def __init__(self, configs):
 
         self.helper = {}
 
-        self.host = Yuuki_Configs.connectInfo["Host"]
-        self.com_path = Yuuki_Configs.connectInfo["Command_Path"]
-        self.poll_path = Yuuki_Configs.connectInfo["LongPoll_path"]
+        self.host = configs.connectInfo["Host"]
+        self.com_path = configs.connectInfo["Command_Path"]
+        self.poll_path = configs.connectInfo["LongPoll_path"]
 
-        self.con_header = Yuuki_Configs.connectHeader
+        self.con_header = configs.connectHeader
 
     def connect(self, listen_timeout=600000):
         transport = THttpClient.THttpClient(self.host + self.com_path)

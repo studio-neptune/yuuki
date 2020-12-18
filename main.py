@@ -12,9 +12,9 @@
     The software licensed under Mozilla Public License Version 2.0
 """
 
-from libs import Yuuki, Yuuki_Config
+from libs import Yuuki, YuukiConfig
 
-config = Yuuki_Config()
+config = YuukiConfig()
 Console = Yuuki(config)
 
 if __name__ == "__main__":

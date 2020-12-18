@@ -11,10 +11,10 @@ import time
 
 from yuuki_core.ttypes import Operation
 
-from .tools import Yuuki_StaticTools, Yuuki_DynamicTools
+from .tools import YuukiStaticTools, YuukiDynamicTools
 
 
-class Yuuki_Poll:
+class YuukiPoll:
     Power = True
 
     NoWork = 0
@@ -25,22 +25,22 @@ class Yuuki_Poll:
 
     def __init__(self, Yuuki):
         self.Yuuki = Yuuki
-        self.Yuuki_DynamicTools = Yuuki_DynamicTools(self.Yuuki)
+        self.YuukiDynamicTools = YuukiDynamicTools(self.Yuuki)
 
     def _action(self):
-        ncMessage = Operation()
+        operation = Operation()
 
-        if time.localtime().tm_hour != self.Yuuki.data.getData(["Global", "LastResetLimitTime"]):
-            self.Yuuki_DynamicTools.limitReset()
-            self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], time.localtime().tm_hour)
+        if time.localtime().tm_hour != self.Yuuki.data.get_data(["Global", "LastResetLimitTime"]):
+            self.YuukiDynamicTools.reset_limit()
+            self.Yuuki.data.update_data(["Global", "LastResetLimitTime"], time.localtime().tm_hour)
 
         if self.NoWork >= self.NoWorkLimit:
             self.NoWork = 0
-            for ncMessage in self.cacheOperations:
-                if ncMessage.reqSeq != -1 and ncMessage.revision > self.Yuuki.revision:
-                    self.Yuuki.revision = ncMessage.revision
+            for operation in self.cacheOperations:
+                if operation.reqSeq != -1 and operation.revision > self.Yuuki.revision:
+                    self.Yuuki.revision = operation.revision
                     break
-            if ncMessage.revision != self.Yuuki.revision:
+            if operation.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
 
         try:
@@ -50,45 +50,45 @@ class Yuuki_Poll:
 
         if self.cacheOperations:
             self.NoWork = 0
-            self.Yuuki.threadExec(self.Yuuki.taskDemux, (self.cacheOperations,))
+            self.Yuuki.thread_append(self.Yuuki.task_executor, (self.cacheOperations,))
             if len(self.cacheOperations) > 1:
                 self.Yuuki.revision = max(self.cacheOperations[-1].revision, self.cacheOperations[-2].revision)
 
     def _exception(self):
-        (err1, err2, err3, ErrorInfo) = Yuuki_StaticTools.errorReport()
+        (err1, err2, err3, error_info) = YuukiStaticTools.report_error()
 
-        ncMessage = Operation()
+        operation = Operation()
 
         # noinspection PyBroadException
         try:
-            for ncMessage in self.cacheOperations:
-                if ncMessage.reqSeq != -1 and ncMessage.revision > self.Yuuki.revision:
-                    self.Yuuki.revision = ncMessage.revision
+            for operation in self.cacheOperations:
+                if operation.reqSeq != -1 and operation.revision > self.Yuuki.revision:
+                    self.Yuuki.revision = operation.revision
                     break
-            if ncMessage.revision != self.Yuuki.revision:
+            if operation.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
             for Root in self.Yuuki.Admin:
-                self.Yuuki_DynamicTools.sendText(
+                self.YuukiDynamicTools.send_text(
                     Root,
                     "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
-                    (err1, err2, err3, ErrorInfo)
+                    (err1, err2, err3, error_info)
                 )
         except:
-            print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, ErrorInfo))
+            print("Star Yuuki BOT - Damage!\nError:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, error_info))
             self.Yuuki.exit()
 
     def init(self):
-        self.Yuuki.data.updateData(["Global", "Power"], self.Power)
+        self.Yuuki.data.update_data(["Global", "Power"], self.Power)
 
-        if "LastResetLimitTime" not in self.Yuuki.data.getData(["Global"]):
-            self.Yuuki.data.updateData(["Global", "LastResetLimitTime"], None)
+        if "LastResetLimitTime" not in self.Yuuki.data.get_data(["Global"]):
+            self.Yuuki.data.update_data(["Global", "LastResetLimitTime"], None)
 
         while self.Power:
             # noinspection PyBroadException
             try:
                 self._action()
                 try:
-                    self.Power = self.Yuuki.data.syncData()
+                    self.Power = self.Yuuki.data.sync_data()
                 except ConnectionRefusedError:
                     self.Power = False
 

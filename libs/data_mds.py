@@ -64,7 +64,7 @@ class PythonMDS:
         _work["DEL"] = self._delete
         _work["GET"] = self._query
         _work["SYC"] = self._sync
-        _work["YLD"] = self._yuuki_limit_decrease
+        _work["YLD"] = self._yuuki_limit_trigger
         _work["EXT"] = self._shutdown
         self.port = port
 
@@ -105,7 +105,7 @@ class PythonMDS:
         self.switch_data = data["path"]
         return {"status": 200}
 
-    def _yuuki_limit_decrease(self, data):
+    def _yuuki_limit_trigger(self, data):
         self.switch_data["LimitInfo"][data["path"]][data["data"]] -= 1
         return {"status": 200}
 

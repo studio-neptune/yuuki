@@ -10,7 +10,7 @@ import multiprocessing
 import threading
 
 
-class Yuuki_Thread:
+class YuukiThread:
     def __init__(self):
         self.lock = threading.Lock()
 
@@ -20,13 +20,13 @@ class Yuuki_Thread:
         added_thread.start()
 
     @staticmethod
-    def getThreadInfo():
+    def get_thread_info():
         print(threading.active_count())
         print(threading.enumerate())
-        print("{} add Threading\n".format(threading.current_thread()))
+        print(f"{threading.current_thread()} add Threading\n")
 
 
-class Yuuki_Multiprocess:
+class YuukiMultiprocess:
     multiprocess_list = {}
 
     def add(self, function, args=()):

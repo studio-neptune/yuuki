@@ -25,7 +25,7 @@ export default {
                             {{getGroupStatus(group)}}
                         </p>
                         <p v-if="!checkSystemMessage(group)">
-                            <a href="#" class="text-danger" title="Leave" @click.prevent="leaveGroup(group.id)">
+                            <a href="#" class="text-danger" title="Leave" @click.prevent="leave_group(group.id)">
                                 <svg width="30px" height="30px" viewBox="0 0 16 16" class="bi bi-door-open" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" d="M1 15.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM11.5 2H11V1h.5A1.5 1.5 0 0 1 13 2.5V15h-1V2.5a.5.5 0 0 0-.5-.5z"/>
                                     <path fill-rule="evenodd" d="M10.828.122A.5.5 0 0 1 11 .5V15h-1V1.077l-6 .857V15H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117z"/>
@@ -49,16 +49,16 @@ export default {
             const inviteeCount = group.invitee ? group.invitee.length : 0
             return `Members:${membersCount} Invites:${inviteeCount}`;
         },
-        leaveGroup(groupId) {
+        leave_group(group_id) {
             const checkpoint = confirm("The group will be removed from the BOT, are you sure?");
             if (!checkpoint) return;
             let body = new FormData();
-            body.append("id", groupId);
+            body.append("id", group_id);
             fetch("/api/groups", {
                 method: "DELETE",
                 body
             });
-            const deleteIndex = this.groupList.findIndex(group => group.id === groupId);
+            const deleteIndex = this.groupList.findIndex(group => group.id === group_id);
             this.groupList.splice(deleteIndex, 1);
         },
         async fetchGroupsJoined() {
@@ -69,8 +69,8 @@ export default {
                 .catch(reject)
                 .then(resolve));
         },
-        async fetchGroupsInfo(groupIds) {
-            return await new Promise((resolve, reject) => fetch(`/api/groups/${groupIds.join(',')}`, {
+        async fetchGroupsInfo(group_ids) {
+            return await new Promise((resolve, reject) => fetch(`/api/groups/${group_ids.join(',')}`, {
                 credentials: "same-origin"
             })
                 .then((body) => body.json())

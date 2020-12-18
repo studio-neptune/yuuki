@@ -17,14 +17,16 @@ from flask import Flask, render_template, request, redirect, jsonify
 from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
 
-from .reader import Yuuki_WebDataReader
-from ..tools import Yuuki_DynamicTools
+from ..yuuki import Yuuki
+from ..data import YuukiData
+from .reader import YuukiWebDataReader
+from ..tools import YuukiDynamicTools
 
 wa_app = Flask(__name__)
 
-Yuuki_Handle = None
-Yuuki_Handle_Data = None
-Yuuki_APIHandle_Data = None
+Yuuki_Handle = Yuuki
+Yuuki_Handle_Data = YuukiData
+Yuuki_APIHandle_Data = YuukiWebDataReader
 
 passports = []
 password = str(hash(random.random()))
@@ -47,7 +49,7 @@ def authorized_response(function):
     return wrapper
 
 
-class Yuuki_WebAdmin:
+class YuukiWebAdmin:
     Bootstrap(wa_app)
     http_server = None
 
@@ -55,7 +57,7 @@ class Yuuki_WebAdmin:
         global Yuuki_Handle, Yuuki_Handle_Data, Yuuki_APIHandle_Data
         Yuuki_Handle = Yuuki
         Yuuki_Handle_Data = Yuuki.data
-        Yuuki_APIHandle_Data = Yuuki_WebDataReader(Yuuki_Handle_Data)
+        Yuuki_APIHandle_Data = YuukiWebDataReader(Yuuki_Handle_Data)
         self.port = port
 
     @staticmethod
@@ -77,7 +79,7 @@ class Yuuki_WebAdmin:
             status = True
         return render_template(
             '/index.html',
-            name=Yuuki_Handle.YuukiConfigs["name"],
+            name=Yuuki_Handle.configs["name"],
             authorized=status
         )
 
@@ -131,7 +133,7 @@ class Yuuki_WebAdmin:
         if request.method == "GET":
             return {
                 "id": Yuuki_Handle.profile.mid,
-                "version": Yuuki_Handle.YuukiConfigs["version"],
+                "version": Yuuki_Handle.configs["version"],
                 "name": Yuuki_Handle.profile.displayName,
                 "status": Yuuki_Handle.profile.statusMessage,
                 "picture": f"{Yuuki_Handle.LINE_Media_server}/{Yuuki_Handle.profile.pictureStatus}"
@@ -140,7 +142,7 @@ class Yuuki_WebAdmin:
         if request.method == "PUT" and "name" in request.values and "status" in request.values:
             Yuuki_Handle.profile.displayName = request.values["name"]
             Yuuki_Handle.profile.statusMessage = request.values["status"]
-            Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).updateProfile(
+            YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).updateProfile(
                 Yuuki_Handle.Seq, Yuuki_Handle.profile
             )
             return {"status": 200}
@@ -151,16 +153,16 @@ class Yuuki_WebAdmin:
     @authorized_response
     def groups():
         if request.method == "GET":
-            return Yuuki_Handle_Data.getData(["Global", "GroupJoined"])
+            return Yuuki_Handle_Data.get_data(["Global", "GroupJoined"])
         if request.method == "POST" and "id" in request.values:
-            return Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).acceptGroupInvitation(
+            return YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).acceptGroupInvitation(
                 Yuuki_Handle.Seq, request.values["id"]
             )
         if request.method == "DELETE" and "id" in request.values:
-            group_information = Yuuki_DynamicTools(Yuuki_Handle).getClient(
+            group_information = YuukiDynamicTools(Yuuki_Handle).get_client(
                 Yuuki_Handle.MyMID
             ).getGroup(request.values["id"])
-            return Yuuki_DynamicTools(Yuuki_Handle).leaveGroup(group_information)
+            return YuukiDynamicTools(Yuuki_Handle).leave_group(group_information)
         return {"status": 400}
 
     @staticmethod
@@ -168,7 +170,7 @@ class Yuuki_WebAdmin:
     @authorized_response
     def group_ticket():
         if "id" in request.values and "ticket" in request.values:
-            return Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).acceptGroupInvitationByTicket(
+            return YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).acceptGroupInvitationByTicket(
                 Yuuki_Handle.Seq, request.values["id"], request.values["ticket"]
             )
         return {"status": 400}
@@ -193,7 +195,7 @@ class Yuuki_WebAdmin:
 
             return [
                 type_handle(obj)
-                for obj in Yuuki_DynamicTools(Yuuki_Handle).getClient(Yuuki_Handle.MyMID).getGroups(read_id_list)
+                for obj in YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).getGroups(read_id_list)
             ]
         return {"status": 400}
 
@@ -211,8 +213,8 @@ class Yuuki_WebAdmin:
             }
 
         return [
-            info_handle(Yuuki_Handle.Connect.helper[userId].get("profile"))
-            for userId in Yuuki_Handle.Connect.helper
+            info_handle(Yuuki_Handle.Connect.helper[user_id].get("profile"))
+            for user_id in Yuuki_Handle.Connect.helper
         ]
 
     @staticmethod
@@ -233,14 +235,14 @@ class Yuuki_WebAdmin:
     def broadcast():
         if "message" in request.values and "audience" in request.values and request.values["message"]:
             audience_ids = {
-                "groups": lambda: Yuuki_Handle_Data.getData(
+                "groups": lambda: Yuuki_Handle_Data.get_data(
                     ["Global", "GroupJoined"]
                 )
             }
             if request.values["audience"] not in audience_ids:
                 return {"status": "404"}
             return [
-                Yuuki_DynamicTools(Yuuki_Handle).sendText(target_id, request.values["message"])
+                YuukiDynamicTools(Yuuki_Handle).send_text(target_id, request.values["message"])
                 for target_id in audience_ids[request.values["audience"]]()
             ]
         return {"status": 400}
@@ -251,7 +253,7 @@ class Yuuki_WebAdmin:
     def shutdown():
         LINE_ACCOUNT_SECURITY_NOTIFY_ID = "u085311ecd9e3e3d74ae4c9f5437cbcb5"
         # The ID belongs to an official account, which is controlled by SysOp of LINE.
-        Yuuki_DynamicTools(Yuuki_Handle).sendText(
+        YuukiDynamicTools(Yuuki_Handle).send_text(
             LINE_ACCOUNT_SECURITY_NOTIFY_ID,
             "[Yuuki] Remote Shutdown"
         )
