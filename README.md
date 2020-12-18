@@ -20,9 +20,9 @@ This is a LINE Group Security BOT, to solve the problem that prevent from someon
 
 As know as the group feature of LINE has a major issue, everyone own the permission to modify the member list.
 
-It's a good idea to be fair, but causes a communicate risk if one of member kick everyone maliciously.
+It's a good idea to be fair, but causes a risk of communication if one of member kick everyone maliciously.
 
-So a protective solution is necessary, especially for corporation, organization, or education.
+So a protective solution is necessary, especially for any corporation, organization, or education.
 
 Since 2015, we start to design and provide several solutions to the market and public, Star Yuuki BOT is one of the success cases.
 
@@ -69,7 +69,7 @@ This is a magic feature since `v6.5.3` that you can control your BOT with GUI.
 
 ## Documents
 
-Are you finding how to setup, configure, and use it, or extend its features? 
+Are you finding how to set up, configure, and use it, or extend its features? 
 
 The documentation for developers is available on [GitHub Wiki](https://github.com/star-inc/star_yuuki_bot/wiki).
 

@@ -10,7 +10,7 @@
 
 + Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-+ If your using cause any legal problem, we DO NOT assume any responsibility.
++ If you cause any legal problem, we DO NOT assume any responsibility.
 
 + Enjoy using ;)
 
