@@ -41,17 +41,22 @@ class YuukiCommand:
         )
 
     def _version(self, operation):
-        self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-            operation), self.Yuuki.configs["version"])
+        self.YuukiDynamicTools.send_text(
+            YuukiStaticTools.send_to_who(operation),
+            self.Yuuki.configs["version"]
+        )
 
     def _user_id(self, operation):
-        self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-            operation), self.Yuuki.get_text("LINE System UserID:\n") + operation.message.from_)
+        self.YuukiDynamicTools.send_text(
+            YuukiStaticTools.send_to_who(operation),
+            self.Yuuki.get_text("LINE System UserID:\n") + operation.message.from_
+        )
 
     def _get_all_helper(self, operation):
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID).getGroup(operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
             group_privilege = [
                 *self.Yuuki.Admin,
                 YuukiStaticTools.get_group_creator(group).mid,
@@ -59,9 +64,8 @@ class YuukiCommand:
             ]
             if operation.message.from_ in group_privilege:
                 for user_id in self.Yuuki.Connect.helper:
-                    self.YuukiDynamicTools.send_user(
-                        YuukiStaticTools.send_to_who(operation),
-                        user_id)
+                    self.YuukiDynamicTools \
+                        .send_user(YuukiStaticTools.send_to_who(operation), user_id)
 
     def _speed(self, operation):
         timer_start = time.time()
@@ -82,20 +86,26 @@ class YuukiCommand:
                 if message_separated[1].isdigit() and 1 >= int(message_separated[1]) >= 0:
                     self.Yuuki.data.update_data(
                         ["Global", "SecurityService"], bool(message_separated[1]))
-                    self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-                        operation), self.Yuuki.get_text("Okay"))
+                    self.YuukiDynamicTools.send_text(
+                        YuukiStaticTools.send_to_who(operation),
+                        self.Yuuki.get_text("Okay")
+                    )
                 else:
-                    self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-                        operation), self.Yuuki.get_text("Enable(True): 1\nDisable(False): 0"))
+                    self.YuukiDynamicTools.send_text(
+                        YuukiStaticTools.send_to_who(operation),
+                        self.Yuuki.get_text("Enable(True): 1\nDisable(False): 0")
+                    )
             else:
-                self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(operation),
-                                                 str(bool(
-                                                     self.Yuuki.data.get_data(["Global", "SecurityService"]))))
+                self.YuukiDynamicTools.send_text(
+                    YuukiStaticTools.send_to_who(operation),
+                    str(bool(self.Yuuki.data.get_data(["Global", "SecurityService"])))
+                )
 
     def _switch(self, operation):
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID).getGroup(operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
             group_privilege = [
                 *self.Yuuki.Admin,
                 YuukiStaticTools.get_group_creator(group).mid,
@@ -113,7 +123,7 @@ class YuukiCommand:
         message_separated = operation.message.text.split(" ")
         status = []
         unknown_msg = []
-        unknown_msgtext = ""
+        unknown_msg_text = ""
         for count, code in enumerate(message_separated):
             if code.isdigit() and 3 >= int(code) >= 0:
                 status.append(int(code))
@@ -122,24 +132,24 @@ class YuukiCommand:
         self.YuukiDynamicTools.config_security_status(
             operation.message.to, status)
         if unknown_msg:
-            unknown_msgtext = ", ".join(unknown_msg)
+            unknown_msg_text = ", ".join(unknown_msg)
         if status:
             self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
                 operation), self.Yuuki.get_text("Okay"))
         else:
             self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
                 operation), self.Yuuki.get_text("Not Found"))
-        if unknown_msgtext != "":
+        if unknown_msg_text != "":
             self.YuukiDynamicTools.send_text(
                 YuukiStaticTools.send_to_who(operation),
-                self.Yuuki.get_text(
-                    "Notice: Unknown command line argument(s)") + "\n({})".format(unknown_msgtext)
+                self.Yuuki.get_text("Notice: Unknown command line argument(s)") + f"\n({unknown_msg_text})"
             )
 
     def _disable_all(self, operation):
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID).getGroup(operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
             group_privilege = [
                 *self.Yuuki.Admin,
                 YuukiStaticTools.get_group_creator(group).mid,
@@ -151,16 +161,18 @@ class YuukiCommand:
                     self.Yuuki.get_text("SecurityService of %s was disable") % (self.Yuuki.configs["name"],)
                 )
             elif operation.message.from_ in group_privilege:
-                self.YuukiDynamicTools.config_security_status(
-                    operation.message.to, [])
-                self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-                    operation), self.Yuuki.get_text("Okay"))
+                self.YuukiDynamicTools.config_security_status(operation.message.to, [])
+                self.YuukiDynamicTools.send_text(
+                    YuukiStaticTools.send_to_who(operation),
+                    self.Yuuki.get_text("Okay")
+                )
 
     def _ext_admin(self, operation):
         message_separated = operation.message.text.split(" ")
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID).getGroup(operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
             group_privilege = [
                 *self.Yuuki.Admin,
                 YuukiStaticTools.get_group_creator(group).mid
@@ -182,22 +194,24 @@ class YuukiCommand:
                     self.Yuuki.get_text("Added")
                 )
             elif message_separated[2] not in self.Yuuki.data.get_data(["BlackList"]):
-                origin = self.Yuuki.data.get_data(
-                    ["Group", group.id, "Ext_Admin"])
+                origin = self.Yuuki.data.get_data(["Group", group.id, "Ext_Admin"])
                 ext_admin_list = origin.copy()
                 ext_admin_list.append(message_separated[2])
-                self.Yuuki.data.update_data(
-                    ["Group", group.id, "Ext_Admin"], ext_admin_list)
-                self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-                    operation), self.Yuuki.get_text("Okay"))
+                self.Yuuki.data.update_data(["Group", group.id, "Ext_Admin"], ext_admin_list)
+                self.YuukiDynamicTools.send_text(
+                    YuukiStaticTools.send_to_who(operation),
+                    self.Yuuki.get_text("Okay")
+                )
             else:
-                self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(operation),
-                                                 self.Yuuki.get_text(
-                                                     "The User(s) was in our blacklist database."))
+                self.YuukiDynamicTools.send_text(
+                    YuukiStaticTools.send_to_who(operation),
+                    self.Yuuki.get_text("The User(s) was in our blacklist database.")
+                )
         else:
-            self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(operation),
-                                             self.Yuuki.get_text(
-                                                 "Wrong UserID or the guy is not in Group"))
+            self.YuukiDynamicTools.send_text(
+                YuukiStaticTools.send_to_who(operation),
+                self.Yuuki.get_text("Wrong UserID or the guy is not in Group")
+            )
 
     def _ext_admin_delete(self, operation, message_separated, group):
         if message_separated[2] in self.Yuuki.data.get_group(group.id)["Ext_Admin"]:
@@ -205,14 +219,18 @@ class YuukiCommand:
             ext_admin_list = origin.copy()
             ext_admin_list.remove(message_separated[2])
             self.Yuuki.data.update_data(
-                ["Group", group.id, "Ext_Admin"], ext_admin_list)
+                ["Group", group.id, "Ext_Admin"],
+                ext_admin_list
+            )
             self.YuukiDynamicTools.send_text(
                 YuukiStaticTools.send_to_who(operation),
                 self.Yuuki.get_text("Okay")
             )
         else:
-            self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-                operation), self.Yuuki.get_text("Not Found"))
+            self.YuukiDynamicTools.send_text(
+                YuukiStaticTools.send_to_who(operation),
+                self.Yuuki.get_text("Not Found")
+            )
 
     def _ext_admin_query(self, operation, group):
         if self.Yuuki.data.get_group(group.id)["Ext_Admin"]:
@@ -220,7 +238,7 @@ class YuukiCommand:
             status_added = []
             for member in group.members:
                 if member.mid in self.Yuuki.data.get_group(group.id)["Ext_Admin"]:
-                    status += "{}\n".format(member.displayName)
+                    status += f"{member.displayName}\n"
                     status_added.append(member.mid)
             for user_id in self.Yuuki.data.get_group(group.id)["Ext_Admin"]:
                 if user_id not in status_added:
@@ -233,29 +251,28 @@ class YuukiCommand:
                 status + self.Yuuki.get_text("\nExtend Administrator(s)")
             )
         else:
-            self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(
-                operation), self.Yuuki.get_text("Not Found"))
+            self.YuukiDynamicTools.send_text(
+                YuukiStaticTools.send_to_who(operation),
+                self.Yuuki.get_text("Not Found")
+            )
 
     def _status(self, operation):
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID).getGroup(operation.message.to)
-            group_status = self.Yuuki.data.get_se_group(
-                operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
+            group_status = self.Yuuki.data.get_se_group(operation.message.to)
             if not self.Yuuki.data.get_data(["Global", "SecurityService"]):
-                status = self.Yuuki.get_text("SecurityService of %s was disable") % (
-                    self.Yuuki.configs["name"],
-                )
+                status = self.Yuuki.get_text("SecurityService of %s was disable") % (self.Yuuki.configs["name"],)
             elif group_status is None:
-                status = self.Yuuki.get_text("Default without Initialize\nMain Admin of the Group:\n%s") % (
-                    YuukiStaticTools.get_group_creator(
-                        group).displayName,
-                )
+                status = self.Yuuki.get_text("Default without Initialize\nMain Admin of the Group:\n%s") % \
+                         (YuukiStaticTools.get_group_creator(group).displayName,)
             else:
                 status = self.Yuuki.get_text(
                     "SecurityService is Listening on\n"
                     "\nURL:%s\nInvite:%s\nJoin:%s\nMembers:%s\n"
-                    "\nMain Admin of the Group:\n%s") % (
+                    "\nMain Admin of the Group:\n%s") % \
+                         (
                              group_status[OpType.NOTIFIED_UPDATE_GROUP],
                              group_status[OpType.NOTIFIED_INVITE_INTO_GROUP],
                              group_status[OpType.NOTIFIED_ACCEPT_GROUP_INVITATION],
@@ -264,23 +281,25 @@ class YuukiCommand:
                                  group).displayName,
                          )
             self.YuukiDynamicTools.send_text(
-                YuukiStaticTools.send_to_who(operation), status)
+                YuukiStaticTools.send_to_who(operation),
+                status
+            )
 
     def _group_backup(self, operation):
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID).getGroup(operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
             group_privilege = [
                 *self.Yuuki.Admin,
                 YuukiStaticTools.get_group_creator(group).mid,
                 *self.Yuuki.data.get_group(group.id)["Ext_Admin"]
             ]
             if operation.message.from_ in group_privilege:
-                group_members = [User.mid for User in group.members]
+                group_members = [user.mid for user in group.members]
                 group_invitations = None
                 if group.invitee:
-                    group_invitations = [
-                        User.mid for User in group.invitee]
+                    group_invitations = [user.mid for user in group.invitee]
                 output_info = {
                     "OriginID": group.id,
                     "Members": group_members,
@@ -295,9 +314,9 @@ class YuukiCommand:
 
     def _quit(self, operation):
         if operation.message.toType == MIDType.GROUP:
-            group = self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID
-            ).getGroup(operation.message.to)
+            group = self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .getGroup(operation.message.to)
             group_privilege = [
                 *self.Yuuki.Admin,
                 YuukiStaticTools.get_group_creator(group).mid
@@ -322,7 +341,7 @@ class YuukiCommand:
                 reporting_message = str(eval(command_message))
             except:
                 (err1, err2, err3, error_info) = YuukiStaticTools.report_error()
-                reporting_message = "Star Yuuki BOT - Eval Error:\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, error_info)
+                reporting_message = f"Star Yuuki BOT - Eval Error:\n{err1}\n{err2}\n{err3}\n\n{error_info}"
             self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(operation), reporting_message)
 
     def _text(self, operation):
@@ -360,12 +379,19 @@ class YuukiCommand:
         if not contact_info:
             msg = self.Yuuki.get_text("Not Found")
         elif contact_info.mid in self.Yuuki.data.get_data(["BlackList"]):
-            msg = "{}\n{}".format(self.Yuuki.get_text(
-                "The User(s) was in our blacklist database."), contact_info.mid)
+            msg = "{}\n{}".format(
+                self.Yuuki.get_text("The User(s) was in our blacklist database."),
+                contact_info.mid
+            )
         else:
             msg = self.Yuuki.get_text("Name:%s\nPicture URL:%s/%s\nStatusMessage:\n%s\nLINE System UserID:%s") % \
-                  (contact_info.displayName, self.Yuuki.LINE_Media_server, contact_info.pictureStatus,
-                   contact_info.statusMessage, contact_info.mid)
+                  (
+                      contact_info.displayName,
+                      self.Yuuki.LINE_Media_server,
+                      contact_info.pictureStatus,
+                      contact_info.statusMessage,
+                      contact_info.mid
+                  )
         self.YuukiDynamicTools.send_text(YuukiStaticTools.send_to_who(operation), msg)
 
     def action(self, operation):
@@ -376,11 +402,9 @@ class YuukiCommand:
             pass
 
         elif operation.message.toType == MIDType.ROOM:
-            self.YuukiDynamicTools.get_client(
-                self.Yuuki.MyMID
-            ).leaveRoom(
-                self.Yuuki.Seq, operation.message.to
-            )
+            self.YuukiDynamicTools \
+                .get_client(self.Yuuki.MyMID) \
+                .leaveRoom(self.Yuuki.Seq, operation.message.to)
 
         elif operation.message.contentType == ContentType.NONE:
             self._text(operation)

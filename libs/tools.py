@@ -14,6 +14,7 @@ import sys
 import traceback
 
 import requests
+from .yuuki import Yuuki
 from yuuki_core.ttypes import OpType, MIDType, ContentType, Group, Message
 
 
@@ -106,8 +107,8 @@ class YuukiStaticTools:
 
 
 class YuukiDynamicTools:
-    def __init__(self, Yuuki):
-        self.Yuuki = Yuuki
+    def __init__(self, handler: Yuuki):
+        self.Yuuki = handler
 
     def get_client(self, user_id):
         """
@@ -135,12 +136,12 @@ class YuukiDynamicTools:
                 return True
         return False
 
-    def switch_group_url_status(self, group, status, handlerId=None):
+    def switch_group_url_status(self, group, status, handler_id=None):
         """
         Change LINE Group URL Status
         :param group: Line Group
         :param status: boolean
-        :param handlerId: string
+        :param handler_id: string
         :return: None
         """
         result = Group()
@@ -148,7 +149,7 @@ class YuukiDynamicTools:
             if key != "members" or key != "invitee":
                 result.__dict__[key] = group.__dict__[key]
         result.preventJoinByTicket = not status
-        handler = self.Yuuki.MyMID if handlerId is None else handlerId
+        handler = self.Yuuki.MyMID if handler_id is None else handler_id
         self.get_client(handler).updateGroup(self.Yuuki.Seq, result)
 
     def config_security_status(self, group_id, status):
@@ -352,6 +353,6 @@ class YuukiDynamicTools:
                 'params': json.dumps(params)
             }
             url = self.Yuuki.LINE_Media_server + '/talk/m/upload.nhn'
-            r = requests.post(url, headers=self.Yuuki.connectHeader, data=data, files=files)
+            r = requests.post(url, headers=self.Yuuki.Connect.con_header, data=data, files=files)
             if r.status_code != 201:
                 self.send_text(send_to, "Error!")

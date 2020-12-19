@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import socket
 import time
 
+from .yuuki import Yuuki
 from yuuki_core.ttypes import Operation
 
 from .tools import YuukiStaticTools, YuukiDynamicTools
@@ -23,9 +24,9 @@ class YuukiPoll:
     fetchNum = 50
     cacheOperations = []
 
-    def __init__(self, Yuuki):
-        self.Yuuki = Yuuki
-        self.YuukiDynamicTools = YuukiDynamicTools(self.Yuuki)
+    def __init__(self, handler: Yuuki):
+        self.Yuuki = handler
+        self.YuukiDynamicTools = YuukiDynamicTools(handler)
 
     def _action(self):
         operation = Operation()

@@ -69,7 +69,7 @@ class YuukiData:
     initHeader = "<title>{} - SYB</title>" \
                  "<meta charset='utf-8' />"
 
-    def __init__(self, threading, mds_port):
+    def __init__(self, threading: bool, mds_port: int):
         self.threading = threading
         self.mds_port = mds_port
         self.ThreadControl = YuukiThread()
@@ -176,11 +176,11 @@ class YuukiData:
             over.update(data)
         return False
 
-    def file(self, Type, Mode, Format):
-        if Format == "Data":
-            return open(self.DataPath + self.DataName.format(Type), Mode)
-        elif Format == "Log":
-            return open(self.LogPath + self.LogName.format(Type), Mode)
+    def file(self, type_, mode_, format_):
+        if format_ == "Data":
+            return open(self.DataPath + self.DataName.format(type_), mode_)
+        elif format_ == "Log":
+            return open(self.LogPath + self.LogName.format(type_), mode_)
 
     def sync_data(self):
         if self.threading:

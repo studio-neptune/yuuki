@@ -9,6 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from thrift.protocol import TCompactProtocol
 from thrift.transport import THttpClient
 
+from .config import YuukiConfig
 from yuuki_core.TalkService import Client, TalkException
 
 #           NC HighSpeed Library
@@ -19,15 +20,15 @@ except ImportError:
 
 
 class YuukiConnect:
-    def __init__(self, configs):
+    def __init__(self, configs: YuukiConfig):
 
         self.helper = {}
 
-        self.host = configs.connectInfo["Host"]
-        self.com_path = configs.connectInfo["Command_Path"]
-        self.poll_path = configs.connectInfo["LongPoll_path"]
+        self.host = configs.connect_info["Host"]
+        self.com_path = configs.connect_info["Command_Path"]
+        self.poll_path = configs.connect_info["LongPoll_path"]
 
-        self.con_header = configs.connectHeader
+        self.con_header = configs.connect_header
 
     def connect(self, listen_timeout=600000):
         transport = THttpClient.THttpClient(self.host + self.com_path)
@@ -49,7 +50,7 @@ class YuukiConnect:
 
         return client, listen
 
-    def helperConnect(self, auth_token):
+    def helper_connect(self, auth_token):
         helper_connect_header = self.con_header.copy()
         helper_connect_header["X-Line-Access"] = auth_token
 

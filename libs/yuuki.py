@@ -15,6 +15,7 @@ import time
 from git import Repo
 from yuuki_core.ttypes import OpType
 
+from .config import YuukiConfig
 from .connection import YuukiConnect
 from .data import YuukiData
 from .events import YuukiCommand, YuukiJoinGroup, YuukiSecurity, YuukiCallback
@@ -25,10 +26,10 @@ from .webadmin.server import YuukiWebAdmin
 
 
 class Yuuki:
-    def __init__(self, yuuki_config):
+    def __init__(self, yuuki_config: YuukiConfig):
 
         self.Connect = YuukiConnect(yuuki_config)
-        self.configs = yuuki_config.systemConfig
+        self.configs = yuuki_config.system_config
 
         # Static_Variable
         self.Thread_Control = YuukiMultiprocess()
@@ -82,7 +83,7 @@ class Yuuki:
 
         if self.configs.get("helper_LINE_ACCESS_KEYs"):
             for access in self.configs["helper_LINE_ACCESS_KEYs"]:
-                self.Connect.helperConnect(access)
+                self.Connect.helper_connect(access)
 
         # Dynamic Variable
         self.get_text = self.i18n.gettext
