@@ -142,12 +142,11 @@ class YuukiData:
                 })
             )
             response = http_client.fetch(http_request)
-            over = json.loads(response.body)
-            if "status" in over:
-                status = over["status"]
-            assert_result = "mds - ERROR {}\n{} on {}".format(status, do, path)
-            assert status == 200, assert_result
-            return over
+            result = json.loads(response.body)
+            if "status" in result:
+                status = result["status"]
+            assert status == 200, f"mds - ERROR {status}\n{do} on {path}"
+            return result
         else:
             status = {"status": status}
             return json.dumps(status)
@@ -160,20 +159,17 @@ class YuukiData:
                 if key in result:
                     if count < query_len:
                         if type(result.get(key)) is not dict:
-                            result = 1
-                            break
+                            return 1
                     result = result.get(key)
                 else:
-                    result = 2
-                    break
-
+                    return 2
             return result
         return 0
 
     def _local_update(self, path, data):
-        over = self._local_query(path)
-        if not str(over).isnumeric():
-            over.update(data)
+        result = self._local_query(path)
+        if not str(result).isnumeric():
+            result.update(data)
         return False
 
     def file(self, type_, mode_, format_):
