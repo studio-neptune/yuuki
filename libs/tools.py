@@ -6,17 +6,21 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
+from __future__ import annotations
+
 import json
 import ntpath
 import os
 import random
 import sys
 import traceback
+from typing import TYPE_CHECKING
 
 import requests
 from yuuki_core.ttypes import OpType, MIDType, ContentType, Group, Message
 
-from .yuuki import Yuuki
+if TYPE_CHECKING:
+    from .yuuki import Yuuki
 
 
 class YuukiStaticTools:

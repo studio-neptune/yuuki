@@ -6,16 +6,20 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
+from __future__ import annotations
+
 import os
 import platform
 import random
 import sys
 import time
+from typing import TYPE_CHECKING
 
 from git import Repo
 from yuuki_core.ttypes import OpType
 
-from .config import YuukiConfig
+if TYPE_CHECKING:
+    from .config import YuukiConfig
 from .connection import YuukiConnect
 from .data import YuukiData
 from .events import YuukiCommand, YuukiJoinGroup, YuukiSecurity, YuukiCallback

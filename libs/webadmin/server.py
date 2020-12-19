@@ -18,15 +18,13 @@ from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
 
 from .reader import YuukiWebDataReader
-from ..data import YuukiData
 from ..tools import YuukiDynamicTools
-from ..yuuki import Yuuki
 
 wa_app = Flask(__name__)
 
-Yuuki_Handle = Yuuki
-Yuuki_Handle_Data = YuukiData
-Yuuki_APIHandle_Data = YuukiWebDataReader
+Yuuki_Handle = None
+Yuuki_Handle_Data = None
+Yuuki_APIHandle_Data = None
 
 passports = []
 password = str(hash(random.random()))

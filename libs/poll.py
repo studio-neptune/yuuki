@@ -6,13 +6,18 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
+from __future__ import annotations
+
 import socket
 import time
+from typing import TYPE_CHECKING
 
 from yuuki_core.ttypes import Operation
 
 from .tools import YuukiStaticTools, YuukiDynamicTools
-from .yuuki import Yuuki
+
+if TYPE_CHECKING:
+    from .yuuki import Yuuki
 
 
 class YuukiPoll:
