@@ -7,7 +7,9 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from bs4 import BeautifulSoup
+
 from ..data import YuukiData
+
 
 class YuukiWebDataReader:
     def __init__(self, yuuki_data: YuukiData):

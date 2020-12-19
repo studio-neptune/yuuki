@@ -9,10 +9,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import socket
 import time
 
-from .yuuki import Yuuki
 from yuuki_core.ttypes import Operation
 
 from .tools import YuukiStaticTools, YuukiDynamicTools
+from .yuuki import Yuuki
 
 
 class YuukiPoll:

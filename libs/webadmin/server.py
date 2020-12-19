@@ -17,10 +17,10 @@ from flask import Flask, render_template, request, redirect, jsonify
 from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
 
-from ..yuuki import Yuuki
-from ..data import YuukiData
 from .reader import YuukiWebDataReader
+from ..data import YuukiData
 from ..tools import YuukiDynamicTools
+from ..yuuki import Yuuki
 
 wa_app = Flask(__name__)
 

@@ -14,8 +14,9 @@ import sys
 import traceback
 
 import requests
-from .yuuki import Yuuki
 from yuuki_core.ttypes import OpType, MIDType, ContentType, Group, Message
+
+from .yuuki import Yuuki
 
 
 class YuukiStaticTools:

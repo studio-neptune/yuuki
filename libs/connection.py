@@ -8,9 +8,9 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from thrift.protocol import TCompactProtocol
 from thrift.transport import THttpClient
+from yuuki_core.TalkService import Client, TalkException
 
 from .config import YuukiConfig
-from yuuki_core.TalkService import Client, TalkException
 
 #           NC HighSpeed Library
 try:
