@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from .yuuki import Yuuki
 
 
-class YuukiStaticTools:
+class StaticTools:
     @staticmethod
     def get_group_creator(group):
         """
@@ -111,7 +111,7 @@ class YuukiStaticTools:
             return operation.message.to
 
 
-class YuukiDynamicTools:
+class DynamicTools:
     def __init__(self, handler: Yuuki):
         self.Yuuki = handler
 
@@ -271,7 +271,7 @@ class YuukiDynamicTools:
         assert action in actions, "Invalid action code"
         if len(self.Yuuki.Connect.helper) >= 1:
             members = [member.mid for member in group.members if member.mid in self.Yuuki.AllAccountIds]
-            accounts = YuukiStaticTools.dict_shuffle(
+            accounts = StaticTools.dict_shuffle(
                 self.Yuuki.data.get_data(["LimitInfo", actions[action].get("command")]), members)
             if len(accounts) == 0:
                 return "None"

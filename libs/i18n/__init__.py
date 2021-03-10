@@ -10,7 +10,7 @@ from .en import English
 from .zh_TW import Traditional_Chinese
 
 
-class Yuuki_LangSetting:
+class LangSetting:
     def __init__(self, default):
         self.default = default
         self.support = {

@@ -19,31 +19,31 @@ from git import Repo
 from yuuki_core.ttypes import OpType
 
 if TYPE_CHECKING:
-    from .config import YuukiConfig
-from .connection import YuukiConnect
-from .data import YuukiData
+    from .config import Config
+from .connection import Connect
+from .data import Data
 from .events import YuukiCommand, YuukiJoinGroup, YuukiSecurity, YuukiCallback
-from .i18n import Yuuki_LangSetting
-from .poll import YuukiPoll
-from .thread_control import YuukiMultiprocess
-from .webadmin.server import YuukiWebAdmin
+from .i18n import LangSetting
+from .poll import Poll
+from .thread import Multiprocess
+from .webadmin.server import WebAdmin
 
 
 class Yuuki:
-    def __init__(self, yuuki_config: YuukiConfig):
+    def __init__(self, yuuki_config: Config):
 
-        self.Connect = YuukiConnect(yuuki_config)
+        self.Connect = Connect(yuuki_config)
         self.configs = yuuki_config.system_config
 
         # Static_Variable
-        self.Thread_Control = YuukiMultiprocess()
+        self.Thread_Control = Multiprocess()
 
         self.Seq = self.configs["Seq"]
         self.Admin = self.configs["Admin"]
         self.Threading = self.configs["Advanced"]
         self.KickLimit = self.configs["Hour_KickLimit"]
         self.CancelLimit = self.configs["Hour_CancelLimit"]
-        self.i18n = Yuuki_LangSetting(self.configs["Default_Language"])
+        self.i18n = LangSetting(self.configs["Default_Language"])
 
         self.LINE_Media_server = "https://obs.line-apps.com"
 
@@ -98,7 +98,7 @@ class Yuuki:
         self.Callback = YuukiCallback(self).action
 
         mds_port = self.configs["MDS_Port"]
-        self.data = YuukiData(self.Threading, mds_port)
+        self.data = Data(self.Threading, mds_port)
 
         self.data.update_data(["Global", "GroupJoined"], self.client.getGroupIdsJoined())
         self.data.update_data(["Global", "SecurityService"], self.configs["SecurityService"])
@@ -122,7 +122,7 @@ class Yuuki:
         if self.Threading and self.configs.get("WebAdmin"):
             wa_port = self.configs["WebAdmin_Port"]
             password = str(hash(random.random()))
-            self.web_admin = YuukiWebAdmin(self, wa_port)
+            self.web_admin = WebAdmin(self, wa_port)
             self.web_admin.set_password(password)
             self.Thread_Control.add(self.web_admin.wa_listen)
             print(
@@ -184,5 +184,5 @@ class Yuuki:
                 self.thread_append(self.Callback, (operation,))
 
     def main(self):
-        handle = YuukiPoll(self)
+        handle = Poll(self)
         handle.init()

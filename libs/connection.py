@@ -15,7 +15,7 @@ from thrift.transport import THttpClient
 from yuuki_core.TalkService import Client, TalkException
 
 if TYPE_CHECKING:
-    from .config import YuukiConfig
+    from .config import Config
 
 #           NC HighSpeed Library
 try:
@@ -24,8 +24,8 @@ except ImportError:
     print("[No fast_binary using]")
 
 
-class YuukiConnect:
-    def __init__(self, configs: YuukiConfig):
+class Connect:
+    def __init__(self, configs: Config):
 
         self.helper = {}
 

@@ -18,7 +18,7 @@ from flask_bootstrap import Bootstrap
 from gevent.pywsgi import WSGIServer
 
 from .reader import YuukiWebDataReader
-from ..tools import YuukiDynamicTools
+from ..tools import DynamicTools
 
 wa_app = Flask(__name__)
 
@@ -47,7 +47,7 @@ def authorized_response(function):
     return wrapper
 
 
-class YuukiWebAdmin:
+class WebAdmin:
     Bootstrap(wa_app)
     http_server = None
 
@@ -140,7 +140,7 @@ class YuukiWebAdmin:
         if request.method == "PUT" and "name" in request.values and "status" in request.values:
             Yuuki_Handle.profile.displayName = request.values["name"]
             Yuuki_Handle.profile.statusMessage = request.values["status"]
-            YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).updateProfile(
+            DynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).updateProfile(
                 Yuuki_Handle.Seq, Yuuki_Handle.profile
             )
             return {"status": 200}
@@ -153,14 +153,14 @@ class YuukiWebAdmin:
         if request.method == "GET":
             return Yuuki_Handle_Data.get_data(["Global", "GroupJoined"])
         if request.method == "POST" and "id" in request.values:
-            return YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).acceptGroupInvitation(
+            return DynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).acceptGroupInvitation(
                 Yuuki_Handle.Seq, request.values["id"]
             )
         if request.method == "DELETE" and "id" in request.values:
-            group_information = YuukiDynamicTools(Yuuki_Handle).get_client(
+            group_information = DynamicTools(Yuuki_Handle).get_client(
                 Yuuki_Handle.MyMID
             ).getGroup(request.values["id"])
-            return YuukiDynamicTools(Yuuki_Handle).leave_group(group_information)
+            return DynamicTools(Yuuki_Handle).leave_group(group_information)
         return {"status": 400}
 
     @staticmethod
@@ -168,7 +168,7 @@ class YuukiWebAdmin:
     @authorized_response
     def group_ticket():
         if "id" in request.values and "ticket" in request.values:
-            return YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).acceptGroupInvitationByTicket(
+            return DynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).acceptGroupInvitationByTicket(
                 Yuuki_Handle.Seq, request.values["id"], request.values["ticket"]
             )
         return {"status": 400}
@@ -193,7 +193,7 @@ class YuukiWebAdmin:
 
             return [
                 type_handle(obj)
-                for obj in YuukiDynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).getGroups(read_id_list)
+                for obj in DynamicTools(Yuuki_Handle).get_client(Yuuki_Handle.MyMID).getGroups(read_id_list)
             ]
         return {"status": 400}
 
@@ -240,7 +240,7 @@ class YuukiWebAdmin:
             if request.values["audience"] not in audience_ids:
                 return {"status": "404"}
             return [
-                YuukiDynamicTools(Yuuki_Handle).send_text(target_id, request.values["message"])
+                DynamicTools(Yuuki_Handle).send_text(target_id, request.values["message"])
                 for target_id in audience_ids[request.values["audience"]]()
             ]
         return {"status": 400}
@@ -251,7 +251,7 @@ class YuukiWebAdmin:
     def shutdown():
         LINE_ACCOUNT_SECURITY_NOTIFY_ID = "u085311ecd9e3e3d74ae4c9f5437cbcb5"
         # The ID belongs to an official account, which is controlled by SysOp of LINE.
-        YuukiDynamicTools(Yuuki_Handle).send_text(
+        DynamicTools(Yuuki_Handle).send_text(
             LINE_ACCOUNT_SECURITY_NOTIFY_ID,
             "[Yuuki] Remote Shutdown"
         )

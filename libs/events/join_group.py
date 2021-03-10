@@ -10,20 +10,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..tools import YuukiStaticTools, YuukiDynamicTools
+from ..tools import StaticTools, DynamicTools
 
 if TYPE_CHECKING:
     from ..yuuki import Yuuki
 
 
-class YuukiJoinGroup:
+class JoinGroup:
     def __init__(self, handler: Yuuki):
         """
             Event Type:
                 NOTIFIED_INVITE_INTO_GROUP (13)
         """
         self.Yuuki = handler
-        self.YuukiDynamicTools = YuukiDynamicTools(self.Yuuki)
+        self.DynamicTools = DynamicTools(self.Yuuki)
 
     def _accept(self, group_id, group, inviter):
         group_list = self.Yuuki.data.get_data(["Global", "GroupJoined"])
@@ -31,20 +31,20 @@ class YuukiJoinGroup:
         new_group_list.append(group_id)
         self.Yuuki.data.update_data(
             ["Global", "GroupJoined"], new_group_list)
-        self.YuukiDynamicTools.send_text(
+        self.DynamicTools.send_text(
             group_id,
             self.Yuuki.get_text("Helllo^^\nMy name is %s ><\nNice to meet you OwO") %
             (self.Yuuki.configs["name"],)
         )
-        self.YuukiDynamicTools.send_text(
+        self.DynamicTools.send_text(
             group_id,
             self.Yuuki.get_text("Type:\n\t%s/Help\nto get more information\n\nMain Admin of the Group:\n%s") %
             (
                 self.Yuuki.configs["name"],
-                YuukiStaticTools.get_group_creator(group).displayName,
+                StaticTools.get_group_creator(group).displayName,
             )
         )
-        self.YuukiDynamicTools.get_group_ticket(group_id, self.Yuuki.MyMID, True)
+        self.DynamicTools.get_group_ticket(group_id, self.Yuuki.MyMID, True)
         # Log
         self.Yuuki.data.update_log(
             "JoinGroup",
@@ -52,12 +52,12 @@ class YuukiJoinGroup:
         )
 
     def _reject(self, group_id, inviter):
-        self.YuukiDynamicTools.send_text(
+        self.DynamicTools.send_text(
             group_id,
             self.Yuuki.get_text("Sorry...\nThe number of members is not satisfied (%s needed)") %
             (self.Yuuki.configs["GroupMembers_Demand"],)
         )
-        self.YuukiDynamicTools.get_client(self.Yuuki.MyMID).leave_group(self.Yuuki.Seq, group_id)
+        self.DynamicTools.get_client(self.Yuuki.MyMID).leave_group(self.Yuuki.Seq, group_id)
         # Log
         self.Yuuki.data.update_log(
             "JoinGroup",
@@ -67,9 +67,9 @@ class YuukiJoinGroup:
     def _check_helper(self, operation, group_invitations, blocked_user):
         if operation.param1 in self.Yuuki.data.get_data(["Global", "GroupJoined"]) and not blocked_user:
             for user_id in self.Yuuki.Connect.helper:
-                if self.YuukiDynamicTools.check_invitation(operation, user_id) or user_id in group_invitations:
-                    self.YuukiDynamicTools.get_client(user_id).acceptGroupInvitation(self.Yuuki.Seq, operation.param1)
-                    self.YuukiDynamicTools.get_group_ticket(operation.param1, user_id, True)
+                if self.DynamicTools.check_invitation(operation, user_id) or user_id in group_invitations:
+                    self.DynamicTools.get_client(user_id).acceptGroupInvitation(self.Yuuki.Seq, operation.param1)
+                    self.DynamicTools.get_group_ticket(operation.param1, user_id, True)
                     # Log
                     self.Yuuki.data.update_log("JoinGroup", (
                         self.Yuuki.data.get_time(),
@@ -81,15 +81,15 @@ class YuukiJoinGroup:
     def action(self, operation):
         group_invitations = []
         blocked_user = operation.param2 in self.Yuuki.data.get_data(["BlackList"])
-        if self.YuukiDynamicTools.check_invitation(operation) and not blocked_user:
+        if self.DynamicTools.check_invitation(operation) and not blocked_user:
             group_id = operation.param1
             inviter = operation.param2
-            group = self.YuukiDynamicTools \
+            group = self.DynamicTools \
                 .get_client(self.Yuuki.MyMID) \
                 .getGroup(group_id)
             group_member = [user.mid for user in group.members] if group.members else []
             group_invitations = [user.mid for user in group.invitee] if group.invitee else []
-            self.YuukiDynamicTools.get_client(self.Yuuki.MyMID).acceptGroupInvitation(self.Yuuki.Seq, group_id)
+            self.DynamicTools.get_client(self.Yuuki.MyMID).acceptGroupInvitation(self.Yuuki.Seq, group_id)
             if len(group_member) >= self.Yuuki.configs["GroupMembers_Demand"]:
                 self._accept(group_id, group, inviter)
             else:

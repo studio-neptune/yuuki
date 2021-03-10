@@ -11,7 +11,7 @@ import os
 import yaml
 
 
-class YuukiConfig:
+class Config:
     """
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

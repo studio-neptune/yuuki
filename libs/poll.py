@@ -14,13 +14,13 @@ from typing import TYPE_CHECKING
 
 from yuuki_core.ttypes import Operation
 
-from .tools import YuukiStaticTools, YuukiDynamicTools
+from .tools import StaticTools, DynamicTools
 
 if TYPE_CHECKING:
     from .yuuki import Yuuki
 
 
-class YuukiPoll:
+class Poll:
     Power = True
 
     NoWork = 0
@@ -31,13 +31,13 @@ class YuukiPoll:
 
     def __init__(self, handler: Yuuki):
         self.Yuuki = handler
-        self.YuukiDynamicTools = YuukiDynamicTools(handler)
+        self.DynamicTools = DynamicTools(handler)
 
     def _action(self):
         operation = Operation()
 
         if time.localtime().tm_hour != self.Yuuki.data.get_data(["Global", "LastResetLimitTime"]):
-            self.YuukiDynamicTools.reset_limit()
+            self.DynamicTools.reset_limit()
             self.Yuuki.data.update_data(["Global", "LastResetLimitTime"], time.localtime().tm_hour)
 
         if self.NoWork >= self.NoWorkLimit:
@@ -61,7 +61,7 @@ class YuukiPoll:
                 self.Yuuki.revision = max(self.cacheOperations[-1].revision, self.cacheOperations[-2].revision)
 
     def _exception(self):
-        (err1, err2, err3, error_info) = YuukiStaticTools.report_error()
+        (err1, err2, err3, error_info) = StaticTools.report_error()
 
         operation = Operation()
 
@@ -74,7 +74,7 @@ class YuukiPoll:
             if operation.revision != self.Yuuki.revision:
                 self.Yuuki.revision = self.Yuuki.client.getLastOpRevision()
             for Root in self.Yuuki.Admin:
-                self.YuukiDynamicTools.send_text(
+                self.DynamicTools.send_text(
                     Root,
                     "Star Yuuki BOT - Something was wrong...\nError:\n%s\n%s\n%s\n\n%s" %
                     (err1, err2, err3, error_info)

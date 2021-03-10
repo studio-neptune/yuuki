@@ -13,20 +13,20 @@ from typing import TYPE_CHECKING
 
 from yuuki_core.ttypes import ContentType
 
-from ..tools import YuukiDynamicTools
+from ..tools import DynamicTools
 
 if TYPE_CHECKING:
     from ..yuuki import Yuuki
 
 
-class YuukiCallback:
+class Callback:
     def __init__(self, handler: Yuuki):
         """
             Event Type:
                 SEND_MESSAGE(25)
         """
         self.Yuuki = handler
-        self.YuukiDynamicTools = YuukiDynamicTools(self.Yuuki)
+        self.DynamicTools = DynamicTools(self.Yuuki)
 
     def _shutdown(self, operation):
         self.Yuuki.Thread_Control.add(self._shutdown_reply, (operation,))
@@ -34,7 +34,7 @@ class YuukiCallback:
 
     def _shutdown_reply(self, operation):
         time.sleep(1)
-        self.YuukiDynamicTools.send_text(
+        self.DynamicTools.send_text(
             operation.message.to,
             self.Yuuki.get_text("Exit.")
         )

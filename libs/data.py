@@ -14,12 +14,12 @@ import time
 from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
-from .data_mds import PythonMDS
-from .thread_control import YuukiMultiprocess
-from .thread_control import YuukiThread
+from .mds import PythonMDS
+from .thread import Multiprocess
+from .thread import YuukiThread
 
 
-class YuukiData:
+class Data:
     # Data Struct Define
 
     Data = {}
@@ -73,7 +73,7 @@ class YuukiData:
         self.threading = threading
         self.mds_port = mds_port
         self.ThreadControl = YuukiThread()
-        self.MdsThreadControl = YuukiMultiprocess()
+        self.MdsThreadControl = Multiprocess()
         self._data_initialize()
 
     def _data_initialize(self):

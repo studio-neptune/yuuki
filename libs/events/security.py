@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 
 from yuuki_core.ttypes import OpType
 
-from ..tools import YuukiStaticTools, YuukiDynamicTools
+from ..tools import StaticTools, DynamicTools
 
 if TYPE_CHECKING:
     from ..yuuki import Yuuki
@@ -27,7 +27,7 @@ def security_access_checker(function):
     return wrapper
 
 
-class YuukiSecurity:
+class Security:
     def __init__(self, handler: Yuuki):
         """
             Event Type:
@@ -37,21 +37,21 @@ class YuukiSecurity:
                 NOTIFIED_KICKOUT_FROM_GROUP (19)
         """
         self.Yuuki = handler
-        self.YuukiDynamicTools = YuukiDynamicTools(self.Yuuki)
+        self.DynamicTools = DynamicTools(self.Yuuki)
 
     @security_access_checker
     def _notified_update_group(self, group, security_info, operation):
         if security_info["Another"] == '4':
             if not group.preventJoinByTicket and security_info["Action"] not in self.Yuuki.Connect.helper:
                 self.Yuuki.thread_append(
-                    self.YuukiDynamicTools.switch_group_url_status,
+                    self.DynamicTools.switch_group_url_status,
                     (group, False)
                 )
                 self.Yuuki.thread_append(
-                    self.YuukiDynamicTools.send_text,
+                    self.DynamicTools.send_text,
                     (security_info["GroupID"], self.Yuuki.get_text("DO NOT ENABLE THE GROUP URL STATUS, see you..."))
                 )
-                kicker = self.YuukiDynamicTools.modify_group_members(1, group, security_info["Action"])
+                kicker = self.DynamicTools.modify_group_members(1, group, security_info["Action"])
                 # Log
                 self.Yuuki.data.update_log("KickEvent", (
                     self.Yuuki.data.get_time(),
@@ -71,7 +71,7 @@ class YuukiSecurity:
         elif security_info["Another"] not in self.Yuuki.AllAccountIds + security_info["GroupPrivilege"]:
             canceler = self._notified_invite_into_group_single(group, security_info, operation)
         if canceler != "None":
-            self.YuukiDynamicTools.send_text(
+            self.DynamicTools.send_text(
                 security_info["GroupID"],
                 self.Yuuki.get_text("Do not invite anyone...thanks")
             )
@@ -80,9 +80,9 @@ class YuukiSecurity:
         for user_id in security_info["Another"].split("\x1e"):
             if user_id not in self.Yuuki.AllAccountIds + security_info["GroupPrivilege"]:
                 if group.invitee and user_id in [user.mid for user in group.invitee]:
-                    canceler = self.YuukiDynamicTools.modify_group_members(2, group, user_id)
+                    canceler = self.DynamicTools.modify_group_members(2, group, user_id)
                 else:
-                    canceler = self.YuukiDynamicTools.modify_group_members(1, group, user_id)
+                    canceler = self.DynamicTools.modify_group_members(1, group, user_id)
                     # Log
                     self.Yuuki.data.update_log("KickEvent", (
                         self.Yuuki.data.get_time(),
@@ -106,9 +106,9 @@ class YuukiSecurity:
 
     def _notified_invite_into_group_single(self, group, security_info, operation):
         if group.invitee and security_info["Another"] in [user.mid for user in group.invitee]:
-            canceler = self.YuukiDynamicTools.modify_group_members(2, group, security_info["Another"])
+            canceler = self.DynamicTools.modify_group_members(2, group, security_info["Another"])
         else:
-            canceler = self.YuukiDynamicTools.modify_group_members(1, group, security_info["Another"])
+            canceler = self.DynamicTools.modify_group_members(1, group, security_info["Another"])
             # Log
             self.Yuuki.data.update_log("KickEvent", (
                 self.Yuuki.data.get_time(),
@@ -133,10 +133,10 @@ class YuukiSecurity:
         for user_id in self.Yuuki.data.get_data(["BlackList"]):
             if user_id == security_info["Action"]:
                 self.Yuuki.thread_append(
-                    self.YuukiDynamicTools.send_text,
+                    self.DynamicTools.send_text,
                     (security_info["GroupID"], self.Yuuki.get_text("You are our blacklist. Bye~"))
                 )
-                kicker = self.YuukiDynamicTools.modify_group_members(1, group, security_info["Action"])
+                kicker = self.DynamicTools.modify_group_members(1, group, security_info["Action"])
                 # Log
                 self.Yuuki.data.update_log("KickEvent", (
                     self.Yuuki.data.get_time(),
@@ -163,7 +163,7 @@ class YuukiSecurity:
         elif security_info["Another"] in self.Yuuki.AllAccountIds:
             kicker = "None"
             try:
-                kicker = self.YuukiDynamicTools.modify_group_members(
+                kicker = self.DynamicTools.modify_group_members(
                     1,
                     group,
                     security_info["Action"],
@@ -184,7 +184,7 @@ class YuukiSecurity:
                     security_info["GroupID"]
                 ))
                 self.Yuuki.thread_append(
-                    self.YuukiDynamicTools.send_text,
+                    self.DynamicTools.send_text,
                     (
                         security_info["Action"],
                         self.Yuuki.get_text("You had been blocked by our database.")
@@ -207,41 +207,41 @@ class YuukiSecurity:
         assert kicker != "None", "No Helper Found"
         if group.preventJoinByTicket:
             self.Yuuki.thread_append(
-                self.YuukiDynamicTools.switch_group_url_status,
+                self.DynamicTools.switch_group_url_status,
                 (group, True, kicker)
             )
-        group_ticket = self.YuukiDynamicTools.get_group_ticket(
+        group_ticket = self.DynamicTools.get_group_ticket(
             security_info["GroupID"], kicker)
         try:
-            self.YuukiDynamicTools.get_client(security_info["Another"]).acceptGroupInvitationByTicket(
+            self.DynamicTools.get_client(security_info["Another"]).acceptGroupInvitationByTicket(
                 self.Yuuki.Seq,
                 security_info["GroupID"],
                 group_ticket
             )
         except:
             if group.preventJoinByTicket:
-                self.YuukiDynamicTools.switch_group_url_status(
+                self.DynamicTools.switch_group_url_status(
                     group,
                     True,
                     kicker
                 )
-            group_ticket = self.YuukiDynamicTools.get_group_ticket(
+            group_ticket = self.DynamicTools.get_group_ticket(
                 security_info["GroupID"], kicker, True)
-            self.YuukiDynamicTools.get_client(security_info["Another"]).acceptGroupInvitationByTicket(
+            self.DynamicTools.get_client(security_info["Another"]).acceptGroupInvitationByTicket(
                 self.Yuuki.Seq,
                 security_info["GroupID"],
                 group_ticket
             )
         if group.preventJoinByTicket:
             self.Yuuki.thread_append(
-                self.YuukiDynamicTools.switch_group_url_status, (group, False, security_info["Another"]))
-        self.YuukiDynamicTools.get_group_ticket(
+                self.DynamicTools.switch_group_url_status, (group, False, security_info["Another"]))
+        self.DynamicTools.get_group_ticket(
             security_info["GroupID"], security_info["Another"], True)
 
     def _notified_kickout_from_group_rescue_failure(self, group, security_info, operation, kicker):
-        (err1, err2, err3, error_info) = YuukiStaticTools.report_error()
+        (err1, err2, err3, error_info) = StaticTools.report_error()
         for Root in self.Yuuki.Admin:
-            self.YuukiDynamicTools.send_text(
+            self.DynamicTools.send_text(
                 Root,
                 "Star Yuuki BOT - SecurityService Failure\n\n%s\n%s\n%s\n\n%s" % (err1, err2, err3, error_info)
             )
@@ -262,9 +262,9 @@ class YuukiSecurity:
         ))
 
     def _notified_kickout_from_group_normal(self, group, security_info, operation):
-        self.Yuuki.thread_append(self.YuukiDynamicTools.send_text, (
+        self.Yuuki.thread_append(self.DynamicTools.send_text, (
             security_info["GroupID"], self.Yuuki.get_text("DO NOT KICK, thank you ^^")))
-        kicker = self.YuukiDynamicTools.modify_group_members(1, group, security_info["Action"])
+        kicker = self.DynamicTools.modify_group_members(1, group, security_info["Action"])
         # Log
         self.Yuuki.data.update_log("KickEvent", (
             self.Yuuki.data.get_time(),
@@ -275,18 +275,18 @@ class YuukiSecurity:
             security_info["Another"],
             operation.type
         ))
-        self.Yuuki.thread_append(self.YuukiDynamicTools.send_text, (security_info["GroupID"], self.Yuuki.get_text(
+        self.Yuuki.thread_append(self.DynamicTools.send_text, (security_info["GroupID"], self.Yuuki.get_text(
             "The one who was been kicked:")))
         self.Yuuki.thread_append(
-            self.YuukiDynamicTools.send_user, (security_info["GroupID"], security_info["Another"]))
+            self.DynamicTools.send_user, (security_info["GroupID"], security_info["Another"]))
 
     def action(self, operation):
-        security_info = YuukiStaticTools.security_for_where(operation)
+        security_info = StaticTools.security_for_where(operation)
 
-        group = self.YuukiDynamicTools.get_client(self.Yuuki.MyMID).getGroup(security_info["GroupID"])
+        group = self.DynamicTools.get_client(self.Yuuki.MyMID).getGroup(security_info["GroupID"])
         security_info["GroupPrivilege"] = [
             *self.Yuuki.Admin,
-            YuukiStaticTools.get_group_creator(group).mid,
+            StaticTools.get_group_creator(group).mid,
             *self.Yuuki.data.get_group(group.id)["Ext_Admin"]
         ]
         if security_info["Action"] in security_info["GroupPrivilege"] or \

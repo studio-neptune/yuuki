@@ -8,11 +8,11 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from bs4 import BeautifulSoup
 
-from ..data import YuukiData
+from ..data import Data
 
 
-class YuukiWebDataReader:
-    def __init__(self, yuuki_data: YuukiData):
+class WebDataReader:
+    def __init__(self, yuuki_data: Data):
         self.handle = yuuki_data
 
     def get_logs(self, name):
