@@ -79,4 +79,4 @@ Welcome to help us for improving and making `Yuuki` better!
 
 Copyright of `logo.png` belongs to "[©川原 礫／ASCII Media Works／SAO Project](https://www.aniplex.co.jp)" and its artists.
 
-> (c) 2020 Star Inc.
+> (c) 2021 Star Inc.
