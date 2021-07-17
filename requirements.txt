@@ -10,7 +10,7 @@ GitPython==3.1.9
 greenlet==0.4.17
 idna==2.10
 itsdangerous==1.1.0
-PyYAML==5.3.1
+PyYAML==5.4
 requests==2.24.0
 six==1.15.0
 smmap2==3.0.1
