@@ -10,14 +10,14 @@ GitPython==3.1.9
 greenlet==0.4.17
 idna==2.10
 itsdangerous==1.1.0
-PyYAML==5.3.1
+PyYAML==5.4
 requests==2.24.0
 six==1.15.0
 smmap2==3.0.1
 soupsieve==2.0.1
 thrift==0.13.0
 tornado==6.0.4
-urllib3==1.25.10
+urllib3==1.26.5
 Werkzeug==1.0.1
 yuuki-core==6.5.2
 zope.event==4.5.0
