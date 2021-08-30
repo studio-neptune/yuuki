@@ -9,4 +9,4 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from .config import Yuuki_Config
 from .yuuki import Yuuki
 
-__all__ = ['connection', 'data', 'data_mds', 'thread_control', 'Yuuki', 'Yuuki_Config']
+__all__ = ['connector.py', 'data', 'mds.py', 'thread.py', 'Yuuki', 'Yuuki_Config']

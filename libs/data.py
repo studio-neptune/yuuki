@@ -14,9 +14,9 @@ import time
 from tornado.httpclient import HTTPClient, HTTPRequest
 from yuuki_core.ttypes import OpType
 
-from .data_mds import PythonMDS
-from .thread_control import Yuuki_Multiprocess
-from .thread_control import Yuuki_Thread
+from .mds import PythonMDS
+from .thread import Yuuki_Multiprocess
+from .thread import Yuuki_Thread
 
 
 class Yuuki_Data:
