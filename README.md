@@ -1,5 +1,7 @@
 # Star Yuuki(pYthon) BOT - Yuuki
 
+> v6 receives security updates only, no feature will be added.
+
 ![Version](https://img.shields.io/badge/v6.5.3-OpenSource-FF0033.svg)
 ![Series](https://img.shields.io/badge/syb-Series-7700FF.svg)
 ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg)
@@ -65,12 +67,12 @@ This is a magic feature since `v6.5.3` that you can control your BOT with GUI.
 
 | Feature | Status |  Note |
 |---|---|---|
-| Broadcast | O | Group Only currently |
+| Broadcast | O | Group only currently |
 | Events Viewer | O |
 | Profile Modify | O |
 | Groups Management | O |
 | Helper Management | O |
-| Yuuki Configure | X | Developing |
+| Yuuki Configure | X | Will be available in v8 |
 
 ![WebAdmin](WebAdmin.png)
 
