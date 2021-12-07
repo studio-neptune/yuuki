@@ -12,7 +12,7 @@ from setuptools import setup
 setup(
     name='star_yuuki_bot',
     version='8.0',
-    packages=['system', 'system.i18n', 'system.model', 'system.model.group', 'system.webadmin', 'system.controller'],
+    packages=['src', 'src.i18n', 'src.model', 'src.model.group', 'src.webadmin', 'src.controller'],
     url='https://line.starinc.xyz/star-yuuki-bot/',
     license='MPL-2.0',
     author='Star Inc.',
