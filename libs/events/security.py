@@ -9,7 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from yuuki_core.ttypes import OpType
 
-from ..tools import Yuuki_StaticTools, Yuuki_DynamicTools
+from ..utils import Yuuki_StaticTools, Yuuki_DynamicTools
 
 
 def security_access_checker(function):

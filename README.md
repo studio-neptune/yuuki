@@ -1,9 +1,18 @@
 # Star Yuuki(pYthon) BOT - Yuuki
 
-![Version](https://img.shields.io/badge/v6.5.3-OpenSource-FF0033.svg) ![Series](https://img.shields.io/badge/syb-Series-7700FF.svg) ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg) ![Python](https://img.shields.io/badge/python-3.x-0066FF.svg) ![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)
+> v6 receives security updates only, no feature will be added.
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/build.png?b=master)](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/build-status/master) [![Code Intelligence Status](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/star-inc/star_yuuki_bot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/star-inc/star_yuuki_bot/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/star-inc/star_yuuki_bot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/star-inc/star_yuuki_bot/context:python)
+![Version](https://img.shields.io/badge/v6.5.3-OpenSource-FF0033.svg)
+![Series](https://img.shields.io/badge/syb-Series-7700FF.svg)
+![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg)
+![Python](https://img.shields.io/badge/python-3.x-0066FF.svg)
+![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)
+
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/build.png?b=master)](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/build-status/master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/star-inc/star_yuuki_bot/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/star-inc/star_yuuki_bot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/star-inc/star_yuuki_bot/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/star-inc/star_yuuki_bot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/star-inc/star_yuuki_bot/context:python)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fstar-inc%2Fstar_yuuki_bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fstar-inc%2Fstar_yuuki_bot?ref=badge_shield)
 
 The perfectest LINE Group Protective BOT.
@@ -20,7 +29,7 @@ This is a LINE Group Security BOT, to solve the problem that prevent from someon
 
 As know as the group feature of LINE has a major issue, everyone own the permission to modify the member list.
 
-It's a good idea to be fair, but causes a communicate risk if one of member kick everyone maliciously.
+It's a good idea to be fair, but causes a communicated risk if one of member kick everyone maliciously.
 
 So a protective solution is necessary, especially for corporation, organization, or education.
 
@@ -58,18 +67,18 @@ This is a magic feature since `v6.5.3` that you can control your BOT with GUI.
 
 | Feature | Status |  Note |
 |---|---|---|
-| Broadcast | O | Group Only currently |
+| Broadcast | O | Group only currently |
 | Events Viewer | O |
 | Profile Modify | O |
 | Groups Management | O |
 | Helper Management | O |
-| Yuuki Configure | X | Developing |
+| Yuuki Configure | X | Will be available in v8 |
 
 ![WebAdmin](WebAdmin.png)
 
 ## Documents
 
-Are you finding how to setup, configure, and use it, or extend its features? 
+Are you finding how to set up, configure, and use it, or extend its features? 
 
 The documentation for developers is available on [GitHub Wiki](https://github.com/star-inc/star_yuuki_bot/wiki).
 

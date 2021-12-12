@@ -11,7 +11,7 @@ import time
 
 from yuuki_core.ttypes import Operation
 
-from .tools import Yuuki_StaticTools, Yuuki_DynamicTools
+from .utils import Yuuki_StaticTools, Yuuki_DynamicTools
 
 
 class Yuuki_Poll:

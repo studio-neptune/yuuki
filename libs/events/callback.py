@@ -10,7 +10,7 @@ import time
 
 from yuuki_core.ttypes import ContentType
 
-from ..tools import Yuuki_DynamicTools
+from ..utils import Yuuki_DynamicTools
 
 
 class Yuuki_Callback:
