@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Yuuki_Libs
-(c) 2020 Star Inc.
+(c) Neptune Studio.
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -15,7 +15,6 @@ setup(
     packages=['src', 'src.i18n', 'src.model', 'src.model.group', 'src.webadmin', 'src.controller'],
     url='https://line.starinc.xyz/star-yuuki-bot/',
     license='MPL-2.0',
-    author='Star Inc.',
-    author_email='"Star Inc." <star_inc@aol.com>',
+    author='Neptune Studio',
     description='The perfectest LINE Group Protective BOT'
 )

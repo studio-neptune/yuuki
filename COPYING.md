@@ -6,7 +6,7 @@
 
 + You can edit/copy these files, but you need to keep the original "[COPYING.md](COPYING.md)", "[LICENSE.md](LICENSE.md)" and  in the program which you did it.
 
-+ The copyright of [LINE Services](https://line.starinc.xyz/) contents belongs to [Star Inc.](https://starinc.xyz)
++ The copyright of [LINE Services](https://line.starinc.xyz/) contents belongs to [Neptune Studio](https://neptune.starinc.xyz)
 
 + Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
@@ -18,4 +18,4 @@
     This Source Code Form is "Incompatible With Secondary Licenses", as
     defined by the Mozilla Public License, v. 2.0.
 
-> Copyright(c) 2020 [Star Inc.](https://starinc.xyz) All Rights Reserved.
+> (c) [Neptune Studio](https://neptune.starinc.xyz).
