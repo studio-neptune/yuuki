@@ -1,0 +1,1 @@
+(c) 2020 [Star Inc.](https://starinc.xyz) with its contributors.
