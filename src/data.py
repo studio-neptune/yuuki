@@ -113,7 +113,7 @@ class DataStore:
             log = self.log_path / (f"{name}.html")
             if not log.exists():
                 log.write_text(
-                    f"<title>{title} - SYB</title><meta charset='utf-8' />",
+                    f"<title>{title} - NepSecretary</title><meta charset='utf-8' />",
                     encoding="utf-8",
                 )
         file = self._file()

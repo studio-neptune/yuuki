@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-    Star Yuuki Bot - Yuuki
+    NepSecretary - Yuuki
     ~~~~~~~~~
 
     Version: v8.0
 
-    Copyright(c) 2021 Star Inc. All Rights Reserved.
+    Copyright(c) 2021 Star Inc.
+    Copyright(c) 2026 Neptune Studio. All Rights Reserved.
     The software licensed under Mozilla Public License Version 2.0
 """
 
@@ -45,7 +46,7 @@ def main() -> None:
     try:
         asyncio.run(run())
     except KeyboardInterrupt:
-        print("Star Yuuki BOT - Bye!")
+        print("NepSecretary BOT - Bye!")
 
 
 if __name__ == "__main__":

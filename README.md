@@ -1,4 +1,4 @@
-# Star Yuuki(pYthon) BOT - Yuuki
+# NepSecretary - Yuuki
 
 > ## WARNING: LINE will bite
 >
@@ -16,7 +16,7 @@
 > If your account gets eaten, that is on you. You have been warned.
 
 ![Version](https://img.shields.io/badge/v8-OpenSource-FF0033.svg)
-![Series](https://img.shields.io/badge/syb-Series-7700FF.svg)
+![Series](https://img.shields.io/badge/nepsecretary-Series-7700FF.svg)
 ![License](https://img.shields.io/badge/license-MPL--2.0-FF6600.svg)
 ![Python](https://img.shields.io/badge/python-3.12%2B-0066FF.svg)
 ![Platform](https://img.shields.io/badge/base_on-LINE-00DD00.svg)

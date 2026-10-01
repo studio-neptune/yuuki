@@ -48,7 +48,7 @@ class WebAdmin:
         self.bot = bot
         self.password = password or str(hash(random.random()))
         self.sessions: set[str] = set()
-        self.app = FastAPI(title="Star Yuuki BOT - WebAdmin")
+        self.app = FastAPI(title="NepSecretary - Yuuki WebAdmin")
         self.templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
         self.app.mount("/static", StaticFiles(directory=str(STATIC_DIR)))
         self._register_routes()
@@ -122,8 +122,8 @@ class WebAdmin:
                 data = base64.b64encode(logo_path.read_bytes()).decode("utf8")
                 return PlainTextResponse(f"data:image/png;base64, {data}")
             return PlainTextResponse(
-                "https://raw.githubusercontent.com/star-inc/"
-                "star_yuuki_bot/master/logo.png"
+                "https://raw.githubusercontent.com/studio-neptune/"
+                "yuuki/main/logo.png"
             )
 
         @app.post("/api/verify")

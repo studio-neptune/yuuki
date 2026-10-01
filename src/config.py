@@ -34,9 +34,9 @@ class YuukiSettings(BaseModel):
     webadmin_port: int = 2020
     helper_tokens: list[str] = Field(default_factory=list)
     version_check: bool = True
-    project_url: str = "https://tinyurl.com/syb-yuuki"
+    project_url: str = "https://github.com/studio-neptune/yuuki"
     man_page: str = "https://tinyurl.com/yuuki-manual"
-    copyright: str = "(c)2026 Star Inc."
+    copyright: str = "(c)2026 Neptune Studio"
 
 
 class LineServerSettings(BaseModel):

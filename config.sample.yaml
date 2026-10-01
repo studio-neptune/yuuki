@@ -1,4 +1,4 @@
-# Sample config file for star_yuuki_bot v8
+# Sample config file for NepSecretary - Yuuki (v8)
 # Copy this file to config.yaml and replace the values.
 # Every key can also be provided through the environment with
 # a double-underscore path, e.g. YUUKI__LINE__SERVER__HOST.
