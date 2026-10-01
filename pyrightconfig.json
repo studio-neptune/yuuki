@@ -1,0 +1,17 @@
+{
+  "include": ["src", "main.py", "tests"],
+  "exclude": [".venv", "**/__pycache__"],
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "standard",
+  "reportMissingTypeStubs": "none",
+  "reportAny": "warning",
+  "reportExplicitAny": "error",
+  "reportMissingParameterType": "error",
+  "reportUnknownParameterType": "warning",
+  "reportUnknownLambdaType": "warning",
+  "reportUnknownVariableType": "warning",
+  "reportUnknownArgumentType": "warning",
+  "reportUnknownMemberType": "none"
+}

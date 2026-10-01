@@ -1,17 +1,26 @@
-# Sample Config File for star_yuuki_bot
-# Please replace setting options from `libs/config.py`
+# Sample config file for star_yuuki_bot v8
+# Copy this file to config.yaml and replace the values.
+# Every key can also be provided through the environment with
+# a double-underscore path, e.g. YUUKI__LINE__SERVER__HOST.
 
-Yuuki:
-  SecurityService: True
-  Default_Language: en
+yuuki:
+  security_service: true
+  default_language: en
+  admin:
+    - "u0000000000000000000000000000000000"
+  hour_kick_limit: 10
+  hour_cancel_limit: 10
+  group_members_demand: 100
+  webadmin_enabled: false
+  webadmin_port: 2020
+  helper_tokens: []
 
-LINE:
-  Server:
-    Host: https://example.com
-    Command_Path: /example_path
-    LongPoll_path: /example_path
-
-  Account:
-    X-Line-Application: LINE_Application_Identification
-    X-Line-Access: LINE_Application_AccessKey
-    User-Agent: LINE_Application_User-Agent
+line:
+  server:
+    host: https://example.com
+    command_path: /example_path
+    long_poll_path: /example_path
+  account:
+    x_line_application: LINE_Application_Identification
+    x_line_access: LINE_Application_AccessKey
+    user_agent: LINE_Application_User-Agent

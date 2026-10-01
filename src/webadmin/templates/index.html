@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/main.css"/>
+
+    <title>Star Yuuki BOT - WebAdmin</title>
+
+    <!-- Alpine.js -->
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+    <script defer src="/static/js/app.js"></script>
+</head>
+
+<body x-data="webadmin">
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#/">{{ name }} - WebAdmin</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#/">Home</a>
+            </li>
+        </ul>
+        <template x-if="authorized">
+            <a class="navbar-brand" href="/logout">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+            </a>
+        </template>
+    </div>
+</nav>
+
+<div class="nav-scroller bg-white shadow-sm pt-1 pb-1" x-show="authorized">
+    <nav class="nav nav-underline">
+        <template x-for="item in pages" :key="item.path">
+            <a class="nav-link" :class="view === item.view && 'active'"
+               :href="item.path" x-text="item.title"></a>
+        </template>
+    </nav>
+</div>
+
+<main class="container" role="main">
+
+    <!-- Login -->
+    <div x-show="view === 'login'">
+        <div class="starter-template">
+            <h1>Star Yuuki BOT - WebAdmin</h1>
+            <p class="lead">Perfect LINE BOT for Groups Protection.</p>
+            <p>The administrator control center of LINE BOT</p>
+            <div class="status damage" x-text="loginMessage" x-show="loginMessage"></div>
+        </div>
+        <div class="password_box">
+            <form class="form-inline mt-2 mt-md-0 login-box" @submit.prevent="authorize">
+                <input x-model="password" class="form-control mr-sm-2" type="password"
+                       placeholder="Type your admin password" aria-label="Login" name="code">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div x-show="view === 'dashboard'">
+        <div :title="profile.id" class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
+            <template x-if="profile.picture">
+                <img width="48" height="48" class="mr-3" :src="profile.picture">
+            </template>
+            <template x-if="!profile.picture">
+                <svg width="48" height="48" viewBox="0 0 16 16" class="mr-3" fill="currentColor"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
+            </template>
+            <div class="lh-100">
+                <h6 class="mb-0 text-white lh-100" x-text="profile.name"></h6>
+                <small x-text="version"></small>
+            </div>
+        </div>
+
+        <form class="my-3 p-3 bg-white rounded shadow-sm">
+            <h6 class="border-bottom border-gray pb-2 mb-0">Broadcast</h6>
+            <textarea x-model="broadcastText" class="form-control" cols="50" rows="5"
+                      placeholder="Type any text message for announcing..." :disabled="broadcastBusy"></textarea>
+            <div class="mt-1">
+                <label>Audience: </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" disabled> Contacts
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" x-model="broadcastGroups" :disabled="broadcastBusy"> Groups
+                </label>
+            </div>
+            <input @click.prevent="broadcast" class="form-control text-light bg-primary mt-1"
+                   type="submit" value="Send" :disabled="broadcastBusy">
+        </form>
+
+        <div class="my-3 p-3 bg-white rounded shadow-sm">
+            <h6 class="border-bottom border-gray pb-2 mb-0">Recent updates</h6>
+            <template x-for="event in eventPreviews" :key="event.title">
+                <a class="media text-muted pt-3" :href="'#/events/' + event.doctype">
+                    <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                         focusable="false" role="img">
+                        <title x-text="event.title"></title>
+                        <rect width="100%" height="100%" :fill="event.color"></rect>
+                        <text x="50%" y="50%" dy=".3em" text-anchor="middle" fill="#fff">32x32</text>
+                    </svg>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <strong class="d-block text-gray-dark" x-text="'[' + event.title + ']'"></strong>
+                        <span x-text="event.preview"></span>
+                    </p>
+                </a>
+            </template>
+        </div>
+    </div>
+
+    <!-- Groups -->
+    <div class="my-3 p-3 bg-white rounded shadow-sm" x-show="view === 'groups'">
+        <h6 class="border-bottom border-gray pb-2 mb-0">Groups</h6>
+        <div id="groups">
+            <template x-for="(group, index) in groups" :key="index">
+                <div class="media pt-3" :title="group.id">
+                    <template x-if="group.picture">
+                        <img class="mini-logo mr-2 rounded" :src="group.picture">
+                    </template>
+                    <template x-if="!group.picture">
+                        <svg viewBox="0 0 16 16" class="mini-logo mr-2 rounded" fill="currentColor"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+                        </svg>
+                    </template>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <strong class="d-block text-gray-dark" x-text="group.name"></strong>
+                        <span x-text="group.systemMessage ? '' : groupStatus(group)"></span>
+                    </p>
+                    <p x-show="!group.systemMessage">
+                        <a href="#" class="text-danger" title="Leave" @click.prevent="leaveGroup(group.id)">
+                            <svg width="30px" height="30px" viewBox="0 0 16 16" fill="currentColor"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M1 15.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM11.5 2H11V1h.5A1.5 1.5 0 0 1 13 2.5V15h-1V2.5a.5.5 0 0 0-.5-.5z"/>
+                                <path fill-rule="evenodd" d="M10.828.122A.5.5 0 0 1 11 .5V15h-1V1.077l-6 .857V15H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117z"/>
+                                <path d="M8 9c0 .552.224 1 .5 1s.5-.448.5-1-.224-1-.5-1-.5.448-.5 1z"/>
+                            </svg>
+                        </a>
+                    </p>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Helpers -->
+    <div class="my-3 p-3 bg-white rounded shadow-sm" x-show="view === 'helpers'">
+        <h6 class="border-bottom border-gray pb-2 mb-0">Helper</h6>
+        <div id="helpers">
+            <template x-for="(helper, index) in helpers" :key="index">
+                <div class="media pt-3" :title="helper.id">
+                    <template x-if="helper.picture">
+                        <img class="mini-logo mr-2 rounded" :src="helper.picture">
+                    </template>
+                    <template x-if="!helper.picture">
+                        <svg viewBox="0 0 16 16" class="mini-logo mr-2 rounded" fill="currentColor"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        </svg>
+                    </template>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <strong class="d-block text-gray-dark" x-text="helper.name"></strong>
+                        <span x-text="helper.status"></span>
+                    </p>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="my-3 p-3 bg-white rounded shadow-sm" x-show="view === 'settings'">
+        <p class="my-3 p-3 bg-white" x-show="shutdownStatus">Disconnected.</p>
+        <div x-show="!shutdownStatus">
+            <h6 class="border-bottom border-gray pb-2 mb-0">Settings</h6>
+            <template x-for="setting in settings" :key="setting.title">
+                <a class="media text-muted pt-3" href="#" @click.prevent="setting.action()">
+                    <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32"
+                         xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
+                         focusable="false" role="img">
+                        <title x-text="setting.title"></title>
+                        <rect width="100%" height="100%" :fill="setting.color"></rect>
+                        <text x="50%" y="50%" dy=".3em" text-anchor="middle" fill="#fff">32x32</text>
+                    </svg>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <strong class="d-block text-gray-dark" x-text="setting.title"></strong>
+                        <span x-text="setting.preview"></span>
+                    </p>
+                </a>
+            </template>
+        </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="text-center my-3 card" x-show="view === 'profile'">
+        <div class="mx-auto w-100 p-5 card-header">
+            <template x-if="profile.picture">
+                <img width="128" height="128" class="mr-2 rounded" :src="profile.picture">
+            </template>
+            <template x-if="!profile.picture">
+                <svg width="128" height="128" viewBox="0 0 16 16" class="mr-2 rounded" fill="currentColor"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
+            </template>
+        </div>
+        <div x-show="!modify">
+            <div class="mx-auto mt-3 card-body">
+                <h6 class="text-dark lh-100" x-text="profile.name"></h6>
+                <p class="mt-3 mb-3 text-secondary" x-html="statusMessage"></p>
+                <button class="btn btn-primary" @click="switchModify">Modify</button>
+            </div>
+        </div>
+        <div x-show="modify">
+            <div class="mx-auto mt-3 card-body">
+                <input class="form-control text-dark lh-100" x-model="profile.name" maxlength="20">
+                <textarea class="form-control mt-3 mb-3 text-secondary" x-model="profile.status"
+                          maxlength="1000"></textarea>
+                <button class="btn btn-primary" @click="switchModify">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events -->
+    <div class="my-3 p-3 bg-white rounded shadow-sm" x-show="view === 'events'">
+        <h6 class="border-bottom border-gray pb-2 mb-0">Event: <span x-text="doctype"></span></h6>
+        <div id="events">
+            <template x-for="(event, index) in events" :key="index">
+                <div class="media pt-3">
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <strong class="d-block text-gray-dark" x-text="event.title"></strong>
+                        <span x-text="event.content"></span>
+                    </p>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- About -->
+    <div class="text-center my-3 p-3 bg-white rounded shadow-sm" x-show="view === 'about'">
+        <h2 class="border-bottom border-gray pb-2 mb-0">Star Yuuki BOT</h2>
+        <p class="mt-3">The perfectest LINE Group Protective BOT.</p>
+        <img class="rounded w-50 mt-5 mb-5" x-show="logo" :src="logo" alt="Logo">
+        <div class="mx-auto mt-3 w-75">
+            <p class="bg-dark text-light rounded p-3">
+                This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.<br>
+                If a copy of the MPL was not distributed with this file, You can obtain one at<br>
+                <a class="text-light" href="http://mozilla.org/MPL/2.0/" target="_blank" rel="noreferrer noopener">http://mozilla.org/MPL/2.0/</a>.
+            </p>
+            <p>
+                <a class="mr-1" title="Homepage" href="https://line.starinc.xyz/star-yuuki-bot/"
+                   target="_blank" rel="noreferrer noopener">
+                    <svg width="30px" height="30px" viewBox="0 0 16 16" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 10.995V14.5a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5V11c0-.25-.25-.5-.5-.5H7c-.25 0-.5.25-.5.495z"/>
+                        <path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                    </svg>
+                </a>
+                <a class="ml-1" title="Repository" href="https://github.com/star-inc/star_yuuki_bot"
+                   target="_blank" rel="noreferrer noopener">
+                    <svg width="30px" height="30px" viewBox="0 0 16 16" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0zm-.999-3.124a.5.5 0 0 1 .33.625l-4 13a.5.5 0 0 1-.955-.294l4-13a.5.5 0 0 1 .625-.33z"/>
+                    </svg>
+                </a>
+            </p>
+            <p>&copy; 2020 <a class="text-dark" href="https://starinc.xyz" target="_blank"
+                              rel="noreferrer noopener">Star Inc.</a></p>
+        </div>
+    </div>
+
+    <!-- Not Found -->
+    <div class="text-center my-3 p-3 bg-white rounded shadow-sm" x-show="view === 'notfound'">
+        <h2 class="pb-2 mb-0">404</h2>
+        <p class="mt-3">Not Found</p>
+    </div>
+
+</main>
+
+<div class="text-center m-5">
+    <a title="About SYB" @click.prevent="toggleAbout" href="#">
+        <svg width="25px" height="25px" viewBox="0 0 16 16" fill="currentColor"
+             xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+            <circle cx="8" cy="4.5" r="1"/>
+        </svg>
+    </a>
+</div>
+
+<!-- Optional JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
