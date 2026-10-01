@@ -1,0 +1,31 @@
+[project]
+name = "star_yuuki_bot"
+version = "8.0"
+description = "The perfectest LINE Group Protective BOT"
+license = { text = "MPL-2.0" }
+authors = [
+    { name = "Neptune Studio" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "yuuki-core>=6.5,<7",
+]
+
+[project.urls]
+Homepage = "https://line.starinc.xyz/star-yuuki-bot/"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "src",
+    "src.controller",
+    "src.i18n",
+    "src.kernel",
+    "src.model",
+    "src.model.group",
+    "src.webadmin",
+]
